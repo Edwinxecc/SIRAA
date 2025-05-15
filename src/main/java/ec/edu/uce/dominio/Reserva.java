@@ -4,12 +4,16 @@ import java.util.Date;
 import java.util.Random;
 
 public class Reserva {
-    private String idReserva;
+    private int idReserva;
     private Date fechaReserva;
 
-    public Reserva(String id){
+    public Reserva(int id){
         this.idReserva = id;
         this.fechaReserva = new Date();
+    }
+
+    public Reserva(){
+
     }
 
     public Date getFechaReserva() {
@@ -26,4 +30,10 @@ public class Reserva {
         int numRandom = num.nextInt(999);
         return  datosUsuario + numRandom;
     }
+
+    public void crearReserva( int id){
+        this.idReserva = id;
+    }
+
+
 }

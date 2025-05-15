@@ -1,25 +1,23 @@
 package ec.edu.uce.consola;
 
-import ec.edu.uce.dominio.Usuario;
-
 import java.util.Scanner;
 
 public class Menu {
-    public void MenuDeIncio(){
+
+    public void MenuDeIncio() {
         String usr, password;
         System.out.println("Bienvenidos al Sistema SIRAA");
         System.out.println("Ingresa tus credenciales");
         Scanner entrada = new Scanner(System.in);
-        System.out.println("Ingresa tu correo [@uce.edu.ec]: ");
+        System.out.print("Ingresa tu correo [@uce.edu.ec]: ");
         usr = entrada.nextLine();
-        System.out.println("Ingresa tu contraseña: ");
+        System.out.print("Ingresa tu contraseña: ");
         password = entrada.nextLine();
-        if (validarCorreo(usr)&& password.equalsIgnoreCase("1234")){
-            //acceso de admin
-
+        if (validarCorreo(usr) && password.equalsIgnoreCase("1234")) {
+            MenuElegirOpcion();
+        } else {
+            System.out.println("Credenciales incorrectas.");
         }
-
-
     }
 
     public boolean validarCorreo(String correo) {
@@ -31,37 +29,43 @@ public class Menu {
         return false;
     }
 
-    public void MenuElegirOpcion(){
+    public void MenuElegirOpcion() {
         Scanner entrada = new Scanner(System.in);
         int opcion;
-        System.out.println("\n[1] Gestionar Usuario");
-        System.out.println("[2] Gestionar Reservar");
-        System.out.println("[3] Configurar Parametros y Politicas (A)");
-        System.out.println("[4] Administrar Equipos y Recursos (A)");
-        System.out.println("[5] Recuperar Credenciales (A)");
-        System.out.println("[0] Salir");
-        System.out.println(">:  ");
-        opcion = entrada.nextInt();
         SubMenu subMenuObj = new SubMenu();
-        switch (opcion){
-            case  1:
-                subMenuObj.MenuGestionarUsuario();
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case  5:
-                break;
-            case 0:
-                System.out.println("Saliendo...");
-                break;
-            default:
-                System.out.println("Ingrese una opcion valida");
 
+        while (true) {
+            System.out.println("\n[1] Gestionar Usuario");
+            System.out.println("[2] Gestionar Reservar");
+            System.out.println("[3] Configurar Parametros y Politicas (A)");
+            System.out.println("[4] Administrar Equipos y Recursos (A)");
+            System.out.println("[5] Recuperar Credenciales (A)");
+            System.out.println("[0] Salir");
+            System.out.print(">: ");
+            opcion = entrada.nextInt();
+
+            switch (opcion) {
+                case 1:
+                    subMenuObj.MenuGestionarUsuario();
+                    break;
+                case 2:
+                    subMenuObj.MenuGestionarReserva();
+                    break;
+                case 3:
+                    subMenuObj.menuConfigurarParametros();
+                    break;
+                case 4:
+                    subMenuObj.menuAdministrarEquipos();
+                    break;
+                case 5:
+                    subMenuObj.menuRecuperarCredenciales();
+                    break;
+                case 0:
+                    System.out.println("Saliendo...");
+                    return;
+                default:
+                    System.out.println("Ingrese una opción válida");
+            }
         }
     }
-
 }

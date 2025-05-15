@@ -68,8 +68,6 @@ public class Usuario {
         this.apellido = nuevoUsuario.apellido;
         this.correo = nuevoUsuario.correo;
 
-        Usuario [] usuariosNuevos = new Usuario[1];
-
     }
 
 

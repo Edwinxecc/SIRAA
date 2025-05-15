@@ -9,16 +9,20 @@ public class Menu {
         System.out.println("\n=============================");
         System.out.println("Bienvenidos al Sistema SIRAA");
         System.out.println("=============================\n");
-        System.out.println("Ingresa tus credenciales");
-        Scanner entrada = new Scanner(System.in);
-        System.out.print("Ingresa tu correo [@uce.edu.ec]: ");
-        usr = entrada.nextLine();
-        System.out.print("Ingresa tu contraseña: ");
-        password = entrada.nextLine();
-        if (validarCorreo(usr) && password.equalsIgnoreCase("1234")) {
-            MenuElegirOpcion();
-        } else {
-            System.out.println("Credenciales incorrectas.");
+        while (true) {
+            System.out.println("Ingresa tus credenciales");
+            Scanner entrada = new Scanner(System.in);
+            System.out.print("Ingresa tu correo [@uce.edu.ec]: ");
+            usr = entrada.nextLine();
+            System.out.print("Ingresa tu contraseña: ");
+            password = entrada.nextLine();
+
+            if (validarCorreo(usr) && password.equalsIgnoreCase("1234")) {
+                MenuElegirOpcion();
+                break;
+            } else {
+                System.out.println("Credenciales incorrectas.\n");
+            }
         }
     }
 

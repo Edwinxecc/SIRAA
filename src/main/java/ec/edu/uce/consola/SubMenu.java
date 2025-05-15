@@ -1,5 +1,6 @@
 package ec.edu.uce.consola;
 
+import ec.edu.uce.Util.Validaciones;
 import ec.edu.uce.dominio.Reserva;
 import ec.edu.uce.dominio.Usuario;
 
@@ -23,11 +24,17 @@ public class SubMenu {
                 String nombre, apellido, correo;
                 System.out.println("\n[1] Crear Usuario");
                 usuarioObj2.setUsuarioId(usuarioObj.generarId());
+
+                Validaciones validacion = new Validaciones();
+
                 System.out.println("Ingresa el nombre del usuario nuevo: ");
                 nombre = entrada.next();
+                nombre = validacion.ValidacionTexto(nombre, "nombre");
                 usuarioObj2.setNombre(nombre);
+
                 System.out.println("Ingresa el apellido del usuario nuevo: ");
                 apellido = entrada.next();
+                apellido = validacion.ValidacionTexto(apellido, "apellido");
                 usuarioObj2.setApellido(apellido);
                 System.out.println("Ingresa el correo del usuario nuevo: ");
                 correo = entrada.next();

@@ -19,6 +19,10 @@ public class Usuario {
         this.correo = correo;
     }
 
+    public Usuario (Usuario []usuarios){
+        usuarios = new Usuario[usuarios.length];
+    }
+
     public int getUsuarioId() {
         return usuarioId;
     }
@@ -47,18 +51,34 @@ public class Usuario {
         return correo;
     }
 
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
     public int generarId(){
         Random num = new Random();
         int numRandom = num.nextInt(999);
         return numRandom;
     }
 
-    public void crearUsuario(Usuario nuevoUsuario){
+    public void crearUsuario(Usuario nuevoUsuario) {
         nuevoUsuario = new Usuario();
         this.usuarioId = nuevoUsuario.generarId();
         this.nombre = nuevoUsuario.nombre;
         this.apellido = nuevoUsuario.apellido;
         this.correo = nuevoUsuario.correo;
+
+        Usuario [] usuariosNuevos = new Usuario[1];
+
+    }
+
+
+
+    public String toString() {
+        return "ID:"+this.correo+"\n" +
+                "Nombre: " + this.nombre + "\n" +
+                "Apellid: " + this.apellido + "\n" +
+                "correo: " + this.apellido;
     }
 
 }

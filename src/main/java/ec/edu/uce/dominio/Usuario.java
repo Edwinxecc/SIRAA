@@ -76,7 +76,7 @@ public class Usuario {
         return "ID:"+this.correo+"\n" +
                 "Nombre: " + this.nombre + "\n" +
                 "Apellid: " + this.apellido + "\n" +
-                "correo: " + this.apellido;
+                "correo: " + this.correo;
     }
 
 }

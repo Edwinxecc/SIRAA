@@ -6,7 +6,9 @@ public class Menu {
 
     public void MenuDeIncio() {
         String usr, password;
+        System.out.println("\n=============================");
         System.out.println("Bienvenidos al Sistema SIRAA");
+        System.out.println("=============================\n");
         System.out.println("Ingresa tus credenciales");
         Scanner entrada = new Scanner(System.in);
         System.out.print("Ingresa tu correo [@uce.edu.ec]: ");

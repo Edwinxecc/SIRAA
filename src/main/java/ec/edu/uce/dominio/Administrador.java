@@ -45,7 +45,4 @@ public class Administrador {
         this.correo = correo;
     }
 
-    public void recuperarCredenciales(Usuario recuperacionUsuario){
-        System.out.println("por desarrollar");
-    }
 }

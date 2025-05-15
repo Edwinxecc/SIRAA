@@ -27,23 +27,26 @@ public class Auditorio {
     public String getUbicacion() { return ubicacion; }
     public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
 
-    // Métodos CRUD simulados
-    public void crear() {
-        System.out.println("Auditorio creado: " + nombre);
+
+    public String crearAuditorio() {
+        return "Auditorio creado: " + nombre;
+        //System.out.println("Auditorio creado: " + nombre);
     }
 
-    public void leer() {
-        System.out.println("Auditorio: " + nombre + " - Capacidad: " + capacidad + " - Ubicación: " + ubicacion);
+    public String consultarAuditorio() {
+        //System.out.println("Auditorio: " + nombre + " - Capacidad: " + capacidad + " - Ubicación: " + ubicacion);
+        return "Auditorio: " + nombre + " - Capacidad: " + capacidad + " - Ubicación: " + ubicacion;
     }
 
-    public void actualizar(String nuevoNombre, int nuevaCapacidad, String nuevaUbicacion) {
+    public void actualizarAuditorio(String nuevoNombre, int nuevaCapacidad, String nuevaUbicacion) {
         this.nombre = nuevoNombre;
         this.capacidad = nuevaCapacidad;
         this.ubicacion = nuevaUbicacion;
         System.out.println("Auditorio actualizado.");
     }
 
-    public void eliminar() {
-        System.out.println("Auditorio eliminado: " + nombre);
+    public String eliminarAuditorio() {
+        //System.out.println("Auditorio eliminado: " + nombre);
+        return "Auditorio eliminado: " + nombre;
     }
 }

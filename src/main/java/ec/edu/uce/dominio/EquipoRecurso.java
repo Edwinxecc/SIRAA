@@ -23,26 +23,31 @@ public class EquipoRecurso {
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
 
-    public boolean isDisponible() { return disponible; }
-    public void setDisponible(boolean disponible) { this.disponible = disponible; }
+    public boolean getDisponible() {
+        return disponible;
+    }
+    public boolean setDisponible() {
+        if (disponible){
+            return false;
+        }else return true;
+    }
 
-    // Métodos CRUD simulados
-    public void crear() {
+    public void crearEquipo() {
         System.out.println("Equipo creado: " + nombre);
     }
 
-    public void leer() {
+    public void consultarEquipo() {
         System.out.println("Equipo: " + nombre + " - Tipo: " + tipo + " - Disponible: " + disponible);
     }
 
-    public void actualizar(String nuevoNombre, String nuevoTipo, boolean disponibilidad) {
+    public void actualizarEquipo(String nuevoNombre, String nuevoTipo, boolean disponibilidad) {
         this.nombre = nuevoNombre;
         this.tipo = nuevoTipo;
         this.disponible = disponibilidad;
         System.out.println("Equipo actualizado.");
     }
 
-    public void eliminar() {
+    public void eliminarEquipo() {
         System.out.println("Equipo eliminado: " + nombre);
     }
 }

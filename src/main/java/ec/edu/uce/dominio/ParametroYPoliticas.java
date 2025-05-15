@@ -23,21 +23,21 @@ public class ParametroYPoliticas {
     public void setValor(String valor) { this.valor = valor; }
 
     // Métodos CRUD simulados
-    public void crear() {
+    public void crearParametro() {
         System.out.println("Parámetro creado: " + politica);
     }
 
-    public void leer() {
+    public void consultarPolitica() {
         System.out.println("Política: " + politica + " - Valor: " + valor);
     }
 
-    public void actualizar(String nuevaPolitica, String nuevoValor) {
+    public void actualizarPolitica(String nuevaPolitica, String nuevoValor) {
         this.politica = nuevaPolitica;
         this.valor = nuevoValor;
         System.out.println("Parámetro actualizado.");
     }
 
-    public void eliminar() {
+    public void eliminarParametro() {
         System.out.println("Parámetro eliminado: " + politica);
     }
 }

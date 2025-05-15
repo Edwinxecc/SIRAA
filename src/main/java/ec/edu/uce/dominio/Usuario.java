@@ -1,10 +1,16 @@
 package ec.edu.uce.dominio;
 
+import java.util.Random;
+
 public class Usuario {
     private int usuarioId;
     private String nombre;
     private String apellido;
     private String correo;
+
+    public Usuario(){
+
+    }
 
     public Usuario(int id, String nombre, String apellido, String correo){
         this.usuarioId=id;
@@ -40,4 +46,19 @@ public class Usuario {
     public String getCorreo() {
         return correo;
     }
+
+    public int generarId(){
+        Random num = new Random();
+        int numRandom = num.nextInt(999);
+        return numRandom;
+    }
+
+    public void crearUsuario(Usuario nuevoUsuario){
+        nuevoUsuario = new Usuario();
+        this.usuarioId = nuevoUsuario.generarId();
+        this.nombre = nuevoUsuario.nombre;
+        this.apellido = nuevoUsuario.apellido;
+        this.correo = nuevoUsuario.correo;
+    }
+
 }

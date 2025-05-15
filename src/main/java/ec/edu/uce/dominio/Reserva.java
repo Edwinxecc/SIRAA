@@ -24,7 +24,6 @@ public class Reserva {
         String datosUsuario = usuario.getNombre().substring(3) + usuario.getApellido().substring(3);
         Random num = new Random();
         int numRandom = num.nextInt(999);
-
         return  datosUsuario + numRandom;
     }
 }

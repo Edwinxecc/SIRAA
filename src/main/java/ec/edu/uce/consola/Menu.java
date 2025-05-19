@@ -43,8 +43,8 @@ public class Menu {
         while (true) {
             System.out.println("\n[1] Gestionar Usuario");
             System.out.println("[2] Gestionar Reservar");
-            System.out.println("[3] Configurar Parametros y Politicas (A)");
-            System.out.println("[4] Administrar Equipos y Recursos (A)");
+            System.out.println("[3] Gestionar Facultades (A)");
+            System.out.println("[4] Gestionar Equipos (A)");
             System.out.println("[5] Recuperar Credenciales (A)");
             System.out.println("[0] Salir");
             System.out.print(">: ");
@@ -58,7 +58,7 @@ public class Menu {
                     subMenuObj.MenuGestionarReserva();
                     break;
                 case 3:
-                    subMenuObj.menuConfigurarParametros();
+                    subMenuObj.menuGestionarFacultades();
                     break;
                 case 4:
                     subMenuObj.menuAdministrarEquipos();

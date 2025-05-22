@@ -3,7 +3,7 @@ package ec.edu.uce.dominio;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GestionarEquipos {
+public class Equipo {
 
     private int id;
     private String nombre;
@@ -11,10 +11,10 @@ public class GestionarEquipos {
     private boolean disponible;
 
     // Lista estática simulando base de datos en memoria
-    private static List<GestionarEquipos> listaEquipos = new ArrayList<>();
+    private static List<Equipo> listaEquipos = new ArrayList<>();
 
     // Constructor
-    public GestionarEquipos(int id, String nombre, String tipo, boolean disponible) {
+    public Equipo(int id, String nombre, String tipo, boolean disponible) {
         this.id = id;
         this.nombre = nombre;
         this.tipo = tipo;
@@ -39,17 +39,16 @@ public class GestionarEquipos {
         this.disponible = disponible;
     }
 
-    // ====================== CRUD ======================
 
     // CREATE
-    public static void crearEquipo(GestionarEquipos equipo) {
+    public static void crearEquipo(Equipo equipo) {
         listaEquipos.add(equipo);
         System.out.println("[✓] Equipo creado: " + equipo.getNombre());
     }
 
     // READ (individual)
-    public static GestionarEquipos consultarEquipo(int id) {
-        for (GestionarEquipos e : listaEquipos) {
+    public static Equipo consultarEquipo(int id) {
+        for (Equipo e : listaEquipos) {
             if (e.getId() == id) {
                 return e;
             }
@@ -58,13 +57,13 @@ public class GestionarEquipos {
     }
 
     // READ (todos)
-    public static List<GestionarEquipos> listarEquipos() {
+    public static List<Equipo> listarEquipos() {
         return new ArrayList<>(listaEquipos); // para evitar modificar la lista original
     }
 
     // UPDATE
     public static boolean actualizarEquipo(int id, String nuevoNombre, String nuevoTipo, boolean nuevaDisponibilidad) {
-        GestionarEquipos equipo = consultarEquipo(id);
+        Equipo equipo = consultarEquipo(id);
         if (equipo != null) {
             equipo.setNombre(nuevoNombre);
             equipo.setTipo(nuevoTipo);
@@ -77,7 +76,7 @@ public class GestionarEquipos {
 
     // DELETE
     public static boolean eliminarEquipo(int id) {
-        GestionarEquipos equipo = consultarEquipo(id);
+        Equipo equipo = consultarEquipo(id);
         if (equipo != null) {
             listaEquipos.remove(equipo);
             System.out.println("[✓] Equipo eliminado: " + equipo.getNombre());

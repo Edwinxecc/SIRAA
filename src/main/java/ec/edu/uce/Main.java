@@ -4,8 +4,7 @@ import ec.edu.uce.consola.Menu;
 
 public class Main {
     public static void main(String[] args) {
-        Menu obj = new Menu();
-        obj.MenuDeIncio();
-
+        Menu menu = new Menu();
+        menu.menuDeInicio();
     }
 }

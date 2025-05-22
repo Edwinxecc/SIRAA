@@ -4,21 +4,21 @@ import java.util.Scanner;
 
 public class Menu {
 
-    public void MenuDeIncio() {
+    public void menuDeInicio() {
         String usr, password;
         System.out.println("\n=============================");
         System.out.println("Bienvenidos al Sistema SIRAA");
         System.out.println("=============================\n");
+        Scanner entrada = new Scanner(System.in);
         while (true) {
             System.out.println("Ingresa tus credenciales");
-            Scanner entrada = new Scanner(System.in);
             System.out.print("Ingresa tu correo [@uce.edu.ec]: ");
             usr = entrada.nextLine();
             System.out.print("Ingresa tu contraseña: ");
             password = entrada.nextLine();
 
-            if (validarCorreo(usr) && password.equalsIgnoreCase("1234")) {
-                MenuElegirOpcion();
+            if (validarCorreo(usr) && password.equals("1234")) {
+                menuElegirOpcion();
                 break;
             } else {
                 System.out.println("Credenciales incorrectas.\n");
@@ -35,7 +35,7 @@ public class Menu {
         return false;
     }
 
-    public void MenuElegirOpcion() {
+    public void menuElegirOpcion() {
         Scanner entrada = new Scanner(System.in);
         int opcion;
         SubMenu subMenuObj = new SubMenu();
@@ -48,7 +48,13 @@ public class Menu {
             System.out.println("[5] Recuperar Credenciales (A)");
             System.out.println("[0] Salir");
             System.out.print(">: ");
+            if (!entrada.hasNextInt()) {
+                System.out.println("Por favor, ingresa un número válido.");
+                entrada.next();
+                continue;
+            }
             opcion = entrada.nextInt();
+            entrada.nextLine(); // limpiar buffer
 
             switch (opcion) {
                 case 1:

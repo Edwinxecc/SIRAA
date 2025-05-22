@@ -3,64 +3,68 @@ package ec.edu.uce.consola;
 import ec.edu.uce.Util.Validaciones;
 import ec.edu.uce.dominio.Reserva;
 import ec.edu.uce.dominio.Usuario;
-import ec.edu.uce.dominio.GestionarFacultades;
-import ec.edu.uce.dominio.GestionarEquipos;
+import ec.edu.uce.dominio.Facultad;
+import ec.edu.uce.dominio.Equipo;
 import java.util.List;
-
 import java.util.Scanner;
 
 public class SubMenu {
 
     public void MenuGestionarUsuario() {
-        Usuario usuarioObj2 = new Usuario();
         Usuario usuarioObj = new Usuario();
         Validaciones validacion = new Validaciones();
         Scanner entrada = new Scanner(System.in);
         int opcion;
+
         do {
-        System.out.println("\n--- MENÚ GESTIONAR USUARIO ---");
-        System.out.println("[1] Crear Usuario");
-        System.out.println("[2] Consultar Usuario");
-        System.out.println("[3] Editar Usuario");
-        System.out.println("[4] Eliminar Usuario");
-        System.out.println("[0] Salir");
-        System.out.print(">: ");
-        opcion = entrada.nextInt();
-        entrada.nextLine();
+            System.out.println("\n--- MENÚ GESTIONAR USUARIO ---");
+            System.out.println("[1] Crear Usuario");
+            System.out.println("[2] Consultar Usuario");
+            System.out.println("[3] Editar Usuario");
+            System.out.println("[4] Eliminar Usuario");
+            System.out.println("[0] Salir");
+            System.out.print(">: ");
+
+            while (!entrada.hasNextInt()) {
+                System.out.println("[!] Entrada inválida. Ingrese un número.");
+                entrada.next();
+                System.out.print(">: ");
+            }
+            opcion = entrada.nextInt();
+            entrada.nextLine();
 
             switch (opcion) {
                 case 1:
                     System.out.println("\n[1] Crear Usuario");
-                    usuarioObj2.setUsuarioId(usuarioObj.generarId());
+                    usuarioObj.setUsuarioId(usuarioObj.generarId());
 
                     System.out.print("Ingresa el nombre del usuario: ");
                     String nombre = entrada.nextLine();
                     nombre = validacion.ValidacionTexto(nombre, "nombre");
-                    usuarioObj2.setNombre(nombre);
+                    usuarioObj.setNombre(nombre);
 
                     System.out.print("Ingresa el apellido del usuario: ");
                     String apellido = entrada.nextLine();
                     apellido = validacion.ValidacionTexto(apellido, "apellido");
-                    usuarioObj2.setApellido(apellido);
+                    usuarioObj.setApellido(apellido);
 
                     System.out.print("Ingresa el correo del usuario: ");
                     String correo = entrada.nextLine();
-                    usuarioObj2.setCorreo(correo);
+                    usuarioObj.setCorreo(correo);
 
                     System.out.println("\n[*] Usuario creado con éxito:");
-                    imprimirUsuario(usuarioObj2);
+                    imprimirUsuario(usuarioObj);
                     break;
 
                 case 2:
                     System.out.println("\n[2] Consultar Usuario");
                     System.out.print("Ingresa el ID del usuario para consultar: ");
-                    int idConsulta = entrada.nextInt();
-                    entrada.nextLine();
+                    int idConsulta = leerEnteroPositivo(entrada);
 
-                    if (usuarioObj2.getNombre() == null) {
+                    if (usuarioObj.getNombre() == null) {
                         System.out.println("[!] No hay usuario registrado.");
-                    } else if (usuarioObj2.getUsuarioId() == idConsulta) {
-                        imprimirUsuario(usuarioObj2);
+                    } else if (usuarioObj.getUsuarioId() == idConsulta) {
+                        imprimirUsuario(usuarioObj);
                     } else {
                         System.out.println("[!] Usuario no encontrado con ese ID.");
                     }
@@ -69,28 +73,27 @@ public class SubMenu {
                 case 3:
                     System.out.println("\n[3] Editar Usuario");
                     System.out.print("Ingresa el ID del usuario a editar: ");
-                    int idEditar = entrada.nextInt();
-                    entrada.nextLine();
+                    int idEditar = leerEnteroPositivo(entrada);
 
-                    if (usuarioObj2.getNombre() == null) {
+                    if (usuarioObj.getNombre() == null) {
                         System.out.println("[!] No hay usuario registrado.");
-                    } else if (usuarioObj2.getUsuarioId() == idEditar) {
+                    } else if (usuarioObj.getUsuarioId() == idEditar) {
                         System.out.print("Nuevo nombre: ");
                         String nuevoNombre = entrada.nextLine();
                         nuevoNombre = validacion.ValidacionTexto(nuevoNombre, "nombre");
-                        usuarioObj2.setNombre(nuevoNombre);
+                        usuarioObj.setNombre(nuevoNombre);
 
                         System.out.print("Nuevo apellido: ");
                         String nuevoApellido = entrada.nextLine();
                         nuevoApellido = validacion.ValidacionTexto(nuevoApellido, "apellido");
-                        usuarioObj2.setApellido(nuevoApellido);
+                        usuarioObj.setApellido(nuevoApellido);
 
                         System.out.print("Nuevo correo: ");
                         String nuevoCorreo = entrada.nextLine();
-                        usuarioObj2.setCorreo(nuevoCorreo);
+                        usuarioObj.setCorreo(nuevoCorreo);
 
                         System.out.println("[*] Usuario editado con éxito:");
-                        imprimirUsuario(usuarioObj2);
+                        imprimirUsuario(usuarioObj);
                     } else {
                         System.out.println("[!] Usuario no encontrado con ese ID.");
                     }
@@ -99,26 +102,26 @@ public class SubMenu {
                 case 4:
                     System.out.println("\n[4] Eliminar Usuario");
                     System.out.print("Ingresa el ID del usuario a eliminar: ");
-                    int idEliminar = entrada.nextInt();
-                    entrada.nextLine();
+                    int idEliminar = leerEnteroPositivo(entrada);
 
-                    if (usuarioObj2.getNombre() == null) {
+                    if (usuarioObj.getNombre() == null) {
                         System.out.println("[!] No hay usuario registrado.");
-                    } else if (usuarioObj2.getUsuarioId() == idEliminar) {
-                        usuarioObj2 = new Usuario(); // "Eliminar" reiniciando el objeto
+                    } else if (usuarioObj.getUsuarioId() == idEliminar) {
+                        usuarioObj = new Usuario(); // Reiniciar objeto para eliminar
                         System.out.println("[*] Usuario eliminado correctamente.");
                     } else {
                         System.out.println("[!] Usuario no encontrado con ese ID.");
                     }
                     break;
+
                 case 0:
                     System.out.println("[!] Saliendo....");
                     break;
+
                 default:
                     System.out.println("[!] Opción no válida.");
             }
-        }while (opcion != 0);
-
+        } while (opcion != 0);
     }
 
     private void imprimirUsuario(Usuario u) {
@@ -145,12 +148,12 @@ public class SubMenu {
 
             while (!entrada.hasNextInt()) {
                 System.out.println("[!] Entrada inválida. Ingrese un número.");
-                entrada.next(); // limpiar
+                entrada.next();
                 System.out.print(">: ");
             }
 
             opcion = entrada.nextInt();
-            entrada.nextLine(); // limpiar buffer
+            entrada.nextLine();
 
             switch (opcion) {
                 case 1 -> {
@@ -200,7 +203,6 @@ public class SubMenu {
         } while (opcion != 0);
     }
 
-    // Método auxiliar para leer un entero positivo con validación
     private int leerEnteroPositivo(Scanner entrada) {
         int numero;
         while (true) {
@@ -209,7 +211,7 @@ public class SubMenu {
                 entrada.next();
             }
             numero = entrada.nextInt();
-            entrada.nextLine(); // limpiar buffer
+            entrada.nextLine();
 
             if (numero <= 0) {
                 System.out.print("[!] El número debe ser positivo. Intente de nuevo: ");
@@ -220,11 +222,11 @@ public class SubMenu {
         return numero;
     }
 
-
     public void menuGestionarFacultades() {
         Scanner scanner = new Scanner(System.in);
         int opcion;
-        GestionarFacultades op = new GestionarFacultades();
+        Facultad op = new Facultad();
+
         do {
             System.out.println("\n=== MENÚ GESTIONAR FACULTADES ===");
             System.out.println("[1] Crear Facultad");
@@ -233,18 +235,23 @@ public class SubMenu {
             System.out.println("[4] Eliminar Facultad");
             System.out.println("[0] Salir");
             System.out.print("Selecciona una opción: ");
+
+            while (!scanner.hasNextInt()) {
+                System.out.println("[!] Entrada inválida. Ingrese un número.");
+                scanner.next();
+                System.out.print("Selecciona una opción: ");
+            }
             opcion = scanner.nextInt();
-            scanner.nextLine(); // limpiar el buffer
+            scanner.nextLine();
 
             switch (opcion) {
                 case 1:
                     System.out.print("Nombre de la facultad: ");
                     String nombre = scanner.nextLine();
                     System.out.print("Cantidad de auditorios: ");
-                    int cantidad = scanner.nextInt();
-                    scanner.nextLine();
+                    int cantidad = leerEnteroPositivo(scanner);
 
-                    GestionarFacultades nueva = new GestionarFacultades(nombre, cantidad);
+                    Facultad nueva = new Facultad(nombre, cantidad);
                     if (op.crearFacultad(nueva)) {
                         System.out.println("Facultad creada correctamente.");
                     } else {
@@ -262,8 +269,7 @@ public class SubMenu {
                     System.out.print("Nuevo nombre: ");
                     String nuevoNombre = scanner.nextLine();
                     System.out.print("Nueva cantidad de auditorios: ");
-                    int nuevosAuditorios = scanner.nextInt();
-                    scanner.nextLine();
+                    int nuevosAuditorios = leerEnteroPositivo(scanner);
 
                     if (op.editarFacultad(nombreActual, nuevoNombre, nuevosAuditorios)) {
                         System.out.println("Facultad editada correctamente.");
@@ -283,14 +289,13 @@ public class SubMenu {
                     }
                     break;
 
-                case 5:
+                case 0:
                     System.out.println("Saliendo del menú...");
                     break;
 
                 default:
                     System.out.println("Opción no válida. Intenta nuevamente.");
             }
-
         } while (opcion != 0);
     }
 
@@ -313,12 +318,12 @@ public class SubMenu {
             }
 
             opcion = entrada.nextInt();
-            entrada.nextLine(); // limpiar buffer
+            entrada.nextLine();
 
             switch (opcion) {
                 case 1 -> {
                     System.out.print("Ingrese ID del equipo: ");
-                    int id = leerEnteroPositivo2(entrada);
+                    int id = leerEnteroPositivo(entrada);
 
                     System.out.print("Ingrese nombre del equipo: ");
                     String nombre = entrada.nextLine();
@@ -329,24 +334,24 @@ public class SubMenu {
                     System.out.print("¿Está disponible? (true/false): ");
                     boolean disponible = leerBooleano(entrada);
 
-                    GestionarEquipos equipo = new GestionarEquipos(id, nombre, tipo, disponible);
-                    GestionarEquipos.crearEquipo(equipo);
+                    Equipo equipo = new Equipo(id, nombre, tipo, disponible);
+                    Equipo.crearEquipo(equipo);
                 }
                 case 2 -> {
                     System.out.println("\n--- LISTA DE EQUIPOS ---");
-                    List<GestionarEquipos> equipos = GestionarEquipos.listarEquipos();
+                    List<Equipo> equipos = Equipo.listarEquipos();
                     if (equipos.isEmpty()) {
                         System.out.println("[!] No hay equipos registrados.");
                     } else {
-                        for (GestionarEquipos eq : equipos) {
+                        for (Equipo eq : equipos) {
                             eq.mostrarInfo();
                         }
                     }
                 }
                 case 3 -> {
                     System.out.print("Ingrese el ID del equipo a eliminar: ");
-                    int id = leerEnteroPositivo2(entrada);
-                    boolean eliminado = GestionarEquipos.eliminarEquipo(id);
+                    int id = leerEnteroPositivo(entrada);
+                    boolean eliminado = Equipo.eliminarEquipo(id);
                     if (!eliminado) {
                         System.out.println("[!] No se encontró el equipo con ID " + id);
                     }
@@ -358,23 +363,6 @@ public class SubMenu {
         } while (opcion != 0);
     }
 
-    private int leerEnteroPositivo2(Scanner entrada) {
-        int numero;
-        while (true) {
-            while (!entrada.hasNextInt()) {
-                System.out.print("[!] Entrada inválida. Ingrese un número: ");
-                entrada.next();
-            }
-            numero = entrada.nextInt();
-            entrada.nextLine(); // limpiar buffer
-            if (numero <= 0) {
-                System.out.print("[!] Debe ser un número positivo. Intente de nuevo: ");
-            } else {
-                return numero;
-            }
-        }
-    }
-
     private boolean leerBooleano(Scanner entrada) {
         while (true) {
             String valor = entrada.nextLine().trim().toLowerCase();
@@ -383,8 +371,6 @@ public class SubMenu {
             System.out.print("[!] Ingrese 'true' o 'false' (o 'sí' / 'no'): ");
         }
     }
-
-
 
     public void menuRecuperarCredenciales() {
         Scanner entrada = new Scanner(System.in);

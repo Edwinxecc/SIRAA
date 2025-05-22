@@ -1,3 +1,7 @@
+/**
+ * Clase que maneja los submenús del sistema SIRAA.
+ * Implementa las operaciones específicas para gestionar usuarios, reservas, facultades y equipos.
+ */
 package ec.edu.uce.consola;
 
 import ec.edu.uce.Util.Validaciones;
@@ -14,11 +18,19 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class SubMenu {
-    private static final List<Usuario> usuarios = new ArrayList<>();
+    private Facultad facultad;
+    /** Lista de usuarios del sistema */
+    //private static final List<Usuario> usuarios = new ArrayList<>();
+    /** Utilidad para validaciones */
     private final Validaciones validacion = new Validaciones();
+    /** Formato para fechas y horas */
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public void menuGestionarUsuario() {
+    /**
+     * Muestra el menú de gestión de usuarios y maneja sus operaciones.
+     */
+    public void menuGestionarUsuario(Facultad f) {
+        facultad=f;
         Scanner entrada = new Scanner(System.in);
         int opcion;
 
@@ -50,6 +62,10 @@ public class SubMenu {
         } while (opcion != 0);
     }
 
+    /**
+     * Crea un nuevo usuario en el sistema.
+     * @param entrada Scanner para leer datos del usuario
+     */
     private void crearUsuario(Scanner entrada) {
         System.out.println("\n[1] Crear Usuario");
         
@@ -74,12 +90,15 @@ public class SubMenu {
         nuevoUsuario.setNombre(nombre);
         nuevoUsuario.setApellido(apellido);
         nuevoUsuario.setCorreo(correo);
-        
-        usuarios.add(nuevoUsuario);
+        facultad.crearUsuario(nombre, apellido, correo); //
         System.out.println("\n[✓] Usuario creado con éxito:");
         imprimirUsuario(nuevoUsuario);
     }
 
+    /**
+     * Consulta un usuario por su ID.
+     * @param entrada Scanner para leer el ID
+     */
     private void consultarUsuario(Scanner entrada) {
         System.out.println("\n[2] Consultar Usuario");
         if (usuarios.isEmpty()) {
@@ -98,6 +117,10 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Edita un usuario existente.
+     * @param entrada Scanner para leer los nuevos datos
+     */
     private void editarUsuario(Scanner entrada) {
         System.out.println("\n[3] Editar Usuario");
         if (usuarios.isEmpty()) {
@@ -136,6 +159,10 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Elimina un usuario del sistema.
+     * @param entrada Scanner para leer el ID
+     */
     private void eliminarUsuario(Scanner entrada) {
         System.out.println("\n[4] Eliminar Usuario");
         if (usuarios.isEmpty()) {
@@ -155,6 +182,11 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Busca un usuario por su ID.
+     * @param id ID del usuario a buscar
+     * @return Usuario encontrado o null si no existe
+     */
     private Usuario buscarUsuarioPorId(int id) {
         return usuarios.stream()
                 .filter(u -> u.getUsuarioId() == id)
@@ -162,6 +194,10 @@ public class SubMenu {
                 .orElse(null);
     }
 
+    /**
+     * Imprime los datos de un usuario.
+     * @param u Usuario a imprimir
+     */
     private void imprimirUsuario(Usuario u) {
         System.out.println("-------------------------------------");
         System.out.println("| ID: " + u.getUsuarioId());
@@ -171,6 +207,9 @@ public class SubMenu {
         System.out.println("-------------------------------------");
     }
 
+    /**
+     * Muestra el menú de gestión de reservas y maneja sus operaciones.
+     */
     public void menuGestionarReserva() {
         Scanner entrada = new Scanner(System.in);
         int opcion;
@@ -205,12 +244,15 @@ public class SubMenu {
         } while (opcion != 0);
     }
 
+    /**
+     * Crea una nueva reserva.
+     * @param entrada Scanner para leer los datos
+     */
     private void crearReserva(Scanner entrada) {
         try {
             System.out.print("Ingrese ID de la reserva: ");
             int id = leerEnteroPositivo(entrada);
 
-            // Solicitar y validar usuario
             System.out.print("Ingrese ID del usuario: ");
             int idUsuario = leerEnteroPositivo(entrada);
             Usuario usuario = buscarUsuarioPorId(idUsuario);
@@ -219,7 +261,6 @@ public class SubMenu {
                 return;
             }
 
-            // Solicitar y validar auditorio
             System.out.print("Ingrese ID del auditorio: ");
             int idAuditorio = leerEnteroPositivo(entrada);
             Auditorio auditorio = buscarAuditorioPorId(idAuditorio);
@@ -228,7 +269,6 @@ public class SubMenu {
                 return;
             }
 
-            // Solicitar fechas
             System.out.println("Ingrese fecha y hora de inicio (formato: dd/MM/yyyy HH:mm)");
             LocalDateTime fechaInicio = leerFecha(entrada);
             if (fechaInicio == null) return;
@@ -237,13 +277,11 @@ public class SubMenu {
             LocalDateTime fechaFin = leerFecha(entrada);
             if (fechaFin == null) return;
 
-            // Validar que la fecha de fin sea posterior a la de inicio
             if (fechaFin.isBefore(fechaInicio)) {
                 System.out.println("[!] La fecha de fin debe ser posterior a la fecha de inicio.");
                 return;
             }
 
-            // Crear la reserva
             Reserva nueva = new Reserva(id, usuario, auditorio, fechaInicio, fechaFin);
             Reserva.crearReserva(nueva);
             System.out.println("[✓] Reserva creada exitosamente.");
@@ -253,6 +291,9 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Muestra todas las reservas existentes.
+     */
     private void mostrarReservas() {
         List<Reserva> reservas = Reserva.listarReservas();
         if (reservas.isEmpty()) {
@@ -265,6 +306,10 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Edita una reserva existente.
+     * @param entrada Scanner para leer los nuevos datos
+     */
     private void editarReserva(Scanner entrada) {
         System.out.print("Ingrese el ID de la reserva a editar: ");
         int id = leerEnteroPositivo(entrada);
@@ -284,6 +329,10 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Elimina una reserva.
+     * @param entrada Scanner para leer el ID
+     */
     private void eliminarReserva(Scanner entrada) {
         System.out.print("Ingrese el ID de la reserva a eliminar: ");
         int id = leerEnteroPositivo(entrada);
@@ -294,6 +343,11 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Lee una fecha y hora del usuario.
+     * @param entrada Scanner para leer la fecha
+     * @return LocalDateTime con la fecha leída o null si es inválida
+     */
     private LocalDateTime leerFecha(Scanner entrada) {
         try {
             String fechaStr = entrada.nextLine().trim();
@@ -304,12 +358,20 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Busca un auditorio por su ID.
+     * @param id ID del auditorio a buscar
+     * @return Auditorio encontrado o null si no existe
+     */
     private Auditorio buscarAuditorioPorId(int id) {
         // TODO: Implementar búsqueda real de auditorios
         // Por ahora retornamos un auditorio de prueba
         return new Auditorio(id, "Auditorio " + id, 100);
     }
 
+    /**
+     * Muestra el menú de gestión de facultades y maneja sus operaciones.
+     */
     public void menuGestionarFacultades() {
         Scanner scanner = new Scanner(System.in);
         int opcion;
@@ -402,6 +464,9 @@ public class SubMenu {
         } while (opcion != 0);
     }
 
+    /**
+     * Muestra el menú de administración de equipos y maneja sus operaciones.
+     */
     public void menuAdministrarEquipos() {
         Scanner entrada = new Scanner(System.in);
         int opcion;
@@ -466,6 +531,9 @@ public class SubMenu {
         } while (opcion != 0);
     }
 
+    /**
+     * Muestra el menú de recuperación de credenciales.
+     */
     public void menuRecuperarCredenciales() {
         Scanner entrada = new Scanner(System.in);
         String correo;
@@ -482,6 +550,11 @@ public class SubMenu {
         }
     }
 
+    /**
+     * Lee un número entero positivo del usuario.
+     * @param entrada Scanner para leer el número
+     * @return Número entero positivo
+     */
     private int leerEnteroPositivo(Scanner entrada) {
         int numero;
         while (true) {
@@ -501,6 +574,11 @@ public class SubMenu {
         return numero;
     }
 
+    /**
+     * Lee un valor booleano del usuario.
+     * @param entrada Scanner para leer el valor
+     * @return true o false según la entrada del usuario
+     */
     private boolean leerBooleano(Scanner entrada) {
         while (true) {
             String valor = entrada.nextLine().trim().toLowerCase();

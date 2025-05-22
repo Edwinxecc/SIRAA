@@ -1,4 +1,7 @@
-// Reserva.java
+/**
+ * Representa una reserva de auditorio en el sistema SIRAA.
+ * Esta clase maneja la información de las reservas, incluyendo usuario, auditorio, fechas y equipos asignados.
+ */
 package ec.edu.uce.dominio;
 
 import java.time.LocalDateTime;
@@ -11,11 +14,18 @@ public class Reserva {
     private Auditorio auditorio;
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaFin;
-    private List<Equipo> equiposAsignados;
+    //private List<Equipo> equiposAsignados;
+    private Equipo [] equipos;
 
-    // Lista simulando base de datos
-    private static List<Reserva> listaReservas = new ArrayList<>();
 
+    /**
+     * Constructor con parámetros.
+     * @param id ID de la reserva
+     * @param usuario Usuario que realiza la reserva
+     * @param auditorio Auditorio reservado
+     * @param fechaInicio Fecha y hora de inicio
+     * @param fechaFin Fecha y hora de fin
+     */
     public Reserva(int id, Usuario usuario, Auditorio auditorio, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
         this.id = id;
         this.usuario = usuario;
@@ -25,39 +35,74 @@ public class Reserva {
         this.equiposAsignados = new ArrayList<>();
     }
 
-    // Getters y Setters
+    /**
+     * Obtiene el ID de la reserva.
+     * @return ID de la reserva
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Obtiene el usuario que realizó la reserva.
+     * @return Usuario de la reserva
+     */
     public Usuario getUsuario() {
         return usuario;
     }
 
+    /**
+     * Obtiene el auditorio reservado.
+     * @return Auditorio de la reserva
+     */
     public Auditorio getAuditorio() {
         return auditorio;
     }
 
+    /**
+     * Obtiene la fecha y hora de inicio.
+     * @return Fecha y hora de inicio
+     */
     public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
+    /**
+     * Establece la fecha y hora de inicio.
+     * @param fechaInicio Nueva fecha y hora de inicio
+     */
     public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
+    /**
+     * Obtiene la fecha y hora de fin.
+     * @return Fecha y hora de fin
+     */
     public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
+    /**
+     * Establece la fecha y hora de fin.
+     * @param fechaFin Nueva fecha y hora de fin
+     */
     public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 
+    /**
+     * Obtiene la lista de equipos asignados a la reserva.
+     * @return Lista de equipos asignados
+     */
     public List<Equipo> getEquiposAsignados() {
         return equiposAsignados;
     }
 
+    /**
+     * Asigna un equipo a la reserva.
+     * @param equipo Equipo a asignar
+     */
     public void asignarEquipo(Equipo equipo) {
         if (equipo.isDisponible()) {
             equipo.setDisponible(false);
@@ -68,6 +113,10 @@ public class Reserva {
         }
     }
 
+    /**
+     * Libera un equipo asignado a la reserva.
+     * @param equipo Equipo a liberar
+     */
     public void liberarEquipo(Equipo equipo) {
         if (equiposAsignados.contains(equipo)) {
             equipo.setDisponible(true);
@@ -76,49 +125,11 @@ public class Reserva {
         }
     }
 
-    // CRUD
-    public static void crearReserva(Reserva reserva) {
-        listaReservas.add(reserva);
-        System.out.println("[✓] Reserva creada.");
-    }
 
-    public static Reserva consultarReserva(int id) {
-        for (Reserva r : listaReservas) {
-            if (r.getId() == id) {
-                return r;
-            }
-        }
-        return null;
-    }
-
-    public static List<Reserva> listarReservas() {
-        return new ArrayList<>(listaReservas);
-    }
-
-    public static boolean actualizarReserva(int id, LocalDateTime nuevaInicio, LocalDateTime nuevaFin) {
-        Reserva reserva = consultarReserva(id);
-        if (reserva != null) {
-            reserva.setFechaInicio(nuevaInicio);
-            reserva.setFechaFin(nuevaFin);
-            System.out.println("[✓] Reserva actualizada.");
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean eliminarReserva(int id) {
-        Reserva reserva = consultarReserva(id);
-        if (reserva != null) {
-            for (Equipo eq : reserva.getEquiposAsignados()) {
-                eq.setDisponible(true);
-            }
-            listaReservas.remove(reserva);
-            System.out.println("[✓] Reserva eliminada.");
-            return true;
-        }
-        return false;
-    }
-
+    /**
+     * Devuelve una representación en texto de la reserva.
+     * @return String con los datos de la reserva
+     */
     @Override
     public String toString() {
         return "Reserva ID: " + id +

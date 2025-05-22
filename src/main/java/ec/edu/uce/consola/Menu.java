@@ -1,12 +1,23 @@
+/**
+ * Clase principal del menú del sistema SIRAA.
+ * Maneja la autenticación de usuarios y el menú principal del sistema.
+ */
 package ec.edu.uce.consola;
 
 import java.util.Scanner;
 
 public class Menu {
+    /** Rol de administrador */
     private static final String ADMIN_ROLE = "ADMIN";
+    /** Rol de usuario regular */
     private static final String USER_ROLE = "USER";
+    /** Rol actual del usuario autenticado */
     private String currentRole;
 
+    /**
+     * Muestra el menú de inicio y maneja la autenticación.
+     * Permite hasta 3 intentos de inicio de sesión.
+     */
     public void menuDeInicio() {
         String usr, password;
         System.out.println("\n=============================");
@@ -46,6 +57,12 @@ public class Menu {
         }
     }
 
+    /**
+     * Verifica las credenciales del usuario.
+     * @param correo Correo del usuario
+     * @param password Contraseña del usuario
+     * @return true si las credenciales son válidas, false en caso contrario
+     */
     private boolean verificarCredenciales(String correo, String password) {
         // TODO: Implementar verificación real contra base de datos
         // Por ahora, simulamos que admin@uce.edu.ec/admin123 es administrador
@@ -54,10 +71,19 @@ public class Menu {
                (correo.equals("usuario@uce.edu.ec") && password.equals("user123"));
     }
 
+    /**
+     * Determina el rol del usuario basado en su correo.
+     * @param correo Correo del usuario
+     */
     private void determinarRol(String correo) {
         currentRole = correo.startsWith("admin") ? ADMIN_ROLE : USER_ROLE;
     }
 
+    /**
+     * Valida que el correo sea institucional.
+     * @param correo Correo a validar
+     * @return true si el correo es válido, false en caso contrario
+     */
     public boolean validarCorreo(String correo) {
         if (correo == null || correo.trim().isEmpty()) {
             return false;
@@ -70,6 +96,9 @@ public class Menu {
         return false;
     }
 
+    /**
+     * Muestra el menú principal y maneja las opciones según el rol del usuario.
+     */
     public void menuElegirOpcion() {
         Scanner entrada = new Scanner(System.in);
         int opcion;

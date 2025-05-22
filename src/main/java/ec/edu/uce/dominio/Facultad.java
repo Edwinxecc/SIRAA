@@ -3,22 +3,39 @@ package ec.edu.uce.dominio;
 import ec.edu.uce.Util.Validaciones;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Facultad {
     private String nombre;
     private int numeroAuditorios;
-    private Validaciones val = new Validaciones();
-    private List<Usuario> usuarios = new ArrayList<>();
-    private List<Auditorio> auditorios = new ArrayList<>();
+    private final Validaciones val;
+    private final List<Usuario> usuarios;
+    private final List<Auditorio> auditorios;
+    private static int contadorAuditorios = 1;
+    private static final List<Facultad> facultades = new ArrayList<>();
 
     public Facultad() {
         this.nombre = "Ingenieria y Ciencias Aplicadas";
         this.numeroAuditorios = 1;
+        this.val = new Validaciones();
+        this.usuarios = new ArrayList<>();
+        this.auditorios = new ArrayList<>();
+        inicializarAuditorios();
     }
 
     public Facultad(String nombre, int numAuditorios) {
+        this.val = new Validaciones();
+        this.usuarios = new ArrayList<>();
+        this.auditorios = new ArrayList<>();
         setNombre(nombre);
         setNumeroAuditorios(numAuditorios);
+        inicializarAuditorios();
+    }
+
+    private void inicializarAuditorios() {
+        for (int i = 0; i < numeroAuditorios; i++) {
+            auditorios.add(new Auditorio(contadorAuditorios++, "Auditorio " + (i + 1), 100));
+        }
     }
 
     public String getNombre() {
@@ -26,8 +43,14 @@ public class Facultad {
     }
 
     public void setNombre(String nombre) {
-        val.ValidacionTexto(nombre, "Nombre");
-        this.nombre = nombre;
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de la facultad no puede estar vacío");
+        }
+        String nombreValidado = val.ValidacionTexto(nombre.trim(), "Nombre");
+        if (nombreValidado == null) {
+            throw new IllegalArgumentException("El nombre de la facultad no es válido");
+        }
+        this.nombre = nombreValidado;
     }
 
     public int getNumeroAuditorios() {
@@ -35,88 +58,134 @@ public class Facultad {
     }
 
     public void setNumeroAuditorios(int numeroAuditorios) {
-        if (numeroAuditorios > 0) {
-            this.numeroAuditorios = numeroAuditorios;
-        } else {
-            throw new IllegalArgumentException("El número de auditorios debe ser mayor a 0.");
+        if (numeroAuditorios <= 0) {
+            throw new IllegalArgumentException("El número de auditorios debe ser mayor a 0");
         }
+        this.numeroAuditorios = numeroAuditorios;
+    }
+
+    public List<Usuario> getUsuarios() {
+        return new ArrayList<>(usuarios);
+    }
+
+    public List<Auditorio> getAuditorios() {
+        return new ArrayList<>(auditorios);
     }
 
     public void crearUsuario(String nombre, String apellido, String correo) {
+        if (nombre == null || apellido == null || correo == null) {
+            throw new IllegalArgumentException("Los datos del usuario no pueden ser nulos");
+        }
+
         Usuario usuario = new Usuario();
         usuario.setUsuarioId(usuario.generarId());
         usuario.setNombre(nombre);
         usuario.setApellido(apellido);
         usuario.setCorreo(correo);
+        
+        if (buscarUsuarioPorCorreo(correo) != null) {
+            throw new IllegalArgumentException("Ya existe un usuario con ese correo");
+        }
+        
         usuarios.add(usuario);
     }
 
     public Usuario buscarUsuario(int id) {
-        for (Usuario usuario : usuarios) {
-            if (usuario.getUsuarioId() == id) {
-                return usuario;
-            }
-        }
-        return null;
+        return usuarios.stream()
+                .filter(usuario -> usuario.getUsuarioId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
-    public boolean editarUsuario(int id, String nuevoNombre, String nuevoApellido, String nuevoCorreo) {
-        Usuario usuario = buscarUsuario(id);
-        if (usuario != null) {
-            usuario.setNombre(nuevoNombre);
-            usuario.setApellido(nuevoApellido);
-            usuario.setCorreo(nuevoCorreo);
-            return true;
-        }
-        return false;
+    public Usuario buscarUsuarioPorCorreo(String correo) {
+        return usuarios.stream()
+                .filter(usuario -> usuario.getCorreo().equalsIgnoreCase(correo))
+                .findFirst()
+                .orElse(null);
     }
 
     public boolean eliminarUsuario(int id) {
-        Usuario usuario = buscarUsuario(id);
-        if (usuario != null) {
-            usuarios.remove(usuario);
-            return true;
+        return usuarios.removeIf(usuario -> usuario.getUsuarioId() == id);
+    }
+
+    public Auditorio buscarAuditorio(String nombre) {
+        return auditorios.stream()
+                .filter(auditorio -> auditorio.getNombre().equalsIgnoreCase(nombre))
+                .findFirst()
+                .orElse(null);
+    }
+
+    // Métodos CRUD para gestionar facultades
+    public static boolean crearFacultad(Facultad facultad) {
+        if (facultad == null) {
+            return false;
         }
-        return false;
+        // Verificar si ya existe una facultad con el mismo nombre
+        if (buscarFacultadPorNombre(facultad.getNombre()) != null) {
+            return false;
+        }
+        return facultades.add(facultad);
     }
 
-    public void crearAuditorio(int id, String nombre, int capacidad) {
-        Auditorio auditorio = new Auditorio(id, nombre, capacidad);
-        auditorios.add(auditorio);
-        numeroAuditorios = auditorios.size();
+    public static List<Facultad> listarFacultades() {
+        return new ArrayList<>(facultades);
     }
 
-    public Auditorio buscarAuditorio(int id) {
-        for (Auditorio auditorio : auditorios) {
-            if (auditorio.getId() == id) {
-                return auditorio;
+    public static Facultad buscarFacultadPorNombre(String nombre) {
+        if (nombre == null) return null;
+        return facultades.stream()
+                .filter(f -> f.getNombre().equalsIgnoreCase(nombre))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static boolean editarFacultad(String nombreOriginal, String nuevoNombre, int nuevosAuditorios) {
+        Facultad facultad = buscarFacultadPorNombre(nombreOriginal);
+        if (facultad == null) return false;
+
+        // Verificar que el nuevo nombre no exista (si es diferente al actual)
+        if (!nombreOriginal.equalsIgnoreCase(nuevoNombre) && 
+            buscarFacultadPorNombre(nuevoNombre) != null) {
+            return false;
+        }
+
+        facultad.setNombre(nuevoNombre);
+        facultad.setNumeroAuditorios(nuevosAuditorios);
+        return true;
+    }
+
+    public static boolean eliminarFacultad(String nombre) {
+        return facultades.removeIf(f -> f.getNombre().equalsIgnoreCase(nombre));
+    }
+
+    public void buscarFacultades() {
+        List<Facultad> todas = listarFacultades();
+        if (todas.isEmpty()) {
+            System.out.println("No hay facultades registradas.");
+        } else {
+            System.out.println("\n=== FACULTADES REGISTRADAS ===");
+            for (Facultad f : todas) {
+                System.out.println(f);
             }
         }
-        return null;
     }
 
-    public boolean editarAuditorio(int id, String nuevoNombre, int nuevaCapacidad) {
-        Auditorio auditorio = buscarAuditorio(id);
-        if (auditorio != null) {
-            auditorio.setNombre(nuevoNombre);
-            auditorio.setCapacidad(nuevaCapacidad);
-            return true;
-        }
-        return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Facultad facultad = (Facultad) o;
+        return Objects.equals(nombre, facultad.nombre);
     }
 
-    public boolean eliminarAuditorio(int id) {
-        Auditorio auditorio = buscarAuditorio(id);
-        if (auditorio != null) {
-            auditorios.remove(auditorio);
-            numeroAuditorios = auditorios.size();
-            return true;
-        }
-        return false;
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre);
     }
 
     @Override
     public String toString() {
-        return "Facultad: " + nombre + " (Auditorios: " + numeroAuditorios + ")";
+        return String.format("Facultad{nombre='%s', numeroAuditorios=%d, usuarios=%d}",
+                nombre, numeroAuditorios, usuarios.size());
     }
 }

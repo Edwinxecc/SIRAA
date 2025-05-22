@@ -5,24 +5,30 @@ import ec.edu.uce.dominio.Reserva;
 import ec.edu.uce.dominio.Usuario;
 import ec.edu.uce.dominio.Facultad;
 import ec.edu.uce.dominio.Equipo;
+import ec.edu.uce.dominio.Auditorio;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class SubMenu {
+    private static final List<Usuario> usuarios = new ArrayList<>();
+    private final Validaciones validacion = new Validaciones();
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public void MenuGestionarUsuario() {
-        Usuario usuarioObj = new Usuario();
-        Validaciones validacion = new Validaciones();
+    public void menuGestionarUsuario() {
         Scanner entrada = new Scanner(System.in);
         int opcion;
 
         do {
-            System.out.println("\n--- MENÚ GESTIONAR USUARIO ---");
+            System.out.println("\n=== MENÚ GESTIONAR USUARIO ===");
             System.out.println("[1] Crear Usuario");
             System.out.println("[2] Consultar Usuario");
             System.out.println("[3] Editar Usuario");
             System.out.println("[4] Eliminar Usuario");
-            System.out.println("[0] Salir");
+            System.out.println("[0] Volver al menú principal");
             System.out.print(">: ");
 
             while (!entrada.hasNextInt()) {
@@ -34,94 +40,126 @@ public class SubMenu {
             entrada.nextLine();
 
             switch (opcion) {
-                case 1:
-                    System.out.println("\n[1] Crear Usuario");
-                    usuarioObj.setUsuarioId(usuarioObj.generarId());
-
-                    System.out.print("Ingresa el nombre del usuario: ");
-                    String nombre = entrada.nextLine();
-                    nombre = validacion.ValidacionTexto(nombre, "nombre");
-                    usuarioObj.setNombre(nombre);
-
-                    System.out.print("Ingresa el apellido del usuario: ");
-                    String apellido = entrada.nextLine();
-                    apellido = validacion.ValidacionTexto(apellido, "apellido");
-                    usuarioObj.setApellido(apellido);
-
-                    System.out.print("Ingresa el correo del usuario: ");
-                    String correo = entrada.nextLine();
-                    usuarioObj.setCorreo(correo);
-
-                    System.out.println("\n[*] Usuario creado con éxito:");
-                    imprimirUsuario(usuarioObj);
-                    break;
-
-                case 2:
-                    System.out.println("\n[2] Consultar Usuario");
-                    System.out.print("Ingresa el ID del usuario para consultar: ");
-                    int idConsulta = leerEnteroPositivo(entrada);
-
-                    if (usuarioObj.getNombre() == null) {
-                        System.out.println("[!] No hay usuario registrado.");
-                    } else if (usuarioObj.getUsuarioId() == idConsulta) {
-                        imprimirUsuario(usuarioObj);
-                    } else {
-                        System.out.println("[!] Usuario no encontrado con ese ID.");
-                    }
-                    break;
-
-                case 3:
-                    System.out.println("\n[3] Editar Usuario");
-                    System.out.print("Ingresa el ID del usuario a editar: ");
-                    int idEditar = leerEnteroPositivo(entrada);
-
-                    if (usuarioObj.getNombre() == null) {
-                        System.out.println("[!] No hay usuario registrado.");
-                    } else if (usuarioObj.getUsuarioId() == idEditar) {
-                        System.out.print("Nuevo nombre: ");
-                        String nuevoNombre = entrada.nextLine();
-                        nuevoNombre = validacion.ValidacionTexto(nuevoNombre, "nombre");
-                        usuarioObj.setNombre(nuevoNombre);
-
-                        System.out.print("Nuevo apellido: ");
-                        String nuevoApellido = entrada.nextLine();
-                        nuevoApellido = validacion.ValidacionTexto(nuevoApellido, "apellido");
-                        usuarioObj.setApellido(nuevoApellido);
-
-                        System.out.print("Nuevo correo: ");
-                        String nuevoCorreo = entrada.nextLine();
-                        usuarioObj.setCorreo(nuevoCorreo);
-
-                        System.out.println("[*] Usuario editado con éxito:");
-                        imprimirUsuario(usuarioObj);
-                    } else {
-                        System.out.println("[!] Usuario no encontrado con ese ID.");
-                    }
-                    break;
-
-                case 4:
-                    System.out.println("\n[4] Eliminar Usuario");
-                    System.out.print("Ingresa el ID del usuario a eliminar: ");
-                    int idEliminar = leerEnteroPositivo(entrada);
-
-                    if (usuarioObj.getNombre() == null) {
-                        System.out.println("[!] No hay usuario registrado.");
-                    } else if (usuarioObj.getUsuarioId() == idEliminar) {
-                        usuarioObj = new Usuario(); // Reiniciar objeto para eliminar
-                        System.out.println("[*] Usuario eliminado correctamente.");
-                    } else {
-                        System.out.println("[!] Usuario no encontrado con ese ID.");
-                    }
-                    break;
-
-                case 0:
-                    System.out.println("[!] Saliendo....");
-                    break;
-
-                default:
-                    System.out.println("[!] Opción no válida.");
+                case 1 -> crearUsuario(entrada);
+                case 2 -> consultarUsuario(entrada);
+                case 3 -> editarUsuario(entrada);
+                case 4 -> eliminarUsuario(entrada);
+                case 0 -> System.out.println("Volviendo al menú principal...");
+                default -> System.out.println("[!] Opción no válida.");
             }
         } while (opcion != 0);
+    }
+
+    private void crearUsuario(Scanner entrada) {
+        System.out.println("\n[1] Crear Usuario");
+        
+        System.out.print("Ingresa el nombre del usuario: ");
+        String nombre = entrada.nextLine();
+        nombre = validacion.ValidacionTexto(nombre, "nombre");
+
+        System.out.print("Ingresa el apellido del usuario: ");
+        String apellido = entrada.nextLine();
+        apellido = validacion.ValidacionTexto(apellido, "apellido");
+
+        System.out.print("Ingresa el correo del usuario: ");
+        String correo = entrada.nextLine();
+        while (!correo.endsWith("@uce.edu.ec")) {
+            System.out.println("[!] El correo debe ser institucional (@uce.edu.ec)");
+            System.out.print("Ingresa el correo del usuario: ");
+            correo = entrada.nextLine();
+        }
+
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setUsuarioId(nuevoUsuario.generarId());
+        nuevoUsuario.setNombre(nombre);
+        nuevoUsuario.setApellido(apellido);
+        nuevoUsuario.setCorreo(correo);
+        
+        usuarios.add(nuevoUsuario);
+        System.out.println("\n[✓] Usuario creado con éxito:");
+        imprimirUsuario(nuevoUsuario);
+    }
+
+    private void consultarUsuario(Scanner entrada) {
+        System.out.println("\n[2] Consultar Usuario");
+        if (usuarios.isEmpty()) {
+            System.out.println("[!] No hay usuarios registrados.");
+            return;
+        }
+
+        System.out.print("Ingresa el ID del usuario para consultar: ");
+        int idConsulta = leerEnteroPositivo(entrada);
+
+        Usuario usuarioEncontrado = buscarUsuarioPorId(idConsulta);
+        if (usuarioEncontrado != null) {
+            imprimirUsuario(usuarioEncontrado);
+        } else {
+            System.out.println("[!] Usuario no encontrado con ese ID.");
+        }
+    }
+
+    private void editarUsuario(Scanner entrada) {
+        System.out.println("\n[3] Editar Usuario");
+        if (usuarios.isEmpty()) {
+            System.out.println("[!] No hay usuarios registrados.");
+            return;
+        }
+
+        System.out.print("Ingresa el ID del usuario a editar: ");
+        int idEditar = leerEnteroPositivo(entrada);
+
+        Usuario usuarioEditar = buscarUsuarioPorId(idEditar);
+        if (usuarioEditar != null) {
+            System.out.print("Nuevo nombre: ");
+            String nuevoNombre = entrada.nextLine();
+            nuevoNombre = validacion.ValidacionTexto(nuevoNombre, "nombre");
+            usuarioEditar.setNombre(nuevoNombre);
+
+            System.out.print("Nuevo apellido: ");
+            String nuevoApellido = entrada.nextLine();
+            nuevoApellido = validacion.ValidacionTexto(nuevoApellido, "apellido");
+            usuarioEditar.setApellido(nuevoApellido);
+
+            System.out.print("Nuevo correo: ");
+            String nuevoCorreo = entrada.nextLine();
+            while (!nuevoCorreo.endsWith("@uce.edu.ec")) {
+                System.out.println("[!] El correo debe ser institucional (@uce.edu.ec)");
+                System.out.print("Ingresa el nuevo correo: ");
+                nuevoCorreo = entrada.nextLine();
+            }
+            usuarioEditar.setCorreo(nuevoCorreo);
+
+            System.out.println("[✓] Usuario editado con éxito:");
+            imprimirUsuario(usuarioEditar);
+        } else {
+            System.out.println("[!] Usuario no encontrado con ese ID.");
+        }
+    }
+
+    private void eliminarUsuario(Scanner entrada) {
+        System.out.println("\n[4] Eliminar Usuario");
+        if (usuarios.isEmpty()) {
+            System.out.println("[!] No hay usuarios registrados.");
+            return;
+        }
+
+        System.out.print("Ingresa el ID del usuario a eliminar: ");
+        int idEliminar = leerEnteroPositivo(entrada);
+
+        Usuario usuarioEliminar = buscarUsuarioPorId(idEliminar);
+        if (usuarioEliminar != null) {
+            usuarios.remove(usuarioEliminar);
+            System.out.println("[✓] Usuario eliminado correctamente.");
+        } else {
+            System.out.println("[!] Usuario no encontrado con ese ID.");
+        }
+    }
+
+    private Usuario buscarUsuarioPorId(int id) {
+        return usuarios.stream()
+                .filter(u -> u.getUsuarioId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
     private void imprimirUsuario(Usuario u) {
@@ -133,7 +171,7 @@ public class SubMenu {
         System.out.println("-------------------------------------");
     }
 
-    public void MenuGestionarReserva() {
+    public void menuGestionarReserva() {
         Scanner entrada = new Scanner(System.in);
         int opcion;
 
@@ -156,46 +194,10 @@ public class SubMenu {
             entrada.nextLine();
 
             switch (opcion) {
-                case 1 -> {
-                    System.out.print("Ingrese un ID para la reserva: ");
-                    int id = leerEnteroPositivo(entrada);
-                    Reserva nueva = new Reserva(id);
-                    Reserva.agregarReserva(nueva);
-                    System.out.println("[✓] Reserva creada con ID: " + id);
-                }
-                case 2 -> {
-                    System.out.println("\n--- LISTA DE RESERVAS ---");
-                    if (Reserva.obtenerTodasLasReservas().isEmpty()) {
-                        System.out.println("[!] No hay reservas registradas.");
-                    } else {
-                        for (Reserva r : Reserva.obtenerTodasLasReservas()) {
-                            System.out.println("ID: " + r.getIdReserva() + " | Fecha: " + r.getFechaReserva());
-                        }
-                    }
-                }
-                case 3 -> {
-                    System.out.print("Ingrese el ID de la reserva a editar: ");
-                    int id = leerEnteroPositivo(entrada);
-                    Reserva encontrada = Reserva.buscarPorId(id);
-                    if (encontrada != null) {
-                        System.out.print("Ingrese el nuevo ID para la reserva: ");
-                        int nuevoId = leerEnteroPositivo(entrada);
-                        Reserva.actualizarReserva(id, nuevoId);
-                        System.out.println("[✓] Reserva actualizada.");
-                    } else {
-                        System.out.println("[!] Reserva no encontrada.");
-                    }
-                }
-                case 4 -> {
-                    System.out.print("Ingrese el ID de la reserva a eliminar: ");
-                    int id = leerEnteroPositivo(entrada);
-                    boolean eliminada = Reserva.eliminarReserva(id);
-                    if (eliminada) {
-                        System.out.println("[✓] Reserva eliminada.");
-                    } else {
-                        System.out.println("[!] No se encontró la reserva con ese ID.");
-                    }
-                }
+                case 1 -> crearReserva(entrada);
+                case 2 -> mostrarReservas();
+                case 3 -> editarReserva(entrada);
+                case 4 -> eliminarReserva(entrada);
                 case 0 -> System.out.println("Regresando al menú principal...");
                 default -> System.out.println("[!] Opción no válida.");
             }
@@ -203,29 +205,114 @@ public class SubMenu {
         } while (opcion != 0);
     }
 
-    private int leerEnteroPositivo(Scanner entrada) {
-        int numero;
-        while (true) {
-            while (!entrada.hasNextInt()) {
-                System.out.print("[!] Entrada inválida. Ingrese un número: ");
-                entrada.next();
-            }
-            numero = entrada.nextInt();
-            entrada.nextLine();
+    private void crearReserva(Scanner entrada) {
+        try {
+            System.out.print("Ingrese ID de la reserva: ");
+            int id = leerEnteroPositivo(entrada);
 
-            if (numero <= 0) {
-                System.out.print("[!] El número debe ser positivo. Intente de nuevo: ");
-            } else {
-                break;
+            // Solicitar y validar usuario
+            System.out.print("Ingrese ID del usuario: ");
+            int idUsuario = leerEnteroPositivo(entrada);
+            Usuario usuario = buscarUsuarioPorId(idUsuario);
+            if (usuario == null) {
+                System.out.println("[!] Usuario no encontrado.");
+                return;
+            }
+
+            // Solicitar y validar auditorio
+            System.out.print("Ingrese ID del auditorio: ");
+            int idAuditorio = leerEnteroPositivo(entrada);
+            Auditorio auditorio = buscarAuditorioPorId(idAuditorio);
+            if (auditorio == null) {
+                System.out.println("[!] Auditorio no encontrado.");
+                return;
+            }
+
+            // Solicitar fechas
+            System.out.println("Ingrese fecha y hora de inicio (formato: dd/MM/yyyy HH:mm)");
+            LocalDateTime fechaInicio = leerFecha(entrada);
+            if (fechaInicio == null) return;
+
+            System.out.println("Ingrese fecha y hora de fin (formato: dd/MM/yyyy HH:mm)");
+            LocalDateTime fechaFin = leerFecha(entrada);
+            if (fechaFin == null) return;
+
+            // Validar que la fecha de fin sea posterior a la de inicio
+            if (fechaFin.isBefore(fechaInicio)) {
+                System.out.println("[!] La fecha de fin debe ser posterior a la fecha de inicio.");
+                return;
+            }
+
+            // Crear la reserva
+            Reserva nueva = new Reserva(id, usuario, auditorio, fechaInicio, fechaFin);
+            Reserva.crearReserva(nueva);
+            System.out.println("[✓] Reserva creada exitosamente.");
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("[!] Error al crear la reserva: " + e.getMessage());
+        }
+    }
+
+    private void mostrarReservas() {
+        List<Reserva> reservas = Reserva.listarReservas();
+        if (reservas.isEmpty()) {
+            System.out.println("[!] No hay reservas registradas.");
+        } else {
+            System.out.println("\n=== LISTA DE RESERVAS ===");
+            for (Reserva r : reservas) {
+                System.out.println(r);
             }
         }
-        return numero;
+    }
+
+    private void editarReserva(Scanner entrada) {
+        System.out.print("Ingrese el ID de la reserva a editar: ");
+        int id = leerEnteroPositivo(entrada);
+        
+        System.out.println("Ingrese nueva fecha y hora de inicio (formato: dd/MM/yyyy HH:mm)");
+        LocalDateTime nuevaFechaInicio = leerFecha(entrada);
+        if (nuevaFechaInicio == null) return;
+
+        System.out.println("Ingrese nueva fecha y hora de fin (formato: dd/MM/yyyy HH:mm)");
+        LocalDateTime nuevaFechaFin = leerFecha(entrada);
+        if (nuevaFechaFin == null) return;
+
+        if (Reserva.actualizarReserva(id, nuevaFechaInicio, nuevaFechaFin)) {
+            System.out.println("[✓] Reserva actualizada exitosamente.");
+        } else {
+            System.out.println("[!] No se encontró la reserva con ese ID.");
+        }
+    }
+
+    private void eliminarReserva(Scanner entrada) {
+        System.out.print("Ingrese el ID de la reserva a eliminar: ");
+        int id = leerEnteroPositivo(entrada);
+        if (Reserva.eliminarReserva(id)) {
+            System.out.println("[✓] Reserva eliminada exitosamente.");
+        } else {
+            System.out.println("[!] No se encontró la reserva con ese ID.");
+        }
+    }
+
+    private LocalDateTime leerFecha(Scanner entrada) {
+        try {
+            String fechaStr = entrada.nextLine().trim();
+            return LocalDateTime.parse(fechaStr, formatter);
+        } catch (DateTimeParseException e) {
+            System.out.println("[!] Formato de fecha inválido. Use dd/MM/yyyy HH:mm");
+            return null;
+        }
+    }
+
+    private Auditorio buscarAuditorioPorId(int id) {
+        // TODO: Implementar búsqueda real de auditorios
+        // Por ahora retornamos un auditorio de prueba
+        return new Auditorio(id, "Auditorio " + id, 100);
     }
 
     public void menuGestionarFacultades() {
         Scanner scanner = new Scanner(System.in);
         int opcion;
-        Facultad op = new Facultad();
 
         do {
             System.out.println("\n=== MENÚ GESTIONAR FACULTADES ===");
@@ -251,16 +338,28 @@ public class SubMenu {
                     System.out.print("Cantidad de auditorios: ");
                     int cantidad = leerEnteroPositivo(scanner);
 
-                    Facultad nueva = new Facultad(nombre, cantidad);
-                    if (op.crearFacultad(nueva)) {
-                        System.out.println("Facultad creada correctamente.");
-                    } else {
-                        System.out.println("Error: nombre inválido.");
+                    try {
+                        Facultad nueva = new Facultad(nombre, cantidad);
+                        if (Facultad.crearFacultad(nueva)) {
+                            System.out.println("[✓] Facultad creada correctamente.");
+                        } else {
+                            System.out.println("[!] Ya existe una facultad con ese nombre.");
+                        }
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("[!] Error: " + e.getMessage());
                     }
                     break;
 
                 case 2:
-                    op.buscarFacultades();
+                    List<Facultad> facultades = Facultad.listarFacultades();
+                    if (facultades.isEmpty()) {
+                        System.out.println("[!] No hay facultades registradas.");
+                    } else {
+                        System.out.println("\n=== FACULTADES REGISTRADAS ===");
+                        for (Facultad f : facultades) {
+                            System.out.println(f);
+                        }
+                    }
                     break;
 
                 case 3:
@@ -271,10 +370,14 @@ public class SubMenu {
                     System.out.print("Nueva cantidad de auditorios: ");
                     int nuevosAuditorios = leerEnteroPositivo(scanner);
 
-                    if (op.editarFacultad(nombreActual, nuevoNombre, nuevosAuditorios)) {
-                        System.out.println("Facultad editada correctamente.");
-                    } else {
-                        System.out.println("Facultad no encontrada.");
+                    try {
+                        if (Facultad.editarFacultad(nombreActual, nuevoNombre, nuevosAuditorios)) {
+                            System.out.println("[✓] Facultad editada correctamente.");
+                        } else {
+                            System.out.println("[!] Facultad no encontrada o el nuevo nombre ya existe.");
+                        }
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("[!] Error: " + e.getMessage());
                     }
                     break;
 
@@ -282,19 +385,19 @@ public class SubMenu {
                     System.out.print("Nombre de la facultad a eliminar: ");
                     String nombreEliminar = scanner.nextLine();
 
-                    if (op.eliminarFacultad(nombreEliminar)) {
-                        System.out.println("Facultad eliminada correctamente.");
+                    if (Facultad.eliminarFacultad(nombreEliminar)) {
+                        System.out.println("[✓] Facultad eliminada correctamente.");
                     } else {
-                        System.out.println("Facultad no encontrada.");
+                        System.out.println("[!] Facultad no encontrada.");
                     }
                     break;
 
                 case 0:
-                    System.out.println("Saliendo del menú...");
+                    System.out.println("Volviendo al menú principal...");
                     break;
 
                 default:
-                    System.out.println("Opción no válida. Intenta nuevamente.");
+                    System.out.println("[!] Opción no válida. Intenta nuevamente.");
             }
         } while (opcion != 0);
     }
@@ -363,15 +466,6 @@ public class SubMenu {
         } while (opcion != 0);
     }
 
-    private boolean leerBooleano(Scanner entrada) {
-        while (true) {
-            String valor = entrada.nextLine().trim().toLowerCase();
-            if (valor.equals("true") || valor.equals("sí") || valor.equals("si")) return true;
-            if (valor.equals("false") || valor.equals("no")) return false;
-            System.out.print("[!] Ingrese 'true' o 'false' (o 'sí' / 'no'): ");
-        }
-    }
-
     public void menuRecuperarCredenciales() {
         Scanner entrada = new Scanner(System.in);
         String correo;
@@ -385,6 +479,34 @@ public class SubMenu {
         } else {
             System.out.println("Correo no válido. Intenta de nuevo.");
             menuRecuperarCredenciales();
+        }
+    }
+
+    private int leerEnteroPositivo(Scanner entrada) {
+        int numero;
+        while (true) {
+            while (!entrada.hasNextInt()) {
+                System.out.print("[!] Entrada inválida. Ingrese un número: ");
+                entrada.next();
+            }
+            numero = entrada.nextInt();
+            entrada.nextLine();
+
+            if (numero <= 0) {
+                System.out.print("[!] El número debe ser positivo. Intente de nuevo: ");
+            } else {
+                break;
+            }
+        }
+        return numero;
+    }
+
+    private boolean leerBooleano(Scanner entrada) {
+        while (true) {
+            String valor = entrada.nextLine().trim().toLowerCase();
+            if (valor.equals("true") || valor.equals("sí") || valor.equals("si")) return true;
+            if (valor.equals("false") || valor.equals("no")) return false;
+            System.out.print("[!] Ingrese 'true' o 'false' (o 'sí' / 'no'): ");
         }
     }
 }

@@ -19,7 +19,7 @@ Este diagrama representa una vista general del sistema SIRAA, destacando los act
 
 En este nivel se detalla el desglose de los procesos principales. Se representan las acciones específicas que cada actor puede realizar dentro del sistema.
 
-![Diagrama de Casos de Uso - Nivel 1](i/src/main/resources/images/DN1.jpeg)
+![Diagrama de Casos de Uso - Nivel 1](/src/main/resources/images/DN1.jpeg)
 > *Figura 2. Diagrama de Casos de Uso - Nivel 1*
 
 ---

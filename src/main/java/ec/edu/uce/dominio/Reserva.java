@@ -4,139 +4,64 @@
  */
 package ec.edu.uce.dominio;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 public class Reserva {
-    private int id;
-    private Usuario usuario;
-    private Auditorio auditorio;
-    private LocalDateTime fechaInicio;
-    private LocalDateTime fechaFin;
-    //private List<Equipo> equiposAsignados;
-    private Equipo [] equipos;
+    private int idReserva;
+    private Date fechaInicio;
+    private Date fechaFin;
+    private Equipo[] equipos;
+    private int numEquipos = 0;
 
-
-    /**
-     * Constructor con parámetros.
-     * @param id ID de la reserva
-     * @param usuario Usuario que realiza la reserva
-     * @param auditorio Auditorio reservado
-     * @param fechaInicio Fecha y hora de inicio
-     * @param fechaFin Fecha y hora de fin
-     */
-    public Reserva(int id, Usuario usuario, Auditorio auditorio, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
-        this.id = id;
-        this.usuario = usuario;
-        this.auditorio = auditorio;
+    public Reserva(int idReserva, Date fechaInicio, Date fechaFin){
+        this.idReserva = idReserva;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.equiposAsignados = new ArrayList<>();
+        this.equipos = new Equipo[numEquipos];
     }
 
-    /**
-     * Obtiene el ID de la reserva.
-     * @return ID de la reserva
-     */
-    public int getId() {
-        return id;
+    public Reserva(){
+        this(0, new Date(1990, 1, 1), new Date(1990, 1, 1));
     }
 
-    /**
-     * Obtiene el usuario que realizó la reserva.
-     * @return Usuario de la reserva
-     */
-    public Usuario getUsuario() {
-        return usuario;
+    public int getIdReserva() {
+        return idReserva;
     }
 
-    /**
-     * Obtiene el auditorio reservado.
-     * @return Auditorio de la reserva
-     */
-    public Auditorio getAuditorio() {
-        return auditorio;
+    public void setIdReserva(int idReserva) {
+        if (idReserva > 0 && this.idReserva != idReserva){
+            this.idReserva = idReserva;
+        }
     }
 
-    /**
-     * Obtiene la fecha y hora de inicio.
-     * @return Fecha y hora de inicio
-     */
-    public LocalDateTime getFechaInicio() {
+    public Date getFechaInicio() {
         return fechaInicio;
     }
 
-    /**
-     * Establece la fecha y hora de inicio.
-     * @param fechaInicio Nueva fecha y hora de inicio
-     */
-    public void setFechaInicio(LocalDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
+    public void setFechaInicio(Date fechaInicio) {
+        if (fechaInicio != this.fechaInicio){
+            this.fechaInicio = fechaInicio;
+        }
     }
 
-    /**
-     * Obtiene la fecha y hora de fin.
-     * @return Fecha y hora de fin
-     */
-    public LocalDateTime getFechaFin() {
+    public Date getFechaFin() {
         return fechaFin;
     }
 
-    /**
-     * Establece la fecha y hora de fin.
-     * @param fechaFin Nueva fecha y hora de fin
-     */
-    public void setFechaFin(LocalDateTime fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    /**
-     * Obtiene la lista de equipos asignados a la reserva.
-     * @return Lista de equipos asignados
-     */
-    public List<Equipo> getEquiposAsignados() {
-        return equiposAsignados;
-    }
-
-    /**
-     * Asigna un equipo a la reserva.
-     * @param equipo Equipo a asignar
-     */
-    public void asignarEquipo(Equipo equipo) {
-        if (equipo.isDisponible()) {
-            equipo.setDisponible(false);
-            equiposAsignados.add(equipo);
-            System.out.println("[✓] Equipo asignado a la reserva.");
-        } else {
-            System.out.println("[!] El equipo no está disponible.");
+    public void setFechaFin(Date fechaFin) {
+        if (fechaFin != this.fechaFin) {
+            this.fechaFin = fechaFin;
         }
     }
 
-    /**
-     * Libera un equipo asignado a la reserva.
-     * @param equipo Equipo a liberar
-     */
-    public void liberarEquipo(Equipo equipo) {
-        if (equiposAsignados.contains(equipo)) {
-            equipo.setDisponible(true);
-            equiposAsignados.remove(equipo);
-            System.out.println("[✓] Equipo liberado de la reserva.");
+    public void crearEquipo(){
+        if (numEquipos == equipos.length){
+            Equipo [] aux = equipos;
+            equipos = new Equipo[numEquipos+1];
+            System.arraycopy(aux, 0, equipos, 0, numEquipos);
         }
+        equipos[numEquipos] = new Equipo();
+        numEquipos++;
     }
 
-
-    /**
-     * Devuelve una representación en texto de la reserva.
-     * @return String con los datos de la reserva
-     */
-    @Override
-    public String toString() {
-        return "Reserva ID: " + id +
-                ", Usuario: " + usuario.getNombre() +
-                ", Auditorio: " + auditorio.getNombre() +
-                ", Inicio: " + fechaInicio +
-                ", Fin: " + fechaFin +
-                ", Equipos: " + equiposAsignados.size();
-    }
 }

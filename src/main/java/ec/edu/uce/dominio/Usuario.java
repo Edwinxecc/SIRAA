@@ -1,24 +1,23 @@
+package ec.edu.uce.dominio;
+
+import java.util.Date;
+
 /**
  * Representa un usuario del sistema SIRAA.
  * Esta clase maneja la información personal y las reservas de un usuario.
  */
-package ec.edu.uce.dominio;
-
-
 public class Usuario {
     private String nombre;
     private String apellido;
     private String correo;
     private int numReservas = 0;
-    private Reserva [] reservas;
+    private Reserva[] reservas;
 
     public Usuario(String nombre, String apellido, String correo){
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
-        this.reservas = new Reserva[numReservas];
-
-
+        this.reservas = new Reserva[0];
     }
 
     public Usuario(){
@@ -49,18 +48,83 @@ public class Usuario {
         return correo;
     }
 
-
     public void setCorreo(String correo) {
         this.correo = correo;
     }
 
-    public void crearReservas(){
-        if (numReservas == reservas.length){
-            Reserva [] aux = reservas;
-            reservas = new Reserva [numReservas+1];
+    public Reserva[] getReservas() {
+        return reservas;
+    }
+
+    // ========================
+    // CRUD de Reservas
+    // ========================
+
+    public void crearReserva() {
+        if (numReservas == reservas.length) {
+            Reserva[] aux = reservas;
+            reservas = new Reserva[numReservas + 1];
             System.arraycopy(aux, 0, reservas, 0, numReservas);
         }
         reservas[numReservas] = new Reserva();
         numReservas++;
+    }
+
+    public void crearReservaPrioritaria(int nivelPrioridad) {
+        if (numReservas == reservas.length) {
+            Reserva[] aux = reservas;
+            reservas = new Reserva[numReservas + 1];
+            System.arraycopy(aux, 0, reservas, 0, numReservas);
+        }
+        reservas[numReservas] = new ReservaPrioritaria();
+        ((ReservaPrioritaria)reservas[numReservas]).setNivelPrioridad(nivelPrioridad);
+        numReservas++;
+    }
+
+    public void listarReservas() {
+        if (numReservas == 0) {
+            System.out.println("No hay reservas registradas para este usuario.");
+            return;
+        }
+        int index = 0;
+        for (Reserva reserva : reservas) {
+            String tipo = (reserva instanceof ReservaPrioritaria) ? "PRIORITARIA" : "NORMAL";
+            System.out.printf("[%d] %s - %s%n", index, tipo, reserva.toString());
+            index++;
+        }
+    }
+
+    public void actualizarReserva(int indice, int nuevoId, Date nuevaInicio, Date nuevaFin) {
+        if (indice >= 0 && indice < numReservas) {
+            reservas[indice].setIdReserva(nuevoId);
+            reservas[indice].setFechaInicio(nuevaInicio);
+            reservas[indice].setFechaFin(nuevaFin);
+            System.out.println("Reserva actualizada.");
+        } else {
+            System.out.println("Índice de reserva inválido.");
+        }
+    }
+
+    public void eliminarReserva(int indice) {
+        if (indice >= 0 && indice < numReservas) {
+            for (int i = indice; i < numReservas - 1; i++) {
+                reservas[i] = reservas[i + 1];
+            }
+            reservas[numReservas - 1] = null;
+            numReservas--;
+
+            Reserva[] aux = new Reserva[numReservas];
+            System.arraycopy(reservas, 0, aux, 0, numReservas);
+            reservas = aux;
+
+            System.out.println("Reserva eliminada.");
+        } else {
+            System.out.println("Índice de reserva inválido.");
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Usuario: " + nombre + " " + apellido + ", Correo: " + correo + ", Reservas: " + numReservas;
     }
 }

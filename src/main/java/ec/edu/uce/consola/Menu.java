@@ -5,6 +5,7 @@
 package ec.edu.uce.consola;
 
 import java.util.Scanner;
+import ec.edu.uce.dominio.*;
 
 public class Menu {
     /** Rol de administrador */
@@ -13,6 +14,14 @@ public class Menu {
     private static final String USER_ROLE = "USER";
     /** Rol actual del usuario autenticado */
     private String currentRole;
+    /** Usuario actual */
+    private Usuario usuarioActual;
+    /** Facultad actual */
+    private Facultad facultadActual;
+
+    public Menu(Facultad facultadActual) {
+        this.facultadActual = facultadActual;
+    }
 
     /**
      * Muestra el menú de inicio y maneja la autenticación.
@@ -41,9 +50,10 @@ public class Menu {
                 continue;
             }
 
-            // Simular verificación de credenciales (en producción esto debería validar contra una base de datos)
             if (verificarCredenciales(usr, password)) {
                 determinarRol(usr);
+                // Crear usuario actual
+                usuarioActual = new Usuario("Usuario", "Test", usr);
                 menuElegirOpcion();
                 return;
             } else {
@@ -64,9 +74,6 @@ public class Menu {
      * @return true si las credenciales son válidas, false en caso contrario
      */
     private boolean verificarCredenciales(String correo, String password) {
-        // TODO: Implementar verificación real contra base de datos
-        // Por ahora, simulamos que admin@uce.edu.ec/admin123 es administrador
-        // y usuario@uce.edu.ec/user123 es usuario regular
         return (correo.equals("admin@uce.edu.ec") && password.equals("admin123")) ||
                (correo.equals("usuario@uce.edu.ec") && password.equals("user123"));
     }
@@ -88,12 +95,7 @@ public class Menu {
         if (correo == null || correo.trim().isEmpty()) {
             return false;
         }
-        int atIndex = correo.indexOf('@');
-        if (atIndex != -1) {
-            String dominio = correo.substring(atIndex);
-            return dominio.equalsIgnoreCase("@uce.edu.ec");
-        }
-        return false;
+        return correo.endsWith("@uce.edu.ec");
     }
 
     /**
@@ -102,7 +104,7 @@ public class Menu {
     public void menuElegirOpcion() {
         Scanner entrada = new Scanner(System.in);
         int opcion;
-        SubMenu subMenuObj = new SubMenu();
+        SubMenu subMenuObj = new SubMenu(facultadActual, usuarioActual);
 
         while (true) {
             System.out.println("\n=== MENÚ PRINCIPAL ===");

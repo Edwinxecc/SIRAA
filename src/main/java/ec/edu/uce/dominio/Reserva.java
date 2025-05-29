@@ -75,33 +75,34 @@ public class Reserva {
         numEquipos++;
     }
 
-    public void listarEquipos(){
+    public String listarEquipos(){
         if (numEquipos == 0) {
-            System.out.println("No hay equipos asignados a esta reserva.");
-            return;
+            return "No hay equipos asignados a esta reserva.";
         }
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numEquipos; i++) {
-            System.out.printf("[%d] Nombre: %s | Categoría: %s | Disponible: %s%n",
+            sb.append(String.format("[%d] Nombre: %s | Categoría: %s | Disponible: %s%n",
                     i,
                     equipos[i].getNombre(),
                     equipos[i].getCategoria(),
                     equipos[i].getDisponibilidad() ? "Sí" : "No"
-            );
+            ));
         }
+        return sb.toString();
     }
 
-    public void actualizarEquipo(int indice, String nuevoNombre, String nuevaCategoria, boolean nuevaDisponibilidad){
+    public String actualizarEquipo(int indice, String nuevoNombre, String nuevaCategoria, boolean nuevaDisponibilidad){
         if (indice >= 0 && indice < numEquipos){
             equipos[indice].setNombre(nuevoNombre);
             equipos[indice].setCategoria(nuevaCategoria);
             equipos[indice].setDisponibilidad(nuevaDisponibilidad);
-            System.out.println("Equipo actualizado.");
+            return "Equipo actualizado.";
         } else {
-            System.out.println("Índice de equipo inválido.");
+            return "Índice de equipo inválido.";
         }
     }
 
-    public void eliminarEquipo(int indice){
+    public String eliminarEquipo(int indice){
         if (indice >= 0 && indice < numEquipos){
             for (int i = indice; i < numEquipos - 1; i++) {
                 equipos[i] = equipos[i + 1];
@@ -113,9 +114,9 @@ public class Reserva {
             System.arraycopy(equipos, 0, aux, 0, numEquipos);
             equipos = aux;
 
-            System.out.println("Equipo eliminado.");
+            return "Equipo eliminado.";
         } else {
-            System.out.println("Índice de equipo inválido.");
+            return "Índice de equipo inválido.";
         }
     }
 

@@ -83,14 +83,18 @@ public class Usuario {
 
     public void listarReservas() {
         if (numReservas == 0) {
-            System.out.println("No hay reservas registradas para este usuario.");
             return;
         }
         int index = 0;
         for (Reserva reserva : reservas) {
             String tipo = (reserva instanceof ReservaPrioritaria) ? "PRIORITARIA" : "NORMAL";
-            System.out.printf("[%d] %s - %s%n", index, tipo, reserva.toString());
             index++;
+        }
+    }
+
+    public void verReservas() {
+        if (numReservas == 0) {
+            return;
         }
     }
 
@@ -99,9 +103,6 @@ public class Usuario {
             reservas[indice].setIdReserva(nuevoId);
             reservas[indice].setFechaInicio(nuevaInicio);
             reservas[indice].setFechaFin(nuevaFin);
-            System.out.println("Reserva actualizada.");
-        } else {
-            System.out.println("Índice de reserva inválido.");
         }
     }
 
@@ -116,10 +117,6 @@ public class Usuario {
             Reserva[] aux = new Reserva[numReservas];
             System.arraycopy(reservas, 0, aux, 0, numReservas);
             reservas = aux;
-
-            System.out.println("Reserva eliminada.");
-        } else {
-            System.out.println("Índice de reserva inválido.");
         }
     }
 

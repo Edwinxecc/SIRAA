@@ -72,13 +72,10 @@ public class Facultad {
 
     public void listarUsuarios() {
         if (numUsuarios == 0) {
-            System.out.println("No hay usuarios registrados.");
             return;
         }
-        int index = 0;
-        for (Usuario u : usuarios) {
-            System.out.println("[" + index + "] " + u.toString());
-            index++;
+        for (int i = 0; i < numUsuarios; i++) {
+            Usuario u = usuarios[i];
         }
     }
 
@@ -87,9 +84,6 @@ public class Facultad {
             usuarios[indice].setNombre(nuevoNombre);
             usuarios[indice].setApellido(nuevoApellido);
             usuarios[indice].setCorreo(nuevoCorreo);
-            System.out.println("Usuario actualizado.");
-        } else {
-            System.out.println("Índice de usuario inválido.");
         }
     }
 
@@ -104,10 +98,6 @@ public class Facultad {
             Usuario[] aux = new Usuario[numUsuarios];
             System.arraycopy(usuarios, 0, aux, 0, numUsuarios);
             usuarios = aux;
-
-            System.out.println("Usuario eliminado.");
-        } else {
-            System.out.println("Índice de usuario inválido.");
         }
     }
 
@@ -127,13 +117,10 @@ public class Facultad {
 
     public void listarAuditorios() {
         if (numAuditorios == 0) {
-            System.out.println("No hay auditorios registrados.");
             return;
         }
-        int index = 0;
-        for (Auditorio a : auditorios) {
-            System.out.println("[" + index + "] " + a.toString());
-            index++;
+        for (int i = 0; i < numAuditorios; i++) {
+            Auditorio a = auditorios[i];
         }
     }
 
@@ -141,9 +128,6 @@ public class Facultad {
         if (indice >= 0 && indice < numAuditorios) {
             auditorios[indice].setNombre(nuevoNombre);
             auditorios[indice].setCapacidad(nuevaCapacidad);
-            System.out.println("Auditorio actualizado.");
-        } else {
-            System.out.println("Índice de auditorio inválido.");
         }
     }
 
@@ -158,10 +142,6 @@ public class Facultad {
             Auditorio[] aux = new Auditorio[numAuditorios];
             System.arraycopy(auditorios, 0, aux, 0, numAuditorios);
             auditorios = aux;
-
-            System.out.println("Auditorio eliminado.");
-        } else {
-            System.out.println("Índice de auditorio inválido.");
         }
     }
 

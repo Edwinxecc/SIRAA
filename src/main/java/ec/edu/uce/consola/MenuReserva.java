@@ -4,6 +4,7 @@ import ec.edu.uce.dominio.Usuario;
 import ec.edu.uce.dominio.Facultad;
 import ec.edu.uce.dominio.Reserva;
 import ec.edu.uce.dominio.Auditorio;
+import ec.edu.uce.dominio.Estado;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -85,45 +86,38 @@ public class MenuReserva extends MenuBase {
     private void crearReservaPrioritaria() {
         System.out.println("\n[2] Crear Reserva Prioritaria");
         
-        // Mostrar auditorios disponibles
-        System.out.println("\nAuditorios disponibles:");
-        facultad.listarAuditorios();
+        // Seleccionar nivel de prioridad
+        System.out.println("\nSeleccione el nivel de prioridad:");
+        System.out.println("[1] Prioridad Baja");
+        System.out.println("[2] Prioridad Media");
+        System.out.println("[3] Prioridad Alta");
+        System.out.println("[4] Prioridad Urgente");
+        System.out.print(">: ");
         
-        System.out.print("\nSeleccione el índice del auditorio: ");
-        int indiceAuditorio = leerEnteroPositivo() - 1;
-
-        System.out.println("\nIngrese fecha y hora de inicio (formato: dd/MM/yyyy HH:mm)");
-        LocalDateTime fechaInicio = leerFecha();
-        if (fechaInicio == null) return;
-
-        System.out.println("Ingrese fecha y hora de fin (formato: dd/MM/yyyy HH:mm)");
-        LocalDateTime fechaFin = leerFecha();
-        if (fechaFin == null) return;
-
-        if (fechaFin.isBefore(fechaInicio)) {
-            System.out.println("[!] La fecha de fin debe ser posterior a la fecha de inicio.");
-            return;
+        int opcion = leerEnteroPositivo();
+        Estado estado;
+        
+        switch (opcion) {
+            case 1 -> estado = Estado.PRIORIDAD_BAJA;
+            case 2 -> estado = Estado.PRIORIDAD_MEDIA;
+            case 3 -> estado = Estado.PRIORIDAD_ALTA;
+            case 4 -> estado = Estado.PRIORIDAD_URGENTE;
+            default -> {
+                System.out.println("[!] Opción no válida. Se usará Prioridad Baja por defecto.");
+                estado = Estado.PRIORIDAD_BAJA;
+            }
         }
 
-        System.out.print("Ingrese el nivel de prioridad (1-5, siendo 5 el más prioritario): ");
-        int nivelPrioridad;
-        do {
-            nivelPrioridad = leerEnteroPositivo();
-            if (nivelPrioridad < 1 || nivelPrioridad > 5) {
-                System.out.print("[!] El nivel debe estar entre 1 y 5. Intente nuevamente: ");
-            }
-        } while (nivelPrioridad < 1 || nivelPrioridad > 5);
+        // Solicitar motivo de la prioridad
+        System.out.print("\nIngrese el motivo de la prioridad: ");
+        String motivo = entrada.nextLine();
+        while (motivo.trim().isEmpty()) {
+            System.out.print("[!] El motivo no puede estar vacío. Ingrese el motivo: ");
+            motivo = entrada.nextLine();
+        }
 
-        // Convertir LocalDateTime a Date para la reserva
-        Date inicio = java.util.Date.from(fechaInicio.atZone(java.time.ZoneId.systemDefault()).toInstant());
-        Date fin = java.util.Date.from(fechaFin.atZone(java.time.ZoneId.systemDefault()).toInstant());
-
-        usuarioActual.crearReservaPrioritaria(nivelPrioridad);
-        int indiceReserva = usuarioActual.getReservas().length - 1;
-        Reserva nuevaReserva = usuarioActual.getReservas()[indiceReserva];
-        nuevaReserva.setFechaInicio(inicio);
-        nuevaReserva.setFechaFin(fin);
-
+        // Crear la reserva prioritaria
+        usuarioActual.crearReservaPrioritaria(estado, motivo);
         System.out.println("[✓] Reserva prioritaria creada exitosamente.");
     }
 

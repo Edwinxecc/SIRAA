@@ -129,14 +129,13 @@ public class Usuario {
         numReservas++;
     }
 
-    public void crearReservaPrioritaria(int nivelPrioridad) {
+    public void crearReservaPrioritaria(Estado estado, String motivo) {
         if (numReservas == reservas.length) {
             Reserva[] aux = reservas;
             reservas = new Reserva[numReservas + 1];
             System.arraycopy(aux, 0, reservas, 0, numReservas);
         }
-        reservas[numReservas] = new ReservaPrioritaria();
-        ((ReservaPrioritaria)reservas[numReservas]).setNivelPrioridad(nivelPrioridad);
+        reservas[numReservas] = new ReservaPrioritaria(0, new Date(), new Date(), estado, motivo);
         numReservas++;
     }
 
@@ -147,7 +146,6 @@ public class Usuario {
         }
         return texto;
     }
-
 
     public void actualizarReserva(int indice, int nuevoId, Date nuevaInicio, Date nuevaFin) {
         if (indice >= 0 && indice < numReservas) {

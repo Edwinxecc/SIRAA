@@ -7,21 +7,70 @@ import java.util.Date;
  * Esta clase maneja la información personal y las reservas de un usuario.
  */
 public class Usuario {
+    // Variables static final para generación automática de códigos
+    private static final String PREFIJO_CODIGO = "USR";
+    private static int contadorUsuarios = 0;
+    
+    private String codigoUsuario;
     private String nombre;
     private String apellido;
     private String correo;
     private int numReservas = 0;
     private Reserva[] reservas;
+    private Estado estado;
 
     public Usuario(String nombre, String apellido, String correo){
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
         this.reservas = new Reserva[0];
+        this.estado = Estado.CONFIRMADA;
+        this.codigoUsuario = generarCodigoUsuario();
     }
 
     public Usuario(){
         this("Sin nombre", "Sin apellido", "NOuser@example.com");
+    }
+
+    // Método para generar códigos automáticos
+    private String generarCodigoUsuario() {
+        contadorUsuarios++;
+        return PREFIJO_CODIGO + String.format("%04d", contadorUsuarios);
+    }
+
+    // Método equals
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Usuario)) return false;
+        
+        Usuario otroUsuario = (Usuario) obj;
+        return this.codigoUsuario.equals(otroUsuario.codigoUsuario) &&
+               this.correo.equals(otroUsuario.correo);
+    }
+
+    // Método para validar duplicados
+    public boolean validarDuplicado(Object obj) {
+        if (!(obj instanceof Usuario)) return false;
+        
+        Usuario otroUsuario = (Usuario) obj;
+        return this.codigoUsuario.equals(otroUsuario.codigoUsuario) ||
+               this.correo.equals(otroUsuario.correo);
+    }
+
+    // Getters y Setters
+    public String getCodigoUsuario() {
+        return codigoUsuario;
+    }
+
+    public Estado getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Estado estado) {
+        if (estado != null) {
+            this.estado = estado;
+        }
     }
 
     public String getNombre() {
@@ -126,6 +175,8 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "[Usuario: " + nombre + " " + apellido + ", Correo: " + correo + "]";
+        return "[Usuario " + codigoUsuario + ": " + nombre + " " + apellido + 
+               ", Correo: " + correo + 
+               ", Estado: " + estado + "]";
     }
 }

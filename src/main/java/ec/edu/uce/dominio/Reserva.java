@@ -7,11 +7,17 @@ import java.util.Date;
  * Esta clase maneja la información de las reservas, incluyendo usuario, auditorio, fechas y equipos asignados.
  */
 public class Reserva {
+    // Variables static final para generación automática de códigos
+    private static final String PREFIJO_CODIGO = "RES";
+    private static int contadorReservas = 0;
+    
+    private String codigoReserva;
     private int idReserva;
     private Date fechaInicio;
     private Date fechaFin;
     private Equipo[] equipos;
     private int numEquipos = 0;
+    private Estado estado;
 
     // Constructor completo
     public Reserva(int idReserva, Date fechaInicio, Date fechaFin){
@@ -19,6 +25,8 @@ public class Reserva {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.equipos = new Equipo[0];
+        this.estado = Estado.PENDIENTE;
+        this.codigoReserva = generarCodigoReserva();
     }
 
     // Constructor por defecto
@@ -26,7 +34,50 @@ public class Reserva {
         this(0, new Date(1990 - 1900, 0, 1), new Date(1990 - 1900, 0, 1));
     }
 
+    // Método para generar códigos automáticos
+    private String generarCodigoReserva() {
+        contadorReservas++;
+        return PREFIJO_CODIGO + String.format("%04d", contadorReservas);
+    }
+
+    // Método equals
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Reserva)) return false;
+        
+        Reserva otraReserva = (Reserva) obj;
+        return this.codigoReserva.equals(otraReserva.codigoReserva) &&
+               this.idReserva == otraReserva.idReserva &&
+               this.fechaInicio.equals(otraReserva.fechaInicio) &&
+               this.fechaFin.equals(otraReserva.fechaFin);
+    }
+
+    // Método para validar duplicados
+    public boolean validarDuplicado(Object obj) {
+        if (!(obj instanceof Reserva)) return false;
+        
+        Reserva otraReserva = (Reserva) obj;
+        return this.codigoReserva.equals(otraReserva.codigoReserva) ||
+               (this.fechaInicio.equals(otraReserva.fechaInicio) && 
+                this.fechaFin.equals(otraReserva.fechaFin));
+    }
+
     // Getters y setters
+    public String getCodigoReserva() {
+        return codigoReserva;
+    }
+
+    public Estado getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Estado estado) {
+        if (estado != null) {
+            this.estado = estado;
+        }
+    }
+
     public int getIdReserva() {
         return idReserva;
     }
@@ -125,9 +176,10 @@ public class Reserva {
     // ========================
     @Override
     public String toString() {
-        return "Reserva ID: " + idReserva +
+        return "Reserva [" + codigoReserva + "] ID: " + idReserva +
                 ", Fecha inicio: " + fechaInicio +
                 ", Fecha fin: " + fechaFin +
+                ", Estado: " + estado +
                 ", Número de equipos: " + numEquipos;
     }
 }

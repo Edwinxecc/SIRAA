@@ -15,7 +15,7 @@ public class Equipo {
     private boolean disponibilidad;
     private Estado estado;
 
-    // Constructor completo
+    // Constructores
     public Equipo(String nombre, String categoria, boolean disponibilidad) {
         this.nombre = nombre;
         this.categoria = categoria;
@@ -24,9 +24,14 @@ public class Equipo {
         this.codigoEquipo = generarCodigoEquipo();
     }
 
-    // Constructor por defecto
     public Equipo() {
         this("Sin nombre", "Sin categoria", false);
+    }
+
+    // Constructor con objeto Equipo
+    public Equipo(Equipo equipo) {
+        this(equipo.getNombre(), equipo.getCategoria(), equipo.getDisponibilidad());
+        this.estado = equipo.getEstado();
     }
 
     // Método para generar códigos automáticos
@@ -98,13 +103,37 @@ public class Equipo {
 
     public void setDisponibilidad(boolean disponibilidad) {
         this.disponibilidad = disponibilidad;
+        this.estado = disponibilidad ? Estado.CONFIRMADA : Estado.CANCELADA;
     }
 
-    // Método auxiliar opcional para imprimir detalles
+    // Método para actualizar todos los atributos
+    public void actualizar(String nombre, String categoria, boolean disponibilidad) {
+        setNombre(nombre);
+        setCategoria(categoria);
+        setDisponibilidad(disponibilidad);
+    }
+
+    // Método para actualizar con objeto
+    public void actualizar(Equipo equipo) {
+        if (equipo != null) {
+            actualizar(equipo.getNombre(), equipo.getCategoria(), equipo.getDisponibilidad());
+            setEstado(equipo.getEstado());
+        }
+    }
+
+    // Método auxiliar para imprimir detalles
     public void mostrarInfo() {
         System.out.println("Equipo [" + codigoEquipo + "]: " + nombre + 
                          " | Categoría: " + categoria + 
                          " | Disponible: " + (disponibilidad ? "Sí" : "No") +
                          " | Estado: " + estado);
+    }
+
+    @Override
+    public String toString() {
+        return "Equipo [" + codigoEquipo + "]: " + nombre + 
+               " | Categoría: " + categoria + 
+               " | Disponible: " + (disponibilidad ? "Sí" : "No") +
+               " | Estado: " + estado;
     }
 }

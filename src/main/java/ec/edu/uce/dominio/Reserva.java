@@ -19,7 +19,7 @@ public class Reserva {
     private int numEquipos = 0;
     private Estado estado;
 
-    // Constructor completo
+    // Constructores
     public Reserva(int idReserva, Date fechaInicio, Date fechaFin){
         this.idReserva = idReserva;
         this.fechaInicio = fechaInicio;
@@ -29,9 +29,20 @@ public class Reserva {
         this.codigoReserva = generarCodigoReserva();
     }
 
-    // Constructor por defecto
     public Reserva(){
         this(0, new Date(1990 - 1900, 0, 1), new Date(1990 - 1900, 0, 1));
+    }
+
+    // Constructor con objeto Reserva
+    public Reserva(Reserva reserva) {
+        this(reserva.getIdReserva(), reserva.getFechaInicio(), reserva.getFechaFin());
+        this.estado = reserva.getEstado();
+        // Copiar equipos
+        for (Equipo equipo : reserva.getEquipos()) {
+            if (equipo != null) {
+                crearEquipo(equipo);
+            }
+        }
     }
 
     // Método para generar códigos automáticos
@@ -116,45 +127,68 @@ public class Reserva {
     // CRUD de Equipos
     // ========================
 
-    public void crearEquipo(String nombre, String categoria, boolean disponible){
-        if (numEquipos == equipos.length){
+    // Crear Equipo - Sobrecarga de métodos
+    public void crearEquipo(String nombre, String categoria, boolean disponible) {
+        crearEquipo(new Equipo(nombre, categoria, disponible));
+    }
+
+    public void crearEquipo(Equipo equipo) {
+        if (equipo == null) return;
+        
+        if (numEquipos == equipos.length) {
             Equipo[] aux = equipos;
             equipos = new Equipo[numEquipos + 1];
             System.arraycopy(aux, 0, equipos, 0, numEquipos);
         }
-        equipos[numEquipos] = new Equipo(nombre, categoria, disponible);
+        equipos[numEquipos] = equipo;
         numEquipos++;
     }
 
-    public String listarEquipos(){
+    // Listar Equipos - Sobrecarga de métodos
+    public String listarEquipos() {
+        return listarEquipos(false);
+    }
+
+    public String listarEquipos(boolean soloDisponibles) {
         if (numEquipos == 0) {
             return "No hay equipos asignados a esta reserva.";
         }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numEquipos; i++) {
-            sb.append(String.format("[%d] Nombre: %s | Categoría: %s | Disponible: %s%n",
-                    i,
-                    equipos[i].getNombre(),
-                    equipos[i].getCategoria(),
-                    equipos[i].getDisponibilidad() ? "Sí" : "No"
-            ));
+            if (!soloDisponibles || equipos[i].getDisponibilidad()) {
+                sb.append(String.format("[%d] Nombre: %s | Categoría: %s | Disponible: %s%n",
+                        i,
+                        equipos[i].getNombre(),
+                        equipos[i].getCategoria(),
+                        equipos[i].getDisponibilidad() ? "Sí" : "No"
+                ));
+            }
         }
         return sb.toString();
     }
 
-    public String actualizarEquipo(int indice, String nuevoNombre, String nuevaCategoria, boolean nuevaDisponibilidad){
-        if (indice >= 0 && indice < numEquipos){
+    // Actualizar Equipo - Sobrecarga de métodos
+    public String actualizarEquipo(int indice, String nuevoNombre, String nuevaCategoria, boolean nuevaDisponibilidad) {
+        if (indice >= 0 && indice < numEquipos) {
             equipos[indice].setNombre(nuevoNombre);
             equipos[indice].setCategoria(nuevaCategoria);
             equipos[indice].setDisponibilidad(nuevaDisponibilidad);
             return "Equipo actualizado.";
-        } else {
-            return "Índice de equipo inválido.";
         }
+        return "Índice de equipo inválido.";
     }
 
-    public String eliminarEquipo(int indice){
-        if (indice >= 0 && indice < numEquipos){
+    public String actualizarEquipo(int indice, Equipo nuevoEquipo) {
+        if (indice >= 0 && indice < numEquipos && nuevoEquipo != null) {
+            equipos[indice] = nuevoEquipo;
+            return "Equipo actualizado.";
+        }
+        return "Índice de equipo inválido o equipo nulo.";
+    }
+
+    // Eliminar Equipo - Sobrecarga de métodos
+    public String eliminarEquipo(int indice) {
+        if (indice >= 0 && indice < numEquipos) {
             for (int i = indice; i < numEquipos - 1; i++) {
                 equipos[i] = equipos[i + 1];
             }
@@ -166,14 +200,21 @@ public class Reserva {
             equipos = aux;
 
             return "Equipo eliminado.";
-        } else {
-            return "Índice de equipo inválido.";
         }
+        return "Índice de equipo inválido.";
     }
 
-    // ========================
-    // toString
-    // ========================
+    public String eliminarEquipo(Equipo equipo) {
+        if (equipo == null) return "Equipo nulo.";
+        
+        for (int i = 0; i < numEquipos; i++) {
+            if (equipos[i].equals(equipo)) {
+                return eliminarEquipo(i);
+            }
+        }
+        return "Equipo no encontrado.";
+    }
+
     @Override
     public String toString() {
         return "Reserva [" + codigoReserva + "] ID: " + idReserva +

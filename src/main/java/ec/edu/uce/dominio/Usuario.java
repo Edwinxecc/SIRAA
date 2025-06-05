@@ -19,6 +19,7 @@ public class Usuario {
     private Reserva[] reservas;
     private Estado estado;
 
+    // Constructores
     public Usuario(String nombre, String apellido, String correo){
         this.nombre = nombre;
         this.apellido = apellido;
@@ -30,6 +31,12 @@ public class Usuario {
 
     public Usuario(){
         this("Sin nombre", "Sin apellido", "NOuser@example.com");
+    }
+
+    // Constructor con objeto Usuario
+    public Usuario(Usuario usuario) {
+        this(usuario.getNombre(), usuario.getApellido(), usuario.getCorreo());
+        this.estado = usuario.getEstado();
     }
 
     // Método para generar códigos automáticos
@@ -109,20 +116,17 @@ public class Usuario {
     // CRUD de Reservas
     // ========================
 
+    // Crear Reserva - Sobrecarga de métodos
     public void crearReserva() {
-        if (numReservas == reservas.length) {
-            Reserva[] aux = reservas;
-            reservas = new Reserva[numReservas + 1];
-            System.arraycopy(aux, 0, reservas, 0, numReservas);
-        }
-        reservas[numReservas] = new Reserva();
-        numReservas++;
+        crearReserva(new Reserva());
     }
 
     public void crearReserva(Reserva reserva){
+        if (reserva == null) return;
+        
         if (numReservas == reservas.length) {
-            Reserva [] aux = reservas;
-            reservas = new Reserva[numReservas+1];
+            Reserva[] aux = reservas;
+            reservas = new Reserva[numReservas + 1];
             System.arraycopy(aux, 0, reservas, 0, numReservas);
         }
         reservas[numReservas] = reserva;
@@ -130,23 +134,25 @@ public class Usuario {
     }
 
     public void crearReservaPrioritaria(Estado estado, String motivo) {
-        if (numReservas == reservas.length) {
-            Reserva[] aux = reservas;
-            reservas = new Reserva[numReservas + 1];
-            System.arraycopy(aux, 0, reservas, 0, numReservas);
-        }
-        reservas[numReservas] = new ReservaPrioritaria(0, new Date(), new Date(), estado, motivo);
-        numReservas++;
+        crearReserva(new ReservaPrioritaria(0, new Date(), new Date(), estado, motivo));
     }
 
+    // Listar Reservas - Sobrecarga de métodos
     public String listarReservas() {
-        String texto = "";
-        for (Reserva r: reservas){
-            texto += r + "\r\n";
-        }
-        return texto;
+        return listarReservas(false);
     }
 
+    public String listarReservas(boolean soloActivas) {
+        StringBuilder texto = new StringBuilder();
+        for (Reserva r: reservas) {
+            if (!soloActivas || r.getEstado() != Estado.CANCELADA) {
+                texto.append(r).append("\r\n");
+            }
+        }
+        return texto.toString();
+    }
+
+    // Actualizar Reserva - Sobrecarga de métodos
     public void actualizarReserva(int indice, int nuevoId, Date nuevaInicio, Date nuevaFin) {
         if (indice >= 0 && indice < numReservas) {
             reservas[indice].setIdReserva(nuevoId);
@@ -155,6 +161,13 @@ public class Usuario {
         }
     }
 
+    public void actualizarReserva(int indice, Reserva nuevaReserva) {
+        if (indice >= 0 && indice < numReservas && nuevaReserva != null) {
+            reservas[indice] = nuevaReserva;
+        }
+    }
+
+    // Eliminar Reserva - Sobrecarga de métodos
     public void eliminarReserva(int indice) {
         if (indice < 0 || indice >= reservas.length) {
             return;
@@ -169,6 +182,18 @@ public class Usuario {
             System.arraycopy(reservas, indice + 1, aux, indice, reservas.length - indice - 1);
         }
         reservas = aux; // Actualizar el array original
+        numReservas--;
+    }
+
+    public void eliminarReserva(Reserva reserva) {
+        if (reserva == null) return;
+        
+        for (int i = 0; i < numReservas; i++) {
+            if (reservas[i].equals(reserva)) {
+                eliminarReserva(i);
+                break;
+            }
+        }
     }
 
     @Override

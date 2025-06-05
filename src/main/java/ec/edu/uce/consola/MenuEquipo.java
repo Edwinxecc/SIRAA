@@ -57,16 +57,17 @@ public class MenuEquipo extends MenuBase {
 
     private void consultarEquipos() {
         System.out.println("\n[2] Consultar Equipos");
-        reservaActual.listarEquipos();
+        System.out.println(reservaActual.listarEquipos());
     }
 
     private void eliminarEquipo() {
         System.out.println("\n[3] Eliminar Equipo");
-        reservaActual.listarEquipos();
+        System.out.println(reservaActual.listarEquipos());
         
         System.out.print("\nSeleccione el índice del equipo a eliminar: ");
         int indice = leerEnteroPositivo() - 1;
         
-        reservaActual.eliminarEquipo(indice);
+        String resultado = reservaActual.eliminarEquipo(indice);
+        System.out.println(resultado);
     }
 } 

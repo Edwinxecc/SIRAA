@@ -51,6 +51,8 @@ public class MenuFacultad extends MenuBase {
     private void mostrarFacultades() {
         System.out.println("\n[2] Mostrar Facultades");
         System.out.println(facultad.toString());
+        System.out.println(facultad.listarAuditorios());
+        System.out.println(facultad.listarUsuarios());
     }
 
     private void editarFacultad() {

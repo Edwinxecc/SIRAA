@@ -62,12 +62,12 @@ public class MenuUsuario extends MenuBase {
 
     private void consultarUsuario() {
         System.out.println("\n[2] Consultar Usuario");
-        facultad.listarUsuarios();
+        System.out.println(facultad.listarUsuarios());
     }
 
     private void editarUsuario() {
         System.out.println("\n[3] Editar Usuario");
-        facultad.listarUsuarios();
+        System.out.println(facultad.listarUsuarios());
         
         System.out.print("Ingrese el índice del usuario a editar: ");
         int indice = leerEnteroPositivo() - 1;
@@ -89,15 +89,17 @@ public class MenuUsuario extends MenuBase {
         }
 
         facultad.actualizarUsuario(indice, nuevoNombre, nuevoApellido, nuevoCorreo);
+        System.out.println("Usuario actualizado.");
     }
 
     private void eliminarUsuario() {
         System.out.println("\n[4] Eliminar Usuario");
-        facultad.listarUsuarios();
+        System.out.println(facultad.listarUsuarios());
         
         System.out.print("Ingrese el índice del usuario a eliminar: ");
         int indice = leerEnteroPositivo() - 1;
         
         facultad.eliminarUsuario(indice);
+        System.out.println("Usuario eliminado.");
     }
 } 

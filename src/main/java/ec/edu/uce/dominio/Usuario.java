@@ -29,7 +29,7 @@ public class Usuario {
     }
 
     public void setNombre(String nombre) {
-        if (nombre.length() > 5){
+        if (nombre != null){
             this.nombre = nombre;
         }
     }
@@ -126,6 +126,6 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "Usuario: " + nombre + " " + apellido + ", Correo: " + correo + ", Reservas: " + numReservas;
+        return "[Usuario: " + nombre + " " + apellido + ", Correo: " + correo + "]";
     }
 }

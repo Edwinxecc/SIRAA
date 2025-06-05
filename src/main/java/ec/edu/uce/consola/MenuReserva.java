@@ -129,12 +129,12 @@ public class MenuReserva extends MenuBase {
 
     private void mostrarReservas() {
         System.out.println("\n[3] Ver Reservas");
-        usuarioActual.listarReservas();
+        System.out.println(usuarioActual.listarReservas());
     }
 
     private void editarReserva() {
         System.out.println("\n[4] Editar Reserva");
-        usuarioActual.listarReservas();
+        System.out.println(usuarioActual.listarReservas());
         
         System.out.print("\nSeleccione el índice de la reserva a editar: ");
         int indice = leerEnteroPositivo() - 1;
@@ -157,15 +157,17 @@ public class MenuReserva extends MenuBase {
         Date fin = java.util.Date.from(nuevaFechaFin.atZone(java.time.ZoneId.systemDefault()).toInstant());
 
         usuarioActual.actualizarReserva(indice, usuarioActual.getReservas()[indice].getIdReserva(), inicio, fin);
+        System.out.println("Reserva actualizada.");
     }
 
     private void eliminarReserva() {
         System.out.println("\n[5] Eliminar Reserva");
-        usuarioActual.listarReservas();
+        System.out.println(usuarioActual.listarReservas());
         
         System.out.print("\nSeleccione el índice de la reserva a eliminar: ");
         int indice = leerEnteroPositivo() - 1;
         
         usuarioActual.eliminarReserva(indice);
+        System.out.println("Reserva eliminada.");
     }
 } 

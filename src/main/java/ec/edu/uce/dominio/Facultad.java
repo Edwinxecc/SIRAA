@@ -29,7 +29,7 @@ public class Facultad {
     }
 
     public void setNombre(String nombre) {
-        if (nombre != null && nombre.length() > 5){
+        if (nombre != null){
             this.nombre = nombre;
         }
     }

@@ -70,6 +70,16 @@ public class Usuario {
         numReservas++;
     }
 
+    public void crearReserva(Reserva reserva){
+        if (numReservas == reservas.length) {
+            Reserva [] aux = reservas;
+            reservas = new Reserva[numReservas+1];
+            System.arraycopy(aux, 0, reservas, 0, numReservas);
+        }
+        reservas[numReservas] = reserva;
+        numReservas++;
+    }
+
     public void crearReservaPrioritaria(int nivelPrioridad) {
         if (numReservas == reservas.length) {
             Reserva[] aux = reservas;
@@ -81,22 +91,14 @@ public class Usuario {
         numReservas++;
     }
 
-    public void listarReservas() {
-        if (numReservas == 0) {
-            return;
+    public String listarReservas() {
+        String texto = "";
+        for (Reserva r: reservas){
+            texto += r + "\r\n";
         }
-        int index = 0;
-        for (Reserva reserva : reservas) {
-            String tipo = (reserva instanceof ReservaPrioritaria) ? "PRIORITARIA" : "NORMAL";
-            index++;
-        }
+        return texto;
     }
 
-    public void verReservas() {
-        if (numReservas == 0) {
-            return;
-        }
-    }
 
     public void actualizarReserva(int indice, int nuevoId, Date nuevaInicio, Date nuevaFin) {
         if (indice >= 0 && indice < numReservas) {
@@ -107,17 +109,19 @@ public class Usuario {
     }
 
     public void eliminarReserva(int indice) {
-        if (indice >= 0 && indice < numReservas) {
-            for (int i = indice; i < numReservas - 1; i++) {
-                reservas[i] = reservas[i + 1];
-            }
-            reservas[numReservas - 1] = null;
-            numReservas--;
-
-            Reserva[] aux = new Reserva[numReservas];
-            System.arraycopy(reservas, 0, aux, 0, numReservas);
-            reservas = aux;
+        if (indice < 0 || indice >= reservas.length) {
+            return;
         }
+        Reserva[] aux = new Reserva[reservas.length - 1];
+        // Copiar elementos antes del índice
+        if (indice > 0) {
+            System.arraycopy(reservas, 0, aux, 0, indice);
+        }
+        // Copiar elementos después del índice
+        if (indice < reservas.length - 1) {
+            System.arraycopy(reservas, indice + 1, aux, indice, reservas.length - indice - 1);
+        }
+        reservas = aux; // Actualizar el array original
     }
 
     @Override

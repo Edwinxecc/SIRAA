@@ -70,13 +70,12 @@ public class Facultad {
         numUsuarios++;
     }
 
-    public void listarUsuarios() {
-        if (numUsuarios == 0) {
-            return;
+    public String listarUsuarios() {
+        String texto = "";
+        for (Usuario u: usuarios){
+            texto += u + "\r\n";
         }
-        for (int i = 0; i < numUsuarios; i++) {
-            Usuario u = usuarios[i];
-        }
+        return texto;
     }
 
     public void actualizarUsuario(int indice, String nuevoNombre, String nuevoApellido, String nuevoCorreo) {
@@ -88,17 +87,19 @@ public class Facultad {
     }
 
     public void eliminarUsuario(int indice) {
-        if (indice >= 0 && indice < numUsuarios) {
-            for (int i = indice; i < numUsuarios - 1; i++) {
-                usuarios[i] = usuarios[i + 1];
-            }
-            usuarios[numUsuarios - 1] = null;
-            numUsuarios--;
-
-            Usuario[] aux = new Usuario[numUsuarios];
-            System.arraycopy(usuarios, 0, aux, 0, numUsuarios);
-            usuarios = aux;
+        if (indice < 0 || indice >= usuarios.length) {
+            return;
         }
+        Usuario[] aux = new Usuario[usuarios.length-1];
+        // Copiar elementos antes del índice
+        if (indice > 0) {
+            System.arraycopy(usuarios, 0, aux, 0, indice);
+        }
+        // Copiar elementos después del índice
+        if (indice < usuarios.length - 1) {
+            System.arraycopy(usuarios, indice + 1, aux, indice, usuarios.length - indice - 1);
+        }
+        usuarios = aux; // Actualizar el array original
     }
 
     // ========================
@@ -106,6 +107,7 @@ public class Facultad {
     // ========================
 
     public void crearAuditorio() {
+        //por defecto
         if (numAuditorios == auditorios.length) {
             Auditorio[] aux = auditorios;
             auditorios = new Auditorio[numAuditorios + 1];
@@ -115,13 +117,22 @@ public class Facultad {
         numAuditorios++;
     }
 
-    public void listarAuditorios() {
-        if (numAuditorios == 0) {
-            return;
+    public void crearAuditorio(Auditorio auditorio){
+        if (numAuditorios == auditorios.length) {
+            Auditorio[] aux = auditorios;
+            auditorios = new Auditorio[numAuditorios + 1];
+            System.arraycopy(aux, 0, auditorios, 0, numAuditorios);
         }
-        for (int i = 0; i < numAuditorios; i++) {
-            Auditorio a = auditorios[i];
+        auditorios[numAuditorios] = auditorio;
+        numAuditorios++;
+    }
+
+    public String listarAuditorios() {
+        String texto = "";
+        for (Auditorio a: auditorios){
+            texto += a + "\r\n";
         }
+        return texto;
     }
 
     public void actualizarAuditorio(int indice, String nuevoNombre, int nuevaCapacidad) {
@@ -132,17 +143,19 @@ public class Facultad {
     }
 
     public void eliminarAuditorio(int indice) {
-        if (indice >= 0 && indice < numAuditorios) {
-            for (int i = indice; i < numAuditorios - 1; i++) {
-                auditorios[i] = auditorios[i + 1];
-            }
-            auditorios[numAuditorios - 1] = null;
-            numAuditorios--;
-
-            Auditorio[] aux = new Auditorio[numAuditorios];
-            System.arraycopy(auditorios, 0, aux, 0, numAuditorios);
-            auditorios = aux;
+        if (indice < 0 || indice >= auditorios.length) {
+            return;
         }
+        Auditorio[] aux = new Auditorio[auditorios.length-1];
+        // Copiar elementos antes del índice
+        if (indice > 0) {
+            System.arraycopy(auditorios, 0, aux, 0, indice);
+        }
+        // Copiar elementos después del índice
+        if (indice < auditorios.length - 1) {
+            System.arraycopy(auditorios, indice + 1, aux, indice, auditorios.length - indice - 1);
+        }
+        auditorios = aux; // Actualizar el array original
     }
 
     // ========================

@@ -33,6 +33,16 @@ public class Universidad {
         numFacultades++;
     }
 
+    public void crearFacultad(Facultad facultad) {
+        if (numFacultades == facultades.length) {
+            Facultad[] aux = facultades;
+            facultades = new Facultad[numFacultades + 1];
+            System.arraycopy(aux, 0, facultades, 0, numFacultades);
+        }
+        facultades[numFacultades] = facultad;
+        numFacultades++;
+    }
+
     public Facultad[] getFacultades() {
         return facultades;
     }
@@ -52,27 +62,27 @@ public class Universidad {
     }
 
     public void eliminarFacultad(int indice) {
-        if (indice >= 0 && indice < numFacultades) {
-            for (int i = indice; i < numFacultades - 1; i++) {
-                facultades[i] = facultades[i + 1];
-            }
-            facultades[numFacultades - 1] = null;
-            numFacultades--;
-
-            Facultad[] aux = new Facultad[numFacultades];
-            System.arraycopy(facultades, 0, aux, 0, numFacultades);
-            facultades = aux;
+        if (indice < 0 || indice >= facultades.length) {
+            return;
         }
+        Facultad[] aux = new Facultad[facultades.length - 1];
+        // Copiar elementos antes del índice
+        if (indice > 0) {
+            System.arraycopy(facultades, 0, aux, 0, indice);
+        }
+        // Copiar elementos después del índice
+        if (indice < facultades.length - 1) {
+            System.arraycopy(facultades, indice + 1, aux, indice, facultades.length - indice - 1);
+        }
+        facultades = aux; // Actualizar el array original
     }
 
     public String listarNombresFacultades() {
-        StringBuilder sb = new StringBuilder();
-        for (Facultad f : facultades) {
-            if (f != null) {
-                sb.append(f.getNombre()).append("\n");
-            }
+        String texto = "";
+        for (Facultad f: facultades){
+            texto += f + "\r\n";
         }
-        return sb.toString();
+        return texto;
     }
 
     @Override

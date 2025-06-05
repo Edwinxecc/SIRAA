@@ -18,4 +18,4 @@ public class Main {
         Menu menuPrincipal = new Menu(facultadPrincipal);
         menuPrincipal.menuDeInicio();
     }
-}   
+}

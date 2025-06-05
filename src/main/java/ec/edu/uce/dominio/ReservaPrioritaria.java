@@ -8,28 +8,24 @@ import java.util.Date;
  */
 public class ReservaPrioritaria extends Reserva {
     // Constantes para la clase
-    private static final NivelPrioridad NIVEL_PRIORIDAD_DEFAULT = NivelPrioridad.BAJA;
+    private static final Estado ESTADO_DEFAULT = Estado.PRIORIDAD_BAJA;
     private static final int MAX_EQUIPOS_PRIORITARIOS = 5;
     
-    private NivelPrioridad nivelPrioridad;
     private String motivoPrioridad;
-    private boolean requiereAprobacion;
 
     /**
      * Constructor completo para ReservaPrioritaria.
      * @param idReserva ID de la reserva
      * @param fechaInicio Fecha de inicio de la reserva
      * @param fechaFin Fecha de fin de la reserva
-     * @param nivelPrioridad Nivel de prioridad de la reserva
+     * @param estado Estado y nivel de prioridad de la reserva
      * @param motivoPrioridad Motivo de la prioridad
      */
     public ReservaPrioritaria(int idReserva, Date fechaInicio, Date fechaFin, 
-                            NivelPrioridad nivelPrioridad, String motivoPrioridad) {
+                            Estado estado, String motivoPrioridad) {
         super(idReserva, fechaInicio, fechaFin);
-        this.nivelPrioridad = nivelPrioridad != null ? nivelPrioridad : NIVEL_PRIORIDAD_DEFAULT;
+        this.setEstado(estado != null && estado.esPrioritario() ? estado : ESTADO_DEFAULT);
         this.motivoPrioridad = motivoPrioridad;
-        this.requiereAprobacion = nivelPrioridad == NivelPrioridad.URGENTE;
-        this.setEstado(Estado.PENDIENTE);
     }
 
     /**
@@ -38,27 +34,25 @@ public class ReservaPrioritaria extends Reserva {
      */
     public ReservaPrioritaria() {
         super();
-        this.nivelPrioridad = NIVEL_PRIORIDAD_DEFAULT;
+        this.setEstado(ESTADO_DEFAULT);
         this.motivoPrioridad = "Sin motivo especificado";
-        this.requiereAprobacion = false;
     }
 
     /**
      * Obtiene el nivel de prioridad de la reserva.
      * @return nivel de prioridad actual
      */
-    public NivelPrioridad getNivelPrioridad() {
-        return nivelPrioridad;
+    public int getNivelPrioridad() {
+        return getEstado().getNivelPrioridad();
     }
 
     /**
      * Establece el nivel de prioridad de la reserva.
-     * @param nivelPrioridad nuevo nivel de prioridad
+     * @param estado nuevo estado y nivel de prioridad
      */
-    public void setNivelPrioridad(NivelPrioridad nivelPrioridad) {
-        if (nivelPrioridad != null) {
-            this.nivelPrioridad = nivelPrioridad;
-            this.requiereAprobacion = nivelPrioridad == NivelPrioridad.URGENTE;
+    public void setNivelPrioridad(Estado estado) {
+        if (estado != null && estado.esPrioritario()) {
+            this.setEstado(estado);
         }
     }
 
@@ -85,7 +79,7 @@ public class ReservaPrioritaria extends Reserva {
      * @return true si requiere aprobación, false en caso contrario
      */
     public boolean requiereAprobacion() {
-        return requiereAprobacion;
+        return getEstado().requiereAprobacion();
     }
 
     @Override
@@ -102,7 +96,7 @@ public class ReservaPrioritaria extends Reserva {
         if (!(obj instanceof ReservaPrioritaria)) return false;
         
         ReservaPrioritaria otraReserva = (ReservaPrioritaria) obj;
-        return this.nivelPrioridad == otraReserva.nivelPrioridad &&
+        return this.getEstado() == otraReserva.getEstado() &&
                this.motivoPrioridad.equals(otraReserva.motivoPrioridad);
     }
 
@@ -112,15 +106,15 @@ public class ReservaPrioritaria extends Reserva {
         if (!(obj instanceof ReservaPrioritaria)) return false;
         
         ReservaPrioritaria otraReserva = (ReservaPrioritaria) obj;
-        return this.nivelPrioridad == otraReserva.nivelPrioridad &&
+        return this.getEstado() == otraReserva.getEstado() &&
                this.motivoPrioridad.equals(otraReserva.motivoPrioridad);
     }
 
     @Override
     public String toString() {
         return super.toString() + 
-               "\nNivel de Prioridad: " + nivelPrioridad +
+               "\nNivel de Prioridad: " + getEstado().getDescripcion() +
                "\nMotivo: " + motivoPrioridad +
-               "\nRequiere Aprobación: " + (requiereAprobacion ? "Sí" : "No");
+               "\nRequiere Aprobación: " + (requiereAprobacion() ? "Sí" : "No");
     }
 } 

@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
 
 /**
  * Test unitario para la implementación de ordenación en la clase Auditorio.
@@ -16,13 +19,18 @@ public class TestOrdenacionAuditorio {
     @BeforeEach
     void setUp() {
         // Crear auditorios de prueba con diferentes características
-        auditorios = new Auditorio[]{
-            new Auditorio("Auditorio A", 150),
-            new Auditorio("Auditorio B", 200),
-            new Auditorio("Auditorio C", 100),
-            new Auditorio("Auditorio D", 300),
-            new Auditorio("Auditorio E", 120)
-        };
+        Map<String, Auditorio> auditoriosMap = new HashMap<>();
+        Auditorio a1 = new Auditorio("Auditorio A", 150);
+        Auditorio a2 = new Auditorio("Auditorio B", 200);
+        Auditorio a3 = new Auditorio("Auditorio C", 100);
+        Auditorio a4 = new Auditorio("Auditorio D", 300);
+        Auditorio a5 = new Auditorio("Auditorio E", 120);
+        auditoriosMap.put(a1.getCodigoAuditorio(), a1);
+        auditoriosMap.put(a2.getCodigoAuditorio(), a2);
+        auditoriosMap.put(a3.getCodigoAuditorio(), a3);
+        auditoriosMap.put(a4.getCodigoAuditorio(), a4);
+        auditoriosMap.put(a5.getCodigoAuditorio(), a5);
+        auditorios = auditoriosMap.values().toArray(new Auditorio[0]);
         
         // Agregar algunas reservas a los auditorios para probar ordenación por número de reservas
         auditorios[0].crearReserva(new Reserva(new Date(), new Date()));

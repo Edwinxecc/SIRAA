@@ -3,6 +3,8 @@ package ec.edu.uce.dominio;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Representa una facultad en el sistema SIRAA.
@@ -17,18 +19,17 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
     private String codigoFacultad;
     private String nombre;
     private int numAuditorios; // Lleva la cuenta de auditorios "reales"
-    private Auditorio[] auditorios; // Arreglo para almacenar auditorios
+    private Map<String, Auditorio> auditorios;
     private int numUsuarios;   // Lleva la cuenta de usuarios "reales"
-    private Usuario[] usuarios;    // Arreglo para almacenar usuarios
+    private Map<String, Usuario> usuarios;
 
     // Constructor completo
     public Facultad(String nombre, int capacidadInicialAuditorios){
         this.nombre = nombre;
-        // Inicializamos los arreglos con una capacidad inicial (puede ser 0 si quieres que crezcan dinámicamente desde el primer elemento)
-        this.auditorios = new Auditorio[capacidadInicialAuditorios > 0 ? capacidadInicialAuditorios : 5]; // Asignamos una capacidad inicial por defecto de 5 si no se especifica
-        this.usuarios = new Usuario[5]; // Asignamos una capacidad inicial por defecto de 5
-        this.numAuditorios = 0; // Al inicio no hay auditorios
-        this.numUsuarios = 0;   // Al inicio no hay usuarios
+        this.auditorios = new HashMap<>();
+        this.usuarios = new HashMap<>();
+        this.numAuditorios = 0;
+        this.numUsuarios = 0;
         this.idFacultad = generarIdFacultad();
         this.codigoFacultad = generarCodigoFacultad();
     }
@@ -74,25 +75,19 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
     }
 
     public int getNumAuditorios() {
-        return numAuditorios; // Devuelve la cantidad de auditorios que realmente existen
+        return auditorios.size();
     }
 
     public int getNumUsuarios() {
-        return numUsuarios; // Devuelve la cantidad de usuarios que realmente existen
+        return usuarios.size();
     }
 
     public Usuario[] getUsuarios() {
-        // Devolvemos una copia del arreglo con solo los elementos reales para evitar NullPointerExceptions
-        Usuario[] usuariosActivos = new Usuario[numUsuarios];
-        System.arraycopy(usuarios, 0, usuariosActivos, 0, numUsuarios);
-        return usuariosActivos;
+        return usuarios.values().toArray(new Usuario[0]);
     }
 
     public Auditorio[] getAuditorios() {
-        // Devolvemos una copia del arreglo con solo los elementos reales
-        Auditorio[] auditoriosActivos = new Auditorio[numAuditorios];
-        System.arraycopy(auditorios, 0, auditoriosActivos, 0, numAuditorios);
-        return auditoriosActivos;
+        return auditorios.values().toArray(new Auditorio[0]);
     }
 
     // ========================
@@ -106,75 +101,47 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
 
     public void crearUsuario(Usuario usuario) {
         if (usuario == null) return;
-
-        // Validar duplicado por correo
-        for (int i = 0; i < numUsuarios; i++) {
-            if (usuarios[i] != null && usuarios[i].validarDuplicado(usuario)) {
-                System.out.println("[!] Usuario duplicado. No se puede agregar.");
-                return;
-            }
+        if (usuarios.containsKey(usuario.getCodigoUsuario())) {
+            System.out.println("[!] Usuario duplicado. No se puede agregar.");
+            return;
         }
-
-        // Si el arreglo está lleno, lo redimensionamos para que quepa el nuevo usuario
-        if (numUsuarios == usuarios.length) {
-            Usuario[] aux = usuarios; // Guardamos el arreglo actual
-            usuarios = new Usuario[numUsuarios + 1]; // Creamos un nuevo arreglo con un espacio más
-            System.arraycopy(aux, 0, usuarios, 0, numUsuarios); // Copiamos los usuarios existentes
-        }
-        usuarios[numUsuarios] = usuario; // Agregamos el nuevo usuario en la siguiente posición disponible
-        numUsuarios++; // Incrementamos el contador de usuarios reales
+        usuarios.put(usuario.getCodigoUsuario(), usuario);
     }
 
     // Listar Usuarios
     public String listarUsuarios() {
-        if (numUsuarios == 0) {
+        if (usuarios.isEmpty()) {
             return "[!] No hay usuarios creados.";
         }
         StringBuilder texto = new StringBuilder();
-        for (int i = 0; i < numUsuarios; i++) {
-            texto.append("[").append(i).append("] ").append(usuarios[i]).append("\r\n");
+        int i = 0;
+        for (Usuario u : usuarios.values()) {
+            texto.append("[").append(i++).append("] ").append(u).append("\r\n");
         }
         return texto.toString();
     }
 
     // Actualizar Usuario - Sobrecarga
-    public void actualizarUsuario(int indice, String nuevoNombre, String nuevoApellido, String nuevoCorreo) {
-        if (indice >= 0 && indice < numUsuarios) { // Aseguramos que el índice sea válido dentro de los usuarios reales
-            usuarios[indice].setNombre(nuevoNombre);
-            usuarios[indice].setApellido(nuevoApellido);
-            usuarios[indice].setCorreo(nuevoCorreo);
+    public void actualizarUsuario(String codigo, Usuario usuario) {
+        if (usuarios.containsKey(codigo) && usuario != null) {
+            usuarios.put(codigo, usuario);
         }
     }
 
     public void actualizarUsuario(int indice, Usuario usuario) {
         if (indice >= 0 && indice < numUsuarios && usuario != null) { // Aseguramos que el índice sea válido
-            usuarios[indice] = usuario;
+            usuarios.put(usuario.getCodigoUsuario(), usuario);
         }
     }
 
     // Eliminar Usuario - Sobrecarga
-    public void eliminarUsuario(int indice) {
-        // Validar que el índice esté dentro del rango de usuarios reales
-        if (indice < 0 || indice >= numUsuarios) {
-            return;
-        }
-
-        // Movemos los elementos para llenar el espacio del eliminado
-        for (int i = indice; i < numUsuarios - 1; i++) {
-            usuarios[i] = usuarios[i + 1];
-        }
-        usuarios[numUsuarios - 1] = null; // Opcional: limpiar la última posición
-        numUsuarios--; // Decrementamos el contador de usuarios reales
+    public void eliminarUsuario(String codigo) {
+        usuarios.remove(codigo);
     }
 
     public void eliminarUsuario(Usuario usuario) {
         if (usuario == null) return;
-        for (int i = 0; i < numUsuarios; i++) {
-            if (usuarios[i] != null && usuarios[i].equals(usuario)) { // Añadimos null check
-                eliminarUsuario(i);
-                break;
-            }
-        }
+        usuarios.remove(usuario.getCodigoUsuario());
     }
 
     // ========================
@@ -188,64 +155,47 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
 
     public void crearAuditorio(Auditorio auditorio){
         if (auditorio == null) return;
-
-        if (numAuditorios == auditorios.length) {
-            Auditorio[] aux = auditorios;
-            auditorios = new Auditorio[numAuditorios + 1];
-            System.arraycopy(aux, 0, auditorios, 0, numAuditorios);
+        if (auditorios.containsKey(auditorio.getCodigoAuditorio())) {
+            System.out.println("[!] Auditorio duplicado. No se puede agregar.");
+            return;
         }
-        auditorios[numAuditorios] = auditorio;
-        numAuditorios++;
+        auditorios.put(auditorio.getCodigoAuditorio(), auditorio);
     }
 
     // Listar Auditorios
     public String listarAuditorios() {
-        if (numAuditorios == 0) {
+        if (auditorios.isEmpty()) {
             return "[!] No hay auditorios creados.";
         }
         StringBuilder texto = new StringBuilder();
-        for (int i = 0; i < numAuditorios; i++) {
-            texto.append("[").append(i).append("] ").append(auditorios[i]).append("\r\n");
+        int i = 0;
+        for (Auditorio a : auditorios.values()) {
+            texto.append("[").append(i++).append("] ").append(a).append("\r\n");
         }
         return texto.toString();
     }
 
     // Actualizar Auditorio - Sobrecarga
-    public void actualizarAuditorio(int indice, String nuevoNombre, int nuevaCapacidad) {
-        if (indice >= 0 && indice < numAuditorios) {
-            auditorios[indice].setNombre(nuevoNombre);
-            auditorios[indice].setCapacidad(nuevaCapacidad);
+    public void actualizarAuditorio(String codigo, Auditorio auditorio) {
+        if (auditorios.containsKey(codigo) && auditorio != null) {
+            auditorios.put(codigo, auditorio);
         }
     }
 
     public void actualizarAuditorio(int indice, Auditorio auditorio) {
         if (indice >= 0 && indice < numAuditorios && auditorio != null) {
-            auditorios[indice] = auditorio;
+            auditorios.put(auditorios.values().toArray(new Auditorio[0])[indice].getCodigoAuditorio(), auditorio);
         }
     }
 
     // Eliminar Auditorio - Sobrecarga
-    public void eliminarAuditorio(int indice) {
-        if (indice < 0 || indice >= numAuditorios) {
-            return;
-        }
-
-        // Movemos los elementos para llenar el espacio del eliminado
-        for (int i = indice; i < numAuditorios - 1; i++) {
-            auditorios[i] = auditorios[i + 1];
-        }
-        auditorios[numAuditorios - 1] = null; // Opcional: limpiar la última posición
-        numAuditorios--; // Decrementamos el contador de auditorios reales
+    public void eliminarAuditorio(String codigo) {
+        auditorios.remove(codigo);
     }
 
     public void eliminarAuditorio(Auditorio auditorio) {
         if (auditorio == null) return;
-        for (int i = 0; i < numAuditorios; i++) {
-            if (auditorios[i] != null && auditorios[i].equals(auditorio)) { // Añadimos null check
-                eliminarAuditorio(i);
-                break;
-            }
-        }
+        auditorios.remove(auditorio.getCodigoAuditorio());
     }
 
     // ========================
@@ -376,7 +326,10 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         Auditorio[] auditoriosActivos = getAuditorios();
         Arrays.sort(auditoriosActivos);
         // Actualizar el arreglo interno
-        System.arraycopy(auditoriosActivos, 0, auditorios, 0, numAuditorios);
+        auditorios.clear();
+        for (Auditorio auditorio : auditoriosActivos) {
+            auditorios.put(auditorio.getCodigoAuditorio(), auditorio);
+        }
     }
 
     /**
@@ -386,7 +339,10 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         Auditorio[] auditoriosActivos = getAuditorios();
         Arrays.sort(auditoriosActivos, Auditorio.COMPARADOR_POR_CAPACIDAD);
         // Actualizar el arreglo interno
-        System.arraycopy(auditoriosActivos, 0, auditorios, 0, numAuditorios);
+        auditorios.clear();
+        for (Auditorio auditorio : auditoriosActivos) {
+            auditorios.put(auditorio.getCodigoAuditorio(), auditorio);
+        }
     }
 
     /**
@@ -396,7 +352,10 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         Auditorio[] auditoriosActivos = getAuditorios();
         Arrays.sort(auditoriosActivos, Auditorio.COMPARADOR_POR_NUM_RESERVAS);
         // Actualizar el arreglo interno
-        System.arraycopy(auditoriosActivos, 0, auditorios, 0, numAuditorios);
+        auditorios.clear();
+        for (Auditorio auditorio : auditoriosActivos) {
+            auditorios.put(auditorio.getCodigoAuditorio(), auditorio);
+        }
     }
 
     // ========================
@@ -410,7 +369,10 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         Usuario[] usuariosActivos = getUsuarios();
         Arrays.sort(usuariosActivos, Usuario.COMPARADOR_POR_NOMBRE);
         // Actualizar el arreglo interno
-        System.arraycopy(usuariosActivos, 0, usuarios, 0, numUsuarios);
+        usuarios.clear();
+        for (Usuario usuario : usuariosActivos) {
+            usuarios.put(usuario.getCodigoUsuario(), usuario);
+        }
     }
 
     /**
@@ -420,7 +382,10 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         Usuario[] usuariosActivos = getUsuarios();
         Arrays.sort(usuariosActivos, Usuario.COMPARADOR_POR_APELLIDO);
         // Actualizar el arreglo interno
-        System.arraycopy(usuariosActivos, 0, usuarios, 0, numUsuarios);
+        usuarios.clear();
+        for (Usuario usuario : usuariosActivos) {
+            usuarios.put(usuario.getCodigoUsuario(), usuario);
+        }
     }
 
     /**
@@ -430,7 +395,10 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         Usuario[] usuariosActivos = getUsuarios();
         Arrays.sort(usuariosActivos, Usuario.COMPARADOR_POR_CORREO);
         // Actualizar el arreglo interno
-        System.arraycopy(usuariosActivos, 0, usuarios, 0, numUsuarios);
+        usuarios.clear();
+        for (Usuario usuario : usuariosActivos) {
+            usuarios.put(usuario.getCodigoUsuario(), usuario);
+        }
     }
 
     /**
@@ -440,7 +408,10 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         Usuario[] usuariosActivos = getUsuarios();
         Arrays.sort(usuariosActivos, Usuario.COMPARADOR_POR_NUM_RESERVAS);
         // Actualizar el arreglo interno
-        System.arraycopy(usuariosActivos, 0, usuarios, 0, numUsuarios);
+        usuarios.clear();
+        for (Usuario usuario : usuariosActivos) {
+            usuarios.put(usuario.getCodigoUsuario(), usuario);
+        }
     }
 
     // ========================

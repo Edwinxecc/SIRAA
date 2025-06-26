@@ -3,6 +3,8 @@ package ec.edu.uce.dominio;
 import java.util.Date;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Representa una reserva de auditorio en el sistema SIRAA.
@@ -19,7 +21,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     private String codigoReserva;
     private Date fechaInicio;
     private Date fechaFin;
-    private Equipo[] equipos;
+    private Map<String, Equipo> equipos;
     private int numEquipos = 0;
     private Estado estado;
 
@@ -27,7 +29,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     public Reserva(int idReserva, Date fechaInicio, Date fechaFin){
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.equipos = new Equipo[CAPACIDAD_INICIAL_EQUIPOS_DEFECTO];
+        this.equipos = new HashMap<>();
         this.estado = Estado.PENDIENTE;
         this.idReserva = generarIdReserva();
         this.codigoReserva = generarCodigoReserva();
@@ -52,7 +54,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     public Reserva(Date fechaInicio, Date fechaFin) {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.equipos = new Equipo[CAPACIDAD_INICIAL_EQUIPOS_DEFECTO];
+        this.equipos = new HashMap<>();
         this.estado = Estado.PENDIENTE;
         this.idReserva = generarIdReserva();
         this.codigoReserva = generarCodigoReserva();
@@ -139,9 +141,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     }
 
     public Equipo[] getEquipos() {
-        Equipo[] equiposCopia = new Equipo[numEquipos];
-        System.arraycopy(equipos, 0, equiposCopia, 0, numEquipos);
-        return equiposCopia;
+        return equipos.values().toArray(new Equipo[0]);
     }
 
     // ========================
@@ -154,14 +154,11 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
 
     public void crearEquipo(Equipo equipo) {
         if (equipo == null) return;
-
-        if (numEquipos == equipos.length) {
-            Equipo[] aux = equipos;
-            equipos = new Equipo[numEquipos + 1];
-            System.arraycopy(aux, 0, equipos, 0, numEquipos);
+        if (equipos.containsKey(equipo.getCodigoEquipo())) {
+            System.out.println("[!] Equipo duplicado. No se puede agregar.");
+            return;
         }
-        equipos[numEquipos] = equipo;
-        numEquipos++;
+        equipos.put(equipo.getCodigoEquipo(), equipo);
     }
 
     public String listarEquipos() {
@@ -169,67 +166,42 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     }
 
     public String listarEquipos(boolean soloDisponibles) {
-        if (numEquipos == 0) {
+        if (equipos.isEmpty()) {
             return "No hay equipos asignados a esta reserva.";
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < numEquipos; i++) {
-            if (equipos[i] != null && (!soloDisponibles || equipos[i].getDisponibilidad())) {
+        int i = 0;
+        for (Equipo equipo : equipos.values()) {
+            if (equipo != null && (!soloDisponibles || equipo.getDisponibilidad())) {
                 sb.append(String.format("[%d] Nombre: %s | Categoría: %s | Disponible: %s%n",
-                        i,
-                        equipos[i].getNombre(),
-                        equipos[i].getCategoria(),
-                        equipos[i].getDisponibilidad() ? "Sí" : "No"
+                        i++,
+                        equipo.getNombre(),
+                        equipo.getCategoria(),
+                        equipo.getDisponibilidad() ? "Sí" : "No"
                 ));
             }
         }
         return sb.toString();
     }
 
-    public String actualizarEquipo(int indice, String nuevoNombre, String nuevaCategoria, boolean nuevaDisponibilidad) {
-        if (indice >= 0 && indice < numEquipos) {
-            equipos[indice].setNombre(nuevoNombre);
-            equipos[indice].setCategoria(nuevaCategoria);
-            equipos[indice].setDisponibilidad(nuevaDisponibilidad);
+    public String actualizarEquipo(String codigo, Equipo nuevoEquipo) {
+        if (equipos.containsKey(codigo) && nuevoEquipo != null) {
+            equipos.put(codigo, nuevoEquipo);
             return "Equipo actualizado.";
         }
-        return "Índice de equipo inválido.";
+        return "Código de equipo inválido.";
     }
 
-    public String actualizarEquipo(int indice, Equipo nuevoEquipo) {
-        if (indice >= 0 && indice < numEquipos && nuevoEquipo != null) {
-            equipos[indice] = nuevoEquipo;
-            return "Equipo actualizado.";
-        }
-        return "Índice de equipo inválido o equipo nulo.";
-    }
-
-    public String eliminarEquipo(int indice) {
-        if (indice >= 0 && indice < numEquipos) {
-            for (int i = indice; i < numEquipos - 1; i++) {
-                equipos[i] = equipos[i + 1];
-            }
-            equipos[numEquipos - 1] = null;
-            numEquipos--;
-
-            Equipo[] aux = new Equipo[numEquipos];
-            System.arraycopy(equipos, 0, aux, 0, numEquipos);
-            equipos = aux;
-
+    public String eliminarEquipo(String codigo) {
+        if (equipos.remove(codigo) != null) {
             return "Equipo eliminado.";
         }
-        return "Índice de equipo inválido.";
+        return "Código de equipo inválido.";
     }
 
     public String eliminarEquipo(Equipo equipo) {
         if (equipo == null) return "Equipo nulo.";
-        
-        for (int i = 0; i < numEquipos; i++) {
-            if (equipos[i] != null && equipos[i].equals(equipo)) {
-                return eliminarEquipo(i);
-            }
-        }
-        return "Equipo no encontrado.";
+        return eliminarEquipo(equipo.getCodigoEquipo());
     }
 
     public boolean requiereAprobacion() {

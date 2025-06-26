@@ -2,6 +2,9 @@ package ec.edu.uce.dominio;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
 
 /**
  * Test completo para evidenciar rápidamente la implementación de ordenamientos.
@@ -37,14 +40,20 @@ public class TestOrdenacionCompleto {
         System.out.println("🔹 TEST ORDENACIÓN DE USUARIOS");
         System.out.println("=" .repeat(50));
         
-        // Crear usuarios de prueba
-        Usuario[] usuarios = {
-            new Usuario("Carlos", "López", "carlos.lopez@uce.edu.ec"),
-            new Usuario("Ana", "Martínez", "ana.martinez@uce.edu.ec"),
-            new Usuario("Juan", "Pérez", "juan.perez@uce.edu.ec"),
-            new Usuario("María", "García", "maria.garcia@uce.edu.ec"),
-            new Usuario("Luis", "Rodríguez", "luis.rodriguez@uce.edu.ec")
-        };
+        // Simular colección real con Map
+        Map<String, Usuario> usuariosMap = new HashMap<>();
+        Usuario u1 = new Usuario("Carlos", "López", "carlos.lopez@uce.edu.ec");
+        Usuario u2 = new Usuario("Ana", "Martínez", "ana.martinez@uce.edu.ec");
+        Usuario u3 = new Usuario("Juan", "Pérez", "juan.perez@uce.edu.ec");
+        Usuario u4 = new Usuario("María", "García", "maria.garcia@uce.edu.ec");
+        Usuario u5 = new Usuario("Luis", "Rodríguez", "luis.rodriguez@uce.edu.ec");
+        usuariosMap.put(u1.getCodigoUsuario(), u1);
+        usuariosMap.put(u2.getCodigoUsuario(), u2);
+        usuariosMap.put(u3.getCodigoUsuario(), u3);
+        usuariosMap.put(u4.getCodigoUsuario(), u4);
+        usuariosMap.put(u5.getCodigoUsuario(), u5);
+        Collection<Usuario> usuariosCol = usuariosMap.values();
+        Usuario[] usuarios = usuariosCol.toArray(new Usuario[0]);
         
         // Agregar reservas para probar ordenación por número de reservas
         usuarios[0].crearReserva(new Reserva(new Date(), new Date()));

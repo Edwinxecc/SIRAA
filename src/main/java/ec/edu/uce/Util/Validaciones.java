@@ -1,6 +1,8 @@
 package ec.edu.uce.Util;
 
 import java.util.Scanner;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * Clase de utilidades para validaciones del sistema SIRAA.
@@ -59,5 +61,34 @@ public class Validaciones {
      */
     public boolean validarTextoNoVacio(String texto) {
         return texto != null && !texto.trim().isEmpty();
+    }
+
+    /**
+     * Valida si el texto cumple con el patrón regex proporcionado.
+     * @param texto Texto a validar
+     * @param regex Expresión regular
+     * @return true si el texto cumple con el patrón, false en caso contrario
+     */
+    public boolean pattern(String texto, String regex) {
+        if (texto == null) return false;
+        return Pattern.matches(regex, texto);
+    }
+
+    /**
+     * Solicita al usuario una entrada que cumpla con el patrón regex proporcionado.
+     * @param textoInicial Texto inicial a validar
+     * @param campo Nombre del campo para mensajes de error
+     * @param regex Expresión regular que debe cumplir la entrada
+     * @param mensajeError Mensaje de error a mostrar si no cumple
+     * @param entrada Scanner para leer la entrada del usuario
+     * @return Texto validado que cumple con el patrón
+     */
+    public String match(String textoInicial, String campo, String regex, String mensajeError, Scanner entrada) {
+        String texto = textoInicial;
+        while (!Pattern.matches(regex, texto)) {
+            System.out.println(mensajeError != null ? mensajeError : ("El " + campo + " no cumple con el formato requerido. Inténtalo de nuevo:"));
+            texto = entrada.nextLine();
+        }
+        return texto;
     }
 }

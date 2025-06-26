@@ -1,6 +1,9 @@
 package ec.edu.uce.dominio;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
 
 public class TestReserva {
     public static void main(String[] args) {

@@ -2,6 +2,8 @@ package ec.edu.uce.consola;
 
 import ec.edu.uce.dominio.Equipo;
 import ec.edu.uce.dominio.Reserva;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuEquipo extends MenuBase {
     private final Reserva reservaActual;
@@ -49,11 +51,11 @@ public class MenuEquipo extends MenuBase {
 
         System.out.print("Ingrese nombre del equipo: ");
         String nombre = entrada.nextLine();
-        nombre = validacion.ValidacionTexto(nombre, "nombre");
+        nombre = validacion.match(nombre, "nombre", "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$", "El nombre solo debe contener letras y espacios (mínimo 2 caracteres). Inténtalo de nuevo:", entrada);
 
         System.out.print("Ingrese tipo de equipo: ");
         String categoria = entrada.nextLine();
-        categoria = validacion.ValidacionTexto(categoria, "categoría");
+        categoria = validacion.match(categoria, "categoría", "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$", "La categoría solo debe contener letras y espacios (mínimo 2 caracteres). Inténtalo de nuevo:", entrada);
 
         System.out.print("¿Está disponible? (true/false): ");
         boolean disponible = leerBooleano();
@@ -90,99 +92,78 @@ public class MenuEquipo extends MenuBase {
 
     private void editarEquipo() {
         System.out.println("\n[3] Editar Equipo");
-        Equipo[] equipos = reservaActual.getEquipos();
-        
-        if (equipos.length == 0) {
+        List<Equipo> equipos = new ArrayList<>(List.of(reservaActual.getEquipos()));
+        if (equipos.isEmpty()) {
             System.out.println("[!] No hay equipos para editar.");
             return;
         }
-        
         System.out.println("=== LISTA DE EQUIPOS ===");
-        for (int i = 0; i < equipos.length; i++) {
-            System.out.println("[" + i + "] " + equipos[i]);
+        for (int i = 0; i < equipos.size(); i++) {
+            System.out.println("[" + i + "] " + equipos.get(i) + " (Código: " + equipos.get(i).getCodigoEquipo() + ")");
         }
-
         System.out.print("\nSeleccione el índice del equipo a editar: ");
         int indice = leerEnteroPositivo();
-
-        if (indice < 0 || indice >= equipos.length) {
+        if (indice < 0 || indice >= equipos.size()) {
             System.out.println("[!] Índice inválido.");
             return;
         }
-
-        Equipo equipoAEditar = equipos[indice];
+        Equipo equipoAEditar = equipos.get(indice);
         System.out.println("\nEditando equipo: " + equipoAEditar);
-
         System.out.print("Nuevo nombre (actual: " + equipoAEditar.getNombre() + "): ");
         String nuevoNombre = entrada.nextLine();
         if (!nuevoNombre.trim().isEmpty()) {
-            nuevoNombre = validacion.ValidacionTexto(nuevoNombre, "nombre");
+            nuevoNombre = validacion.match(nuevoNombre, "nombre", "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$", "El nombre solo debe contener letras y espacios (mínimo 2 caracteres). Inténtalo de nuevo:", entrada);
         } else {
             nuevoNombre = equipoAEditar.getNombre();
         }
-
         System.out.print("Nueva categoría (actual: " + equipoAEditar.getCategoria() + "): ");
         String nuevaCategoria = entrada.nextLine();
         if (!nuevaCategoria.trim().isEmpty()) {
-            nuevaCategoria = validacion.ValidacionTexto(nuevaCategoria, "categoría");
+            nuevaCategoria = validacion.match(nuevaCategoria, "categoría", "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$", "La categoría solo debe contener letras y espacios (mínimo 2 caracteres). Inténtalo de nuevo:", entrada);
         } else {
             nuevaCategoria = equipoAEditar.getCategoria();
         }
-
         System.out.print("¿Está disponible? (actual: " + (equipoAEditar.getDisponibilidad() ? "Sí" : "No") + ") (true/false): ");
         String disponibilidadStr = entrada.nextLine();
         boolean nuevaDisponibilidad = equipoAEditar.getDisponibilidad();
         if (!disponibilidadStr.trim().isEmpty()) {
             nuevaDisponibilidad = disponibilidadStr.toLowerCase().equals("true");
         }
-
-        // Crear equipo actualizado
         Equipo equipoActualizado = new Equipo(nuevoNombre, nuevaCategoria, nuevaDisponibilidad);
         equipoActualizado.setEstado(equipoAEditar.getEstado());
-        
-        // Usar el método de la interfaz IAdministrarCRUD
         String resultado = equipoAEditar.editar(equipoActualizado);
         System.out.println(resultado);
-        
         if (resultado.contains("editado correctamente")) {
-            reservaActual.actualizarEquipo(indice, equipoActualizado);
+            reservaActual.actualizarEquipo(equipoAEditar.getCodigoEquipo(), equipoActualizado);
             System.out.println("[✓] Equipo actualizado correctamente.");
         }
     }
 
     private void eliminarEquipo() {
         System.out.println("\n[4] Eliminar Equipo");
-        Equipo[] equipos = reservaActual.getEquipos();
-        
-        if (equipos.length == 0) {
+        List<Equipo> equipos = new ArrayList<>(List.of(reservaActual.getEquipos()));
+        if (equipos.isEmpty()) {
             System.out.println("[!] No hay equipos para eliminar.");
             return;
         }
-        
         System.out.println("=== LISTA DE EQUIPOS ===");
-        for (int i = 0; i < equipos.length; i++) {
-            System.out.println("[" + i + "] " + equipos[i]);
+        for (int i = 0; i < equipos.size(); i++) {
+            System.out.println("[" + i + "] " + equipos.get(i) + " (Código: " + equipos.get(i).getCodigoEquipo() + ")");
         }
-
         System.out.print("\nSeleccione el índice del equipo a eliminar: ");
         int indice = leerEnteroPositivo();
-
-        if (indice < 0 || indice >= equipos.length) {
+        if (indice < 0 || indice >= equipos.size()) {
             System.out.println("[!] Índice inválido.");
             return;
         }
-
-        Equipo equipoAEliminar = equipos[indice];
+        Equipo equipoAEliminar = equipos.get(indice);
         System.out.println("¿Está seguro de eliminar el equipo: " + equipoAEliminar + "? (s/n): ");
         String confirmacion = entrada.nextLine().toLowerCase();
-        
         if (confirmacion.equals("s") || confirmacion.equals("si") || confirmacion.equals("sí")) {
-            // Usar el método de la interfaz IAdministrarCRUD
             String resultado = equipoAEliminar.borrar(equipoAEliminar);
             System.out.println(resultado);
-            
             if (resultado.contains("eliminado correctamente")) {
-                String resultadoEliminacion = reservaActual.eliminarEquipo(indice);
+                String resultadoEliminacion = reservaActual.eliminarEquipo(equipoAEliminar.getCodigoEquipo());
                 System.out.println(resultadoEliminacion);
             }
         } else {

@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
 
 /**
  * Test unitario para la implementación de ordenación en la clase Facultad.
@@ -16,23 +19,26 @@ public class TestOrdenacionFacultad {
     @BeforeEach
     void setUp() {
         // Crear facultades de prueba con diferentes características
-        facultades = new Facultad[]{
-            new Facultad("Facultad de Ingeniería"),
-            new Facultad("Facultad de Ciencias"),
-            new Facultad("Facultad de Medicina"),
-            new Facultad("Facultad de Derecho"),
-            new Facultad("Facultad de Economía")
-        };
+        Map<String, Facultad> facultadesMap = new HashMap<>();
+        Facultad f1 = new Facultad("Facultad de Ingeniería");
+        Facultad f2 = new Facultad("Facultad de Ciencias");
+        Facultad f3 = new Facultad("Facultad de Medicina");
+        Facultad f4 = new Facultad("Facultad de Derecho");
+        Facultad f5 = new Facultad("Facultad de Economía");
+        facultadesMap.put(f1.getCodigoFacultad(), f1);
+        facultadesMap.put(f2.getCodigoFacultad(), f2);
+        facultadesMap.put(f3.getCodigoFacultad(), f3);
+        facultadesMap.put(f4.getCodigoFacultad(), f4);
+        facultadesMap.put(f5.getCodigoFacultad(), f5);
+        facultades = facultadesMap.values().toArray(new Facultad[0]);
         
-        // Agregar algunos auditorios y usuarios a las facultades para probar ordenación
+        // Agregar auditorios y usuarios para probar ordenación
         facultades[0].crearAuditorio(new Auditorio("Auditorio A", 150));
         facultades[0].crearAuditorio(new Auditorio("Auditorio B", 200));
         facultades[0].crearUsuario(new Usuario("Juan", "Pérez", "juan.perez@uce.edu.ec"));
         facultades[0].crearUsuario(new Usuario("María", "García", "maria.garcia@uce.edu.ec"));
-        
         facultades[1].crearAuditorio(new Auditorio("Auditorio C", 100));
         facultades[1].crearUsuario(new Usuario("Carlos", "López", "carlos.lopez@uce.edu.ec"));
-        
         facultades[2].crearAuditorio(new Auditorio("Auditorio D", 300));
         facultades[2].crearAuditorio(new Auditorio("Auditorio E", 120));
         facultades[2].crearAuditorio(new Auditorio("Auditorio F", 180));

@@ -1,5 +1,9 @@
 package ec.edu.uce.dominio;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
+
 public class TestEquipo {
     public static void main(String[] args) {
         System.out.println("--- Test de la clase Equipo ---");

@@ -1,6 +1,9 @@
 package ec.edu.uce.dominio;
 
 import ec.edu.uce.Util.OrdenacionUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
 
 /**
  * Clase de prueba para demostrar el uso de los métodos de ordenación

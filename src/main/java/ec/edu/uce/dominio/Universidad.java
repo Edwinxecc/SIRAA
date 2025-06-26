@@ -3,6 +3,8 @@ package ec.edu.uce.dominio;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Representa una universidad en el sistema SIRAA.
@@ -13,13 +15,11 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     // 1. Atributo estático privado que almacena la única instancia
     private static Universidad instancia;
 
-    private int numFacultades = 0;
-    private Facultad[] facultades;
+    private Map<String, Facultad> facultades;
 
     // 2. Constructor privado para evitar que se cree con new desde fuera
     private Universidad() {
-        this.numFacultades = 0;
-        this.facultades = new Facultad[10]; // capacidad inicial de 10
+        this.facultades = new HashMap<>();
     }
 
     // 3. Método público estático que devuelve la instancia única
@@ -33,12 +33,12 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     // Getters y setters
 
     public int getNumFacultades() {
-        return numFacultades;
+        return facultades.size();
     }
 
     public void setNumFacultades(int numFacultades) {
         if (numFacultades >= 0){
-            this.numFacultades = numFacultades;
+            // This method is no longer used as the number of facultades is managed by the map
         }
     }
 
@@ -49,12 +49,7 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      */
     public boolean validarDuplicado(Facultad facultad) {
         if (facultad == null) return false;
-        for (int i = 0; i < numFacultades; i++) {
-            if (facultades[i] != null && facultades[i].equals(facultad)) {
-                return true;
-            }
-        }
-        return false;
+        return facultades.containsKey(facultad.getCodigoFacultad());
     }
 
     // Métodos CRUD de Facultad
@@ -84,69 +79,49 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
             System.out.println("La facultad ya existe y no se puede agregar duplicada.");
             return;
         }
-        if (numFacultades == facultades.length) {
-            Facultad[] aux = facultades;
-            facultades = new Facultad[numFacultades + 1];
-            System.arraycopy(aux, 0, facultades, 0, numFacultades);
-        }
-        facultades[numFacultades] = facultad;
-        numFacultades++;
+        facultades.put(facultad.getCodigoFacultad(), facultad);
     }
 
     public Facultad[] getFacultades() {
-        // Devuelve una copia con solo los elementos reales para evitar NullPointerExceptions
-        Facultad[] facultadesActivas = new Facultad[numFacultades];
-        System.arraycopy(facultades, 0, facultadesActivas, 0, numFacultades);
-        return facultadesActivas;
+        return facultades.values().toArray(new Facultad[0]);
     }
 
     /**
      * Obtiene una facultad por su índice.
-     * @param indice Índice de la facultad.
+     * @param codigo Código de la facultad.
      * @return La facultad en el índice especificado o null si el índice es inválido.
      */
-    public Facultad getFacultad(int indice) {
-        if (indice >= 0 && indice < numFacultades) {
-            return facultades[indice];
-        }
-        return null;
+    public Facultad getFacultad(String codigo) {
+        return facultades.get(codigo);
     }
 
     /**
      * Actualiza el nombre de una facultad.
-     * @param indice Índice de la facultad a actualizar.
+     * @param codigo Código de la facultad a actualizar.
      * @param nuevoNombre Nuevo nombre de la facultad.
      */
-    public void actualizarFacultad(int indice, String nuevoNombre) {
-        if (indice >= 0 && indice < numFacultades) {
-            facultades[indice].setNombre(nuevoNombre);
+    public void actualizarFacultad(String codigo, Facultad facultad) {
+        if (facultades.containsKey(codigo) && facultad != null) {
+            facultades.put(codigo, facultad);
         }
     }
 
     /**
      * Actualiza una facultad con un nuevo objeto Facultad.
-     * @param indice Índice de la facultad a actualizar.
      * @param facultad Nuevo objeto Facultad.
      */
-    public void actualizarFacultad(int indice, Facultad facultad) {
-        if (indice >= 0 && indice < numFacultades && facultad != null) {
-            facultades[indice] = facultad;
+    public void actualizarFacultad(Facultad facultad) {
+        if (facultad != null) {
+            facultades.put(facultad.getCodigoFacultad(), facultad);
         }
     }
 
     /**
      * Elimina una facultad por su índice.
-     * @param indice Índice de la facultad a eliminar.
+     * @param codigo Código de la facultad a eliminar.
      */
-    public void eliminarFacultad(int indice) {
-        if (indice < 0 || indice >= numFacultades) {
-            return;
-        }
-        for (int i = indice; i < numFacultades - 1; i++) {
-            facultades[i] = facultades[i + 1];
-        }
-        facultades[numFacultades - 1] = null;
-        numFacultades--;
+    public void eliminarFacultad(String codigo) {
+        facultades.remove(codigo);
     }
 
     /**
@@ -155,12 +130,7 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      */
     public void eliminarFacultad(Facultad facultad) {
         if (facultad == null) return;
-        for (int i = 0; i < numFacultades; i++) {
-            if (facultades[i] != null && facultades[i].equals(facultad)) {
-                eliminarFacultad(i);
-                break;
-            }
-        }
+        facultades.remove(facultad.getCodigoFacultad());
     }
 
     /**
@@ -168,14 +138,12 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      * @return Una cadena con la lista de facultades.
      */
     public String listarNombresFacultades() {
-        if (numFacultades == 0) {
+        if (facultades.isEmpty()) {
             return "[!] No hay facultades registradas.";
         }
         StringBuilder texto = new StringBuilder();
-        for (int i = 0; i < numFacultades; i++) {
-            if (facultades[i] != null) {
-                texto.append(facultades[i]).append("\r\n");
-            }
+        for (Facultad f : facultades.values()) {
+            texto.append(f).append("\r\n");
         }
         return texto.toString();
     }
@@ -200,7 +168,7 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
                            "│ Facultades Registradas: %-3d │%n" +
                            "└─────────────────────────────────────────────────────────────────────┘",
                            "Universidad Central del Ecuador (UCE)",
-                           numFacultades);
+                           getNumFacultades());
     }
 
     // Métodos de la interfaz IAdministrarCRUD
@@ -224,10 +192,9 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
             return "[!] El objeto no es una Facultad válida.";
         }
         Facultad facultadEditada = (Facultad) obj;
-        for (int i = 0; i < getNumFacultades(); i++) {
-            Facultad f = getFacultad(i);
-            if (f != null && f.equals(facultadEditada)) {
-                actualizarFacultad(i, facultadEditada);
+        for (Facultad f : facultades.values()) {
+            if (f.equals(facultadEditada)) {
+                actualizarFacultad(f.getCodigoFacultad(), facultadEditada);
                 return "[✓] Facultad editada correctamente.";
             }
         }
@@ -240,10 +207,9 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
             return "[!] El objeto no es una Facultad válida.";
         }
         Facultad facultadABorrar = (Facultad) obj;
-        for (int i = 0; i < getNumFacultades(); i++) {
-            Facultad f = getFacultad(i);
-            if (f != null && f.equals(facultadABorrar)) {
-                eliminarFacultad(i);
+        for (Facultad f : facultades.values()) {
+            if (f.equals(facultadABorrar)) {
+                eliminarFacultad(f.getCodigoFacultad());
                 return "[✓] Facultad eliminada correctamente.";
             }
         }
@@ -255,7 +221,7 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
         if (id == null || id < 0 || id >= getNumFacultades()) {
             return null;
         }
-        return getFacultad(id);
+        return getFacultad(id.toString());
     }
 
     @Override
@@ -278,8 +244,6 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     public void ordenarFacultadesPorNombre() {
         Facultad[] facultadesActivas = getFacultades();
         Arrays.sort(facultadesActivas);
-        // Actualizar el arreglo interno
-        System.arraycopy(facultadesActivas, 0, facultades, 0, numFacultades);
     }
 
     /**
@@ -288,8 +252,6 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     public void ordenarFacultadesPorNumAuditorios() {
         Facultad[] facultadesActivas = getFacultades();
         Arrays.sort(facultadesActivas, Facultad.COMPARADOR_POR_NUM_AUDITORIOS);
-        // Actualizar el arreglo interno
-        System.arraycopy(facultadesActivas, 0, facultades, 0, numFacultades);
     }
 
     /**
@@ -298,8 +260,6 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     public void ordenarFacultadesPorNumUsuarios() {
         Facultad[] facultadesActivas = getFacultades();
         Arrays.sort(facultadesActivas, Facultad.COMPARADOR_POR_NUM_USUARIOS);
-        // Actualizar el arreglo interno
-        System.arraycopy(facultadesActivas, 0, facultades, 0, numFacultades);
     }
 
     /**
@@ -308,8 +268,6 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     public void ordenarFacultadesPorId() {
         Facultad[] facultadesActivas = getFacultades();
         Arrays.sort(facultadesActivas, Facultad.COMPARADOR_POR_ID);
-        // Actualizar el arreglo interno
-        System.arraycopy(facultadesActivas, 0, facultades, 0, numFacultades);
     }
 
     // ========================

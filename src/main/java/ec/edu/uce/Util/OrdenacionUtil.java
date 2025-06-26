@@ -3,6 +3,9 @@ package ec.edu.uce.Util;
 import ec.edu.uce.dominio.*;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
 
 /**
  * Clase de utilidad para demostrar el uso de los métodos de ordenación
@@ -15,34 +18,34 @@ public class OrdenacionUtil {
      */
     public static void demostrarOrdenacionUsuarios() {
         System.out.println("=== DEMOSTRACIÓN ORDENACIÓN DE USUARIOS ===");
-        
-        // Crear algunos usuarios de ejemplo
-        Usuario[] usuarios = {
-            new Usuario("Carlos", "López", "carlos.lopez@uce.edu.ec"),
-            new Usuario("Ana", "Martínez", "ana.martinez@uce.edu.ec"),
-            new Usuario("Juan", "Pérez", "juan.perez@uce.edu.ec"),
-            new Usuario("María", "García", "maria.garcia@uce.edu.ec")
-        };
-
+        // Simular colección real con Map
+        Map<String, Usuario> usuariosMap = new HashMap<>();
+        Usuario u1 = new Usuario("Carlos", "López", "carlos.lopez@uce.edu.ec");
+        Usuario u2 = new Usuario("Ana", "Martínez", "ana.martinez@uce.edu.ec");
+        Usuario u3 = new Usuario("Juan", "Pérez", "juan.perez@uce.edu.ec");
+        Usuario u4 = new Usuario("María", "García", "maria.garcia@uce.edu.ec");
+        usuariosMap.put(u1.getCodigoUsuario(), u1);
+        usuariosMap.put(u2.getCodigoUsuario(), u2);
+        usuariosMap.put(u3.getCodigoUsuario(), u3);
+        usuariosMap.put(u4.getCodigoUsuario(), u4);
+        Collection<Usuario> usuariosCol = usuariosMap.values();
+        Usuario[] usuarios = usuariosCol.toArray(new Usuario[0]);
         System.out.println("Usuarios originales:");
         for (Usuario usuario : usuarios) {
             System.out.println(usuario);
         }
-
         // Ordenar por ID (Comparable)
         System.out.println("\n--- Ordenados por ID (Comparable) ---");
         Arrays.sort(usuarios);
         for (Usuario usuario : usuarios) {
             System.out.println(usuario);
         }
-
         // Ordenar por nombre (Comparator)
         System.out.println("\n--- Ordenados por nombre (Comparator) ---");
         Arrays.sort(usuarios, Usuario.COMPARADOR_POR_NOMBRE);
         for (Usuario usuario : usuarios) {
             System.out.println(usuario);
         }
-
         // Ordenar por apellido (Comparator)
         System.out.println("\n--- Ordenados por apellido (Comparator) ---");
         Arrays.sort(usuarios, Usuario.COMPARADOR_POR_APELLIDO);
@@ -56,28 +59,25 @@ public class OrdenacionUtil {
      */
     public static void demostrarOrdenacionAuditorios() {
         System.out.println("\n=== DEMOSTRACIÓN ORDENACIÓN DE AUDITORIOS ===");
-        
-        // Crear algunos auditorios de ejemplo
-        Auditorio[] auditorios = {
-            new Auditorio("Sala de Conferencias", 75),
-            new Auditorio("Auditorio Principal", 100),
-            new Auditorio("Aula Magna", 200),
-            new Auditorio("Auditorio Secundario", 50)
-        };
-
+        Map<String, Auditorio> auditoriosMap = new HashMap<>();
+        Auditorio a1 = new Auditorio("Sala de Conferencias", 75);
+        Auditorio a2 = new Auditorio("Auditorio Principal", 100);
+        Auditorio a3 = new Auditorio("Aula Magna", 200);
+        Auditorio a4 = new Auditorio("Auditorio Secundario", 50);
+        auditoriosMap.put(a1.getCodigoAuditorio(), a1);
+        auditoriosMap.put(a2.getCodigoAuditorio(), a2);
+        auditoriosMap.put(a3.getCodigoAuditorio(), a3);
+        auditoriosMap.put(a4.getCodigoAuditorio(), a4);
+        Auditorio[] auditorios = auditoriosMap.values().toArray(new Auditorio[0]);
         System.out.println("Auditorios originales:");
         for (Auditorio auditorio : auditorios) {
             System.out.println(auditorio);
         }
-
-        // Ordenar por nombre (Comparable)
         System.out.println("\n--- Ordenados por nombre (Comparable) ---");
         Arrays.sort(auditorios);
         for (Auditorio auditorio : auditorios) {
             System.out.println(auditorio);
         }
-
-        // Ordenar por capacidad (Comparator)
         System.out.println("\n--- Ordenados por capacidad (Comparator) ---");
         Arrays.sort(auditorios, Auditorio.COMPARADOR_POR_CAPACIDAD);
         for (Auditorio auditorio : auditorios) {
@@ -90,28 +90,25 @@ public class OrdenacionUtil {
      */
     public static void demostrarOrdenacionFacultades() {
         System.out.println("\n=== DEMOSTRACIÓN ORDENACIÓN DE FACULTADES ===");
-        
-        // Crear algunas facultades de ejemplo
-        Facultad[] facultades = {
-            new Facultad("Facultad de Medicina", 5),
-            new Facultad("Facultad de Ingeniería", 5),
-            new Facultad("Facultad de Derecho", 5),
-            new Facultad("Facultad de Ciencias Sociales", 5)
-        };
-
+        Map<String, Facultad> facultadesMap = new HashMap<>();
+        Facultad f1 = new Facultad("Facultad de Medicina", 5);
+        Facultad f2 = new Facultad("Facultad de Ingeniería", 5);
+        Facultad f3 = new Facultad("Facultad de Derecho", 5);
+        Facultad f4 = new Facultad("Facultad de Ciencias Sociales", 5);
+        facultadesMap.put(f1.getCodigoFacultad(), f1);
+        facultadesMap.put(f2.getCodigoFacultad(), f2);
+        facultadesMap.put(f3.getCodigoFacultad(), f3);
+        facultadesMap.put(f4.getCodigoFacultad(), f4);
+        Facultad[] facultades = facultadesMap.values().toArray(new Facultad[0]);
         System.out.println("Facultades originales:");
         for (Facultad facultad : facultades) {
             System.out.println(facultad);
         }
-
-        // Ordenar por nombre (Comparable)
         System.out.println("\n--- Ordenadas por nombre (Comparable) ---");
         Arrays.sort(facultades);
         for (Facultad facultad : facultades) {
             System.out.println(facultad);
         }
-
-        // Ordenar por ID (Comparator)
         System.out.println("\n--- Ordenadas por ID (Comparator) ---");
         Arrays.sort(facultades, Facultad.COMPARADOR_POR_ID);
         for (Facultad facultad : facultades) {
@@ -163,35 +160,30 @@ public class OrdenacionUtil {
      */
     public static void demostrarOrdenacionEquipos() {
         System.out.println("\n=== DEMOSTRACIÓN ORDENACIÓN DE EQUIPOS ===");
-        
-        // Crear algunos equipos de ejemplo
-        Equipo[] equipos = {
-            new Equipo("Laptop", "Computación", true),
-            new Equipo("Proyector", "Visual", true),
-            new Equipo("Micrófono", "Audio", false),
-            new Equipo("Cámara", "Video", true)
-        };
-
+        Map<String, Equipo> equiposMap = new HashMap<>();
+        Equipo e1 = new Equipo("Laptop", "Computación", true);
+        Equipo e2 = new Equipo("Proyector", "Visual", true);
+        Equipo e3 = new Equipo("Micrófono", "Audio", false);
+        Equipo e4 = new Equipo("Cámara", "Video", true);
+        equiposMap.put(e1.getCodigoEquipo(), e1);
+        equiposMap.put(e2.getCodigoEquipo(), e2);
+        equiposMap.put(e3.getCodigoEquipo(), e3);
+        equiposMap.put(e4.getCodigoEquipo(), e4);
+        Equipo[] equipos = equiposMap.values().toArray(new Equipo[0]);
         System.out.println("Equipos originales:");
         for (Equipo equipo : equipos) {
             System.out.println(equipo);
         }
-
-        // Ordenar por nombre (Comparable)
         System.out.println("\n--- Ordenados por nombre (Comparable) ---");
         Arrays.sort(equipos);
         for (Equipo equipo : equipos) {
             System.out.println(equipo);
         }
-
-        // Ordenar por disponibilidad (Comparator)
         System.out.println("\n--- Ordenados por disponibilidad (Comparator) ---");
         Arrays.sort(equipos, Equipo.COMPARADOR_POR_DISPONIBILIDAD);
         for (Equipo equipo : equipos) {
             System.out.println(equipo);
         }
-
-        // Ordenar por categoría (Comparator)
         System.out.println("\n--- Ordenados por categoría (Comparator) ---");
         Arrays.sort(equipos, Equipo.COMPARADOR_POR_CATEGORIA);
         for (Equipo equipo : equipos) {

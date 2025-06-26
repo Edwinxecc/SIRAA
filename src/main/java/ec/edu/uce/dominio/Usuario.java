@@ -4,6 +4,8 @@ package ec.edu.uce.dominio;
 import java.util.Date;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Representa un usuario del sistema SIRAA.
@@ -19,8 +21,7 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     private String nombre;
     private String apellido;
     private String correo;
-    private int numReservas = 0;
-    private Reserva[] reservas;
+    private Map<String, Reserva> reservas;
     private Estado estado;
 
     // Constructores
@@ -28,7 +29,7 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
-        this.reservas = new Reserva[0];
+        this.reservas = new HashMap<>();
         this.estado = Estado.CONFIRMADA;
         this.idUsuario = generarIdUsuario();
         this.codigoUsuario = generarCodigoUsuario();
@@ -125,14 +126,11 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     }
 
     public Reserva[] getReservas() {
-        // Devuelve una copia con solo los elementos reales para evitar NullPointerExceptions
-        Reserva[] reservasActivas = new Reserva[numReservas];
-        System.arraycopy(reservas, 0, reservasActivas, 0, numReservas);
-        return reservasActivas;
+        return reservas.values().toArray(new Reserva[0]);
     }
 
     public int getNumReservas() {
-        return numReservas;
+        return reservas.size();
     }
 
     // ========================
@@ -147,22 +145,11 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
 
     public void crearReserva(Reserva reserva){
         if (reserva == null) return;
-
-        // Validar duplicados antes de agregar
-        for (int i = 0; i < numReservas; i++) {
-            if (reservas[i] != null && reservas[i].validarDuplicado(reserva)) { // Añadido null check
-                System.out.println("[!] Reserva duplicada. No se puede agregar.");
-                return;
-            }
+        if (reservas.containsKey(reserva.getCodigoReserva())) {
+            System.out.println("[!] Reserva duplicada. No se puede agregar.");
+            return;
         }
-
-        if (numReservas == reservas.length) {
-            Reserva[] aux = reservas;
-            reservas = new Reserva[numReservas + 1];
-            System.arraycopy(aux, 0, reservas, 0, numReservas);
-        }
-        reservas[numReservas] = reserva;
-        numReservas++;
+        reservas.put(reserva.getCodigoReserva(), reserva);
     }
 
     public void crearReservaPrioritaria(Estado estado, String motivo) {
@@ -175,12 +162,11 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     }
 
     public String listarReservas(boolean soloActivas) {
-        if (numReservas == 0) {
+        if (reservas.isEmpty()) {
             return "No hay reservas asignadas a este usuario.";
         }
         StringBuilder texto = new StringBuilder();
-        for (int i = 0; i < numReservas; i++) { // Iterar hasta numReservas
-            Reserva r = reservas[i];
+        for (Reserva r : reservas.values()) {
             if (r != null && (!soloActivas || r.getEstado() != Estado.CANCELADA)) {
                 texto.append(r).append("\r\n");
             }
@@ -189,46 +175,20 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     }
 
     // Actualizar Reserva - Sobrecarga de métodos
-    public void actualizarReserva(int indice, int nuevoId, Date nuevaInicio, Date nuevaFin) {
-        if (indice >= 0 && indice < numReservas) { // Ajustado a numReservas
-            reservas[indice].setIdReserva(nuevoId);
-            reservas[indice].setFechaInicio(nuevaInicio);
-            reservas[indice].setFechaFin(nuevaFin);
-        }
-    }
-
-    public void actualizarReserva(int indice, Reserva nuevaReserva) {
-        if (indice >= 0 && indice < numReservas && nuevaReserva != null) { // Ajustado a numReservas
-            reservas[indice] = nuevaReserva;
+    public void actualizarReserva(String codigo, Reserva nuevaReserva) {
+        if (reservas.containsKey(codigo) && nuevaReserva != null) {
+            reservas.put(codigo, nuevaReserva);
         }
     }
 
     // Eliminar Reserva - Sobrecarga de métodos
-    public void eliminarReserva(int indice) {
-        if (indice < 0 || indice >= numReservas) { // Ajustado a numReservas
-            return;
-        }
-        // Mover elementos para llenar el espacio
-        for (int i = indice; i < numReservas - 1; i++) {
-            reservas[i] = reservas[i + 1];
-        }
-        reservas[numReservas - 1] = null; // Limpiar la última posición
-        numReservas--; // Decrementar el contador
-
-        // Redimensionar el arreglo
-        Reserva[] aux = new Reserva[numReservas];
-        System.arraycopy(reservas, 0, aux, 0, numReservas);
-        reservas = aux;
+    public void eliminarReserva(String codigo) {
+        reservas.remove(codigo);
     }
 
     public void eliminarReserva(Reserva reserva) {
         if (reserva == null) return;
-        for (int i = 0; i < numReservas; i++) {
-            if (reservas[i] != null && reservas[i].equals(reserva)) {
-                eliminarReserva(i);
-                break;
-            }
-        }
+        reservas.remove(reserva.getCodigoReserva());
     }
 
     // Métodos de la interfaz IAdministrarCRUD
@@ -241,8 +201,8 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
         Usuario usuarioNuevo = (Usuario) obj;
 
         // Validar duplicado por correo
-        for (int i = 0; i < numReservas; i++) {
-            if (reservas[i] != null && reservas[i].validarDuplicado(usuarioNuevo)) {
+        for (Reserva r : reservas.values()) {
+            if (r != null && r.validarDuplicado(usuarioNuevo)) {
                 return "[!] El usuario ya existe.";
             }
         }
@@ -271,9 +231,9 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
             return "[!] El objeto no es un Usuario válido.";
         }
         Usuario usuarioABorrar = (Usuario) obj;
-        for (int i = 0; i < numReservas; i++) {
-            if (reservas[i] != null && reservas[i].equals(usuarioABorrar)) {
-                eliminarReserva(i);
+        for (Reserva r : reservas.values()) {
+            if (r != null && r.equals(usuarioABorrar)) {
+                eliminarReserva(r.getCodigoReserva());
                 return "[✓] Usuario eliminado correctamente.";
             }
         }
@@ -319,7 +279,7 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
                            "└─────────────────────────────────────────────────────────────────────┘",
                            codigoUsuario, idUsuario, estado.getDescripcion(),
                            nombre, apellido,
-                           correo, numReservas);
+                           correo, reservas.size());
     }
 
     @Override
@@ -343,7 +303,10 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
             }
         });
         // Actualizar el arreglo interno
-        System.arraycopy(reservasActivas, 0, reservas, 0, numReservas);
+        reservas.clear();
+        for (Reserva r : reservasActivas) {
+            reservas.put(r.getCodigoReserva(), r);
+        }
     }
 
     /**
@@ -358,7 +321,10 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
             }
         });
         // Actualizar el arreglo interno
-        System.arraycopy(reservasActivas, 0, reservas, 0, numReservas);
+        reservas.clear();
+        for (Reserva r : reservasActivas) {
+            reservas.put(r.getCodigoReserva(), r);
+        }
     }
 
     /**
@@ -373,7 +339,10 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
             }
         });
         // Actualizar el arreglo interno
-        System.arraycopy(reservasActivas, 0, reservas, 0, numReservas);
+        reservas.clear();
+        for (Reserva r : reservasActivas) {
+            reservas.put(r.getCodigoReserva(), r);
+        }
     }
 
     // ========================

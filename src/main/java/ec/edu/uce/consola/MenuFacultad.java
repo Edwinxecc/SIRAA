@@ -1,6 +1,8 @@
 package ec.edu.uce.consola;
 
 import ec.edu.uce.dominio.Facultad;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuFacultad extends MenuBase {
     private final Facultad facultad;
@@ -44,7 +46,7 @@ public class MenuFacultad extends MenuBase {
 
         System.out.print("Nombre de la facultad: ");
         String nombre = entrada.nextLine();
-        nombre = validacion.ValidacionTexto(nombre, "nombre");
+        nombre = validacion.match(nombre, "nombre", "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$", "El nombre solo debe contener letras y espacios (mínimo 2 caracteres). Inténtalo de nuevo:", entrada);
 
         System.out.print("Cantidad inicial de auditorios: ");
         int cantidad = leerEnteroPositivo();
@@ -71,9 +73,15 @@ public class MenuFacultad extends MenuBase {
         System.out.println("=== INFORMACIÓN DE LA FACULTAD ACTUAL ===");
         System.out.println(facultad);
         System.out.println("\n=== AUDITORIOS ===");
-        System.out.println(facultad.listarAuditorios());
+        List<ec.edu.uce.dominio.Auditorio> auditorios = new ArrayList<>(facultad.getAuditorios());
+        for (ec.edu.uce.dominio.Auditorio a : auditorios) {
+            System.out.println("Código: " + a.getCodigoAuditorio() + " | " + a);
+        }
         System.out.println("\n=== USUARIOS ===");
-        System.out.println(facultad.listarUsuarios());
+        List<ec.edu.uce.dominio.Usuario> usuarios = new ArrayList<>(facultad.getUsuarios());
+        for (ec.edu.uce.dominio.Usuario u : usuarios) {
+            System.out.println("Código: " + u.getCodigoUsuario() + " | " + u);
+        }
     }
 
     private void editarFacultad() {
@@ -83,7 +91,7 @@ public class MenuFacultad extends MenuBase {
         System.out.print("Nuevo nombre (actual: " + facultad.getNombre() + "): ");
         String nuevoNombre = entrada.nextLine();
         if (!nuevoNombre.trim().isEmpty()) {
-            nuevoNombre = validacion.ValidacionTexto(nuevoNombre, "nombre");
+            nuevoNombre = validacion.match(nuevoNombre, "nombre", "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$", "El nombre solo debe contener letras y espacios (mínimo 2 caracteres). Inténtalo de nuevo:", entrada);
         } else {
             nuevoNombre = facultad.getNombre();
         }

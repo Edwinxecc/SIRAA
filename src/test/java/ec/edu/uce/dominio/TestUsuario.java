@@ -19,10 +19,19 @@ public class TestUsuario {
         // Dado que 'Reserva' es abstracta, necesitamos instanciar 'ReservaPrioritaria'.
         // También se añaden fechas y un estado para la reserva.
         System.out.println("Creando algunas reservas...");
-        Reserva re1 = new ReservaPrioritaria(1, new Date(), new Date(new Date().getTime() + 3600 * 1000 * 24), Estado.PENDIENTE, "Reunión importante");
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTime(new Date());
+        Date fechaInicio1 = cal.getTime();
+        cal.add(java.util.Calendar.DATE, 1);
+        Date fechaFin1 = cal.getTime();
+        Reserva re1 = new ReservaPrioritaria(1, fechaInicio1, fechaFin1, Estado.PENDIENTE, "Reunión importante");
         user.crearReserva(re1);
 
-        Reserva re2 = new ReservaPrioritaria(2, new Date(new Date().getTime() + 3600 * 1000 * 24 * 7), new Date(new Date().getTime() + 3600 * 1000 * 24 * 8), Estado.PRIORIDAD_MEDIA, "Evento departamental");
+        cal.add(java.util.Calendar.DATE, 6);
+        Date fechaInicio2 = cal.getTime();
+        cal.add(java.util.Calendar.DATE, 1);
+        Date fechaFin2 = cal.getTime();
+        Reserva re2 = new ReservaPrioritaria(2, fechaInicio2, fechaFin2, Estado.PRIORIDAD_MEDIA, "Evento departamental");
         user.crearReserva(re2);
 
         // Crear una reserva con el método simplificado del usuario
@@ -49,7 +58,16 @@ public class TestUsuario {
         System.out.println("Actualizando la primera reserva (índice 0) con nuevas fechas y ID...");
         // Aseguramos que haya al menos una reserva para actualizar
         if (user.getReservas().length > 0) {
-            user.actualizarReserva(0, 99, new Date(new Date().getTime() + 3600 * 1000 * 24 * 10), new Date(new Date().getTime() + 3600 * 1000 * 24 * 11));
+            Reserva reservaActualizar = user.getReservas()[0];
+            reservaActualizar.setIdReserva(99);
+            cal.setTime(new Date());
+            cal.add(java.util.Calendar.DATE, 10);
+            Date nuevaFechaInicio = cal.getTime();
+            cal.add(java.util.Calendar.DATE, 1);
+            Date nuevaFechaFin = cal.getTime();
+            reservaActualizar.setFechaInicio(nuevaFechaInicio);
+            reservaActualizar.setFechaFin(nuevaFechaFin);
+            user.actualizarReserva(reservaActualizar.getCodigoReserva(), reservaActualizar);
             System.out.println("Reservas después de la actualización de la primera reserva:");
             System.out.println(user.listarReservas());
         } else {
@@ -61,7 +79,8 @@ public class TestUsuario {
         System.out.println("Eliminando la primera reserva (índice 0)...");
         // Aseguramos que haya al menos una reserva para eliminar
         if (user.getReservas().length > 0) {
-            user.eliminarReserva(0);
+            Reserva reservaEliminar = user.getReservas()[0];
+            user.eliminarReserva(reservaEliminar.getCodigoReserva());
             System.out.println("Reservas después de la eliminación:");
             System.out.println(user.listarReservas());
             System.out.println("Número de reservas del usuario: " + user.getReservas().length);

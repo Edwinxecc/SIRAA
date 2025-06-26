@@ -2,6 +2,7 @@ package ec.edu.uce.consola;
 
 import ec.edu.uce.dominio.Facultad;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MenuFacultad extends MenuBase {
@@ -73,14 +74,22 @@ public class MenuFacultad extends MenuBase {
         System.out.println("=== INFORMACIÓN DE LA FACULTAD ACTUAL ===");
         System.out.println(facultad);
         System.out.println("\n=== AUDITORIOS ===");
-        List<ec.edu.uce.dominio.Auditorio> auditorios = new ArrayList<>(facultad.getAuditorios());
-        for (ec.edu.uce.dominio.Auditorio a : auditorios) {
-            System.out.println("Código: " + a.getCodigoAuditorio() + " | " + a);
+        List<ec.edu.uce.dominio.Auditorio> auditorios = new ArrayList<>(Arrays.asList(facultad.getAuditorios()));
+        if (auditorios.isEmpty()) {
+            System.out.println("[!] No hay auditorios registrados.");
+        } else {
+            for (ec.edu.uce.dominio.Auditorio a : auditorios) {
+                System.out.println("Código: " + a.getCodigoAuditorio() + " | " + a);
+            }
         }
         System.out.println("\n=== USUARIOS ===");
-        List<ec.edu.uce.dominio.Usuario> usuarios = new ArrayList<>(facultad.getUsuarios());
-        for (ec.edu.uce.dominio.Usuario u : usuarios) {
-            System.out.println("Código: " + u.getCodigoUsuario() + " | " + u);
+        List<ec.edu.uce.dominio.Usuario> usuarios = new ArrayList<>(Arrays.asList(facultad.getUsuarios()));
+        if (usuarios.isEmpty()) {
+            System.out.println("[!] No hay usuarios registrados.");
+        } else {
+            for (ec.edu.uce.dominio.Usuario u : usuarios) {
+                System.out.println("Código: " + u.getCodigoUsuario() + " | " + u);
+            }
         }
     }
 
@@ -112,7 +121,7 @@ public class MenuFacultad extends MenuBase {
     private void eliminarFacultad() {
         System.out.println("\n[4] Eliminar Facultad");
         System.out.println("Facultad actual: " + facultad);
-        System.out.println("¿Está seguro de eliminar esta facultad? (s/n): ");
+        System.out.print("¿Está seguro de eliminar esta facultad? (s/n): ");
         String confirmacion = entrada.nextLine().toLowerCase();
         
         if (confirmacion.equals("s") || confirmacion.equals("si") || confirmacion.equals("sí")) {

@@ -20,22 +20,29 @@ public class TestRelacionAuditorioReserva {
         System.out.println("\n2. Creando reservas...");
         
         // Reserva 1
-        Date fecha1 = new Date(2024, 0, 15, 9, 0); // 15 de enero de 2024, 9:00 AM
-        Date fecha2 = new Date(2024, 0, 15, 11, 0); // 15 de enero de 2024, 11:00 AM
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.set(2024, java.util.Calendar.JANUARY, 15, 9, 0, 0);
+        Date fecha1 = cal.getTime(); // 15 de enero de 2024, 9:00 AM
+        cal.set(2024, java.util.Calendar.JANUARY, 15, 11, 0, 0);
+        Date fecha2 = cal.getTime(); // 15 de enero de 2024, 11:00 AM
         Reserva reserva1 = new Reserva(1, fecha1, fecha2);
         reserva1.setEstado(Estado.CONFIRMADA);
         auditorio.crearReserva(reserva1);
         
         // Reserva 2
-        Date fecha3 = new Date(2024, 0, 16, 14, 0); // 16 de enero de 2024, 2:00 PM
-        Date fecha4 = new Date(2024, 0, 16, 16, 0); // 16 de enero de 2024, 4:00 PM
+        cal.set(2024, java.util.Calendar.JANUARY, 16, 14, 0, 0);
+        Date fecha3 = cal.getTime(); // 16 de enero de 2024, 2:00 PM
+        cal.set(2024, java.util.Calendar.JANUARY, 16, 16, 0, 0);
+        Date fecha4 = cal.getTime(); // 16 de enero de 2024, 4:00 PM
         Reserva reserva2 = new Reserva(2, fecha3, fecha4);
         reserva2.setEstado(Estado.PENDIENTE);
         auditorio.crearReserva(reserva2);
         
         // Reserva 3
-        Date fecha5 = new Date(2024, 0, 17, 10, 0); // 17 de enero de 2024, 10:00 AM
-        Date fecha6 = new Date(2024, 0, 17, 12, 0); // 17 de enero de 2024, 12:00 PM
+        cal.set(2024, java.util.Calendar.JANUARY, 17, 10, 0, 0);
+        Date fecha5 = cal.getTime(); // 17 de enero de 2024, 10:00 AM
+        cal.set(2024, java.util.Calendar.JANUARY, 17, 12, 0, 0);
+        Date fecha6 = cal.getTime(); // 17 de enero de 2024, 12:00 PM
         auditorio.crearReserva(3, fecha5, fecha6);
         
         System.out.println("Reservas creadas exitosamente");
@@ -76,13 +83,18 @@ public class TestRelacionAuditorioReserva {
         
         // 9. Verificar disponibilidad
         System.out.println("\n9. Verificando disponibilidad...");
-        Date fechaVerificar1 = new Date(2024, 0, 15, 8, 0); // 8:00 AM
-        Date fechaVerificar2 = new Date(2024, 0, 15, 10, 0); // 10:00 AM
+        Date fechaVerificar1, fechaVerificar2, fechaVerificar3, fechaVerificar4;
+        cal.set(2024, java.util.Calendar.JANUARY, 15, 8, 0, 0);
+        fechaVerificar1 = cal.getTime(); // 8:00 AM
+        cal.set(2024, java.util.Calendar.JANUARY, 15, 10, 0, 0);
+        fechaVerificar2 = cal.getTime(); // 10:00 AM
         boolean disponible = auditorio.estaDisponible(fechaVerificar1, fechaVerificar2);
         System.out.println("¿Disponible de 8:00 AM a 10:00 AM el 15 de enero? " + (disponible ? "Sí" : "No"));
         
-        Date fechaVerificar3 = new Date(2024, 0, 18, 9, 0); // 18 de enero, 9:00 AM
-        Date fechaVerificar4 = new Date(2024, 0, 18, 11, 0); // 18 de enero, 11:00 AM
+        cal.set(2024, java.util.Calendar.JANUARY, 18, 9, 0, 0);
+        fechaVerificar3 = cal.getTime(); // 18 de enero, 9:00 AM
+        cal.set(2024, java.util.Calendar.JANUARY, 18, 11, 0, 0);
+        fechaVerificar4 = cal.getTime(); // 18 de enero, 11:00 AM
         boolean disponible2 = auditorio.estaDisponible(fechaVerificar3, fechaVerificar4);
         System.out.println("¿Disponible de 9:00 AM a 11:00 AM el 18 de enero? " + (disponible2 ? "Sí" : "No"));
         
@@ -92,9 +104,14 @@ public class TestRelacionAuditorioReserva {
         
         // 11. Eliminar una reserva
         System.out.println("\n11. Eliminando reserva...");
-        auditorio.eliminarReserva(0);
-        System.out.println("Reserva eliminada. Nueva lista:");
-        System.out.println(auditorio.listarReservas());
+        if (auditorio.getReservas().length > 0) {
+            Reserva reservaEliminar = auditorio.getReservas()[0];
+            auditorio.eliminarReserva(reservaEliminar.getCodigoReserva());
+            System.out.println("Reserva eliminada. Nueva lista:");
+            System.out.println(auditorio.listarReservas());
+        } else {
+            System.out.println("No hay reservas para eliminar.");
+        }
         
         // 12. Mostrar información final del auditorio
         System.out.println("\n12. Información final del auditorio:");

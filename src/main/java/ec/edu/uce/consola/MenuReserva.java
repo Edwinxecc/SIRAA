@@ -62,6 +62,11 @@ public class MenuReserva extends MenuBase {
 
         System.out.print("\nSeleccione el índice del auditorio: ");
         int indiceAuditorio = leerEnteroPositivo();
+        ec.edu.uce.dominio.Auditorio[] auditorios = facultad.getAuditorios();
+        if (indiceAuditorio < 0 || indiceAuditorio >= auditorios.length) {
+            System.out.println("[!] Índice de auditorio inválido.");
+            return;
+        }
 
         System.out.println("\nIngrese fecha y hora de inicio (formato: dd/MM/yyyy HH:mm)");
         LocalDateTime fechaInicio = leerFecha();
@@ -198,7 +203,7 @@ public class MenuReserva extends MenuBase {
         int indice = leerEnteroPositivo();
 
         if (indice < 0 || indice >= reservas.length) {
-            System.out.println("[!] Índice inválido.");
+            System.out.println("[!] Índice de reserva inválido.");
             return;
         }
 
@@ -231,7 +236,7 @@ public class MenuReserva extends MenuBase {
         System.out.println(resultado);
         
         if (resultado.contains("editada correctamente")) {
-            usuarioActual.actualizarReserva(indice, reservaActualizada);
+            usuarioActual.actualizarReserva(reservaAEditar.getCodigoReserva(), reservaActualizada);
             System.out.println("[✓] Reserva actualizada correctamente.");
         }
     }
@@ -268,7 +273,7 @@ public class MenuReserva extends MenuBase {
             System.out.println(resultado);
             
             if (resultado.contains("eliminada correctamente")) {
-                usuarioActual.eliminarReserva(indice);
+                usuarioActual.eliminarReserva(reservaAEliminar.getCodigoReserva());
                 System.out.println("[✓] Reserva eliminada correctamente.");
             }
         } else {

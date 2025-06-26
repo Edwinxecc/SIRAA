@@ -13,7 +13,7 @@ public class Main {
 
         // Inicializar la facultad principal
         Facultad facultadPrincipal = new Facultad("Facultad de Ingeniería", 3);
-        
+
         // Crear y mostrar el menú principal
         Menu menuPrincipal = new Menu(facultadPrincipal);
         menuPrincipal.menuDeInicio();

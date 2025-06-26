@@ -3,6 +3,7 @@ package ec.edu.uce.consola;
 import ec.edu.uce.dominio.Usuario;
 import ec.edu.uce.dominio.Facultad;
 import ec.edu.uce.dominio.Reserva;
+import ec.edu.uce.dominio.ReservaPrioritaria;
 import ec.edu.uce.dominio.Auditorio;
 import ec.edu.uce.dominio.Estado;
 import java.time.LocalDateTime;
@@ -21,14 +22,18 @@ public class MenuReserva extends MenuBase {
     public void mostrarMenu() {
         int opcion;
         do {
-            System.out.println("\n--- MENÚ GESTIÓN DE RESERVAS ---");
-            System.out.println("[1] Crear Reserva Normal");
-            System.out.println("[2] Crear Reserva Prioritaria");
-            System.out.println("[3] Ver Reservas");
-            System.out.println("[4] Editar Reserva");
-            System.out.println("[5] Eliminar Reserva");
-            System.out.println("[0] Volver al Menú Principal");
-            System.out.print(">: ");
+            System.out.printf("%n%s%n", "=".repeat(50));
+            System.out.printf("%-20s%s%n", "", "MENÚ GESTIÓN DE RESERVAS");
+            System.out.printf("%s%n", "=".repeat(50));
+            System.out.printf("%-5s%-30s%n", "[1]", "Crear Reserva Normal");
+            System.out.printf("%-5s%-30s%n", "[2]", "Crear Reserva Prioritaria");
+            System.out.printf("%-5s%-30s%n", "[3]", "Ver Reservas");
+            System.out.printf("%-5s%-30s%n", "[4]", "Editar Reserva");
+            System.out.printf("%-5s%-30s%n", "[5]", "Eliminar Reserva");
+            System.out.printf("%-5s%-30s%n", "[6]", "Buscar Reserva por ID");
+            System.out.printf("%-5s%-30s%n", "[0]", "Volver al Menú Principal");
+            System.out.printf("%s%n", "─".repeat(50));
+            System.out.printf("%-5s", ">: ");
 
             opcion = leerEnteroPositivo();
 
@@ -38,24 +43,25 @@ public class MenuReserva extends MenuBase {
                 case 3 -> mostrarReservas();
                 case 4 -> editarReserva();
                 case 5 -> eliminarReserva();
+                case 6 -> buscarReservaPorId();
                 case 0 -> {
-                    System.out.println("Regresando al menú principal...");
+                    System.out.printf("%-25s%n", "🔄 Regresando al menú principal...");
                     return;
                 }
-                default -> System.out.println("[!] Opción no válida.");
+                default -> System.out.printf("%-25s%n", "❌ Opción no válida");
             }
         } while (opcion != 0);
     }
 
     private void crearReserva() {
         System.out.println("\n[1] Crear Reserva");
-        
+
         // Mostrar auditorios disponibles
         System.out.println("\nAuditorios disponibles:");
         facultad.listarAuditorios();
-        
+
         System.out.print("\nSeleccione el índice del auditorio: ");
-        int indiceAuditorio = leerEnteroPositivo() - 1;
+        int indiceAuditorio = leerEnteroPositivo();
 
         System.out.println("\nIngrese fecha y hora de inicio (formato: dd/MM/yyyy HH:mm)");
         LocalDateTime fechaInicio = leerFecha();
@@ -74,18 +80,28 @@ public class MenuReserva extends MenuBase {
         Date inicio = java.util.Date.from(fechaInicio.atZone(java.time.ZoneId.systemDefault()).toInstant());
         Date fin = java.util.Date.from(fechaFin.atZone(java.time.ZoneId.systemDefault()).toInstant());
 
-        usuarioActual.crearReserva();
-        int indiceReserva = usuarioActual.getReservas().length - 1;
-        Reserva nuevaReserva = usuarioActual.getReservas()[indiceReserva];
-        nuevaReserva.setFechaInicio(inicio);
-        nuevaReserva.setFechaFin(fin);
-
-        System.out.println("[✓] Reserva creada exitosamente.");
+        // Crear nueva reserva
+        Reserva nuevaReserva = new Reserva(inicio, fin);
+        
+        // Usar el método de la interfaz IAdministrarCRUD
+        String resultado = nuevaReserva.nuevo(nuevaReserva);
+        System.out.println(resultado);
+        
+        if (resultado.contains("creada correctamente")) {
+            usuarioActual.crearReserva(nuevaReserva);
+            System.out.println("\n[✓] Información de la reserva creada:");
+            System.out.println("ID: " + nuevaReserva.getIdReserva());
+            System.out.println("Código: " + nuevaReserva.getCodigoReserva());
+            System.out.println("Estado: " + nuevaReserva.getEstado().getDescripcion());
+            System.out.println("Fecha Inicio: " + nuevaReserva.getFechaInicio());
+            System.out.println("Fecha Fin: " + nuevaReserva.getFechaFin());
+            System.out.println("Tipo: " + nuevaReserva.tipoReserva());
+        }
     }
 
     private void crearReservaPrioritaria() {
         System.out.println("\n[2] Crear Reserva Prioritaria");
-        
+
         // Seleccionar nivel de prioridad
         System.out.println("\nSeleccione el nivel de prioridad:");
         System.out.println("[1] Prioridad Baja");
@@ -93,10 +109,10 @@ public class MenuReserva extends MenuBase {
         System.out.println("[3] Prioridad Alta");
         System.out.println("[4] Prioridad Urgente");
         System.out.print(">: ");
-        
+
         int opcion = leerEnteroPositivo();
         Estado estado;
-        
+
         switch (opcion) {
             case 1 -> estado = Estado.PRIORIDAD_BAJA;
             case 2 -> estado = Estado.PRIORIDAD_MEDIA;
@@ -116,22 +132,78 @@ public class MenuReserva extends MenuBase {
             motivo = entrada.nextLine();
         }
 
+        System.out.println("\nIngrese fecha y hora de inicio (formato: dd/MM/yyyy HH:mm)");
+        LocalDateTime fechaInicio = leerFecha();
+        if (fechaInicio == null) return;
+
+        System.out.println("Ingrese fecha y hora de fin (formato: dd/MM/yyyy HH:mm)");
+        LocalDateTime fechaFin = leerFecha();
+        if (fechaFin == null) return;
+
+        if (fechaFin.isBefore(fechaInicio)) {
+            System.out.println("[!] La fecha de fin debe ser posterior a la fecha de inicio.");
+            return;
+        }
+
+        // Convertir LocalDateTime a Date para la reserva
+        Date inicio = java.util.Date.from(fechaInicio.atZone(java.time.ZoneId.systemDefault()).toInstant());
+        Date fin = java.util.Date.from(fechaFin.atZone(java.time.ZoneId.systemDefault()).toInstant());
+
         // Crear la reserva prioritaria
-        usuarioActual.crearReservaPrioritaria(estado, motivo);
-        System.out.println("[✓] Reserva prioritaria creada exitosamente.");
+        ReservaPrioritaria nuevaReserva = new ReservaPrioritaria(inicio, fin, estado, motivo);
+        
+        // Usar el método de la interfaz IAdministrarCRUD
+        String resultado = nuevaReserva.nuevo(nuevaReserva);
+        System.out.println(resultado);
+        
+        if (resultado.contains("creada correctamente")) {
+            usuarioActual.crearReserva(nuevaReserva);
+            System.out.println("\n[✓] Información de la reserva prioritaria creada:");
+            System.out.println("ID: " + nuevaReserva.getIdReserva());
+            System.out.println("Código: " + nuevaReserva.getCodigoReserva());
+            System.out.println("Estado: " + nuevaReserva.getEstado().getDescripcion());
+            System.out.println("Nivel de Prioridad: " + nuevaReserva.getNivelPrioridad());
+            System.out.println("Motivo: " + nuevaReserva.getMotivoPrioridad());
+            System.out.println("Requiere Aprobación: " + (nuevaReserva.requiereAprobacion() ? "Sí" : "No"));
+            System.out.println("Tipo: " + nuevaReserva.tipoReserva());
+        }
     }
 
     private void mostrarReservas() {
         System.out.println("\n[3] Ver Reservas");
-        System.out.println(usuarioActual.listarReservas());
+        String listado = usuarioActual.listarReservas();
+        if (listado.contains("No hay reservas")) {
+            System.out.println("[!] No hay reservas para mostrar.");
+        } else {
+            System.out.println("=== RESERVAS DEL USUARIO ===");
+            System.out.println(listado);
+        }
     }
 
     private void editarReserva() {
         System.out.println("\n[4] Editar Reserva");
-        System.out.println(usuarioActual.listarReservas());
+        Reserva[] reservas = usuarioActual.getReservas();
         
+        if (reservas.length == 0) {
+            System.out.println("[!] No hay reservas para editar.");
+            return;
+        }
+        
+        System.out.println("=== LISTA DE RESERVAS ===");
+        for (int i = 0; i < reservas.length; i++) {
+            System.out.println("[" + i + "] " + reservas[i]);
+        }
+
         System.out.print("\nSeleccione el índice de la reserva a editar: ");
-        int indice = leerEnteroPositivo() - 1;
+        int indice = leerEnteroPositivo();
+
+        if (indice < 0 || indice >= reservas.length) {
+            System.out.println("[!] Índice inválido.");
+            return;
+        }
+
+        Reserva reservaAEditar = reservas[indice];
+        System.out.println("\nEditando reserva: " + reservaAEditar);
 
         System.out.println("\nIngrese nueva fecha y hora de inicio (formato: dd/MM/yyyy HH:mm)");
         LocalDateTime nuevaFechaInicio = leerFecha();
@@ -150,18 +222,85 @@ public class MenuReserva extends MenuBase {
         Date inicio = java.util.Date.from(nuevaFechaInicio.atZone(java.time.ZoneId.systemDefault()).toInstant());
         Date fin = java.util.Date.from(nuevaFechaFin.atZone(java.time.ZoneId.systemDefault()).toInstant());
 
-        usuarioActual.actualizarReserva(indice, usuarioActual.getReservas()[indice].getIdReserva(), inicio, fin);
-        System.out.println("Reserva actualizada.");
+        // Crear reserva actualizada
+        Reserva reservaActualizada = new Reserva(inicio, fin);
+        reservaActualizada.setEstado(reservaAEditar.getEstado());
+        
+        // Usar el método de la interfaz IAdministrarCRUD
+        String resultado = reservaAEditar.editar(reservaActualizada);
+        System.out.println(resultado);
+        
+        if (resultado.contains("editada correctamente")) {
+            usuarioActual.actualizarReserva(indice, reservaActualizada);
+            System.out.println("[✓] Reserva actualizada correctamente.");
+        }
     }
 
     private void eliminarReserva() {
         System.out.println("\n[5] Eliminar Reserva");
-        System.out.println(usuarioActual.listarReservas());
+        Reserva[] reservas = usuarioActual.getReservas();
         
+        if (reservas.length == 0) {
+            System.out.println("[!] No hay reservas para eliminar.");
+            return;
+        }
+        
+        System.out.println("=== LISTA DE RESERVAS ===");
+        for (int i = 0; i < reservas.length; i++) {
+            System.out.println("[" + i + "] " + reservas[i]);
+        }
+
         System.out.print("\nSeleccione el índice de la reserva a eliminar: ");
-        int indice = leerEnteroPositivo() - 1;
+        int indice = leerEnteroPositivo();
+
+        if (indice < 0 || indice >= reservas.length) {
+            System.out.println("[!] Índice inválido.");
+            return;
+        }
+
+        Reserva reservaAEliminar = reservas[indice];
+        System.out.println("¿Está seguro de eliminar la reserva: " + reservaAEliminar + "? (s/n): ");
+        String confirmacion = entrada.nextLine().toLowerCase();
         
-        usuarioActual.eliminarReserva(indice);
-        System.out.println("Reserva eliminada.");
+        if (confirmacion.equals("s") || confirmacion.equals("si") || confirmacion.equals("sí")) {
+            // Usar el método de la interfaz IAdministrarCRUD
+            String resultado = reservaAEliminar.borrar(reservaAEliminar);
+            System.out.println(resultado);
+            
+            if (resultado.contains("eliminada correctamente")) {
+                usuarioActual.eliminarReserva(indice);
+                System.out.println("[✓] Reserva eliminada correctamente.");
+            }
+        } else {
+            System.out.println("[!] Operación cancelada.");
+        }
+    }
+
+    private void buscarReservaPorId() {
+        System.out.println("\n[6] Buscar Reserva por ID");
+        System.out.print("Ingrese el ID de la reserva: ");
+        int id = leerEnteroPositivo();
+        
+        Reserva[] reservas = usuarioActual.getReservas();
+        Reserva reservaEncontrada = null;
+        
+        for (Reserva reserva : reservas) {
+            if (reserva.getIdReserva() == id) {
+                reservaEncontrada = reserva;
+                break;
+            }
+        }
+        
+        if (reservaEncontrada != null) {
+            System.out.println("\n[✓] Reserva encontrada:");
+            System.out.println(reservaEncontrada);
+        } else {
+            System.out.println("[!] No se encontró una reserva con el ID: " + id);
+        }
+    }
+
+    // Método para obtener el usuario actual
+    public Usuario getUsuarioActual() {
+        return usuarioActual;
     }
 } 

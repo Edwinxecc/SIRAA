@@ -18,21 +18,28 @@ public class MenuEquipo extends MenuBase {
     public void mostrarMenu() {
         int opcion;
         do {
-            System.out.println("\n--- MENÚ ADMINISTRAR EQUIPOS ---");
-            System.out.println("[1] Agregar equipo");
-            System.out.println("[2] Consultar equipo");
-            System.out.println("[3] Eliminar equipo");
-            System.out.println("[0] Volver al menú anterior");
-            System.out.print(">: ");
+            System.out.printf("%n%s%n", "=".repeat(50));
+            System.out.printf("%-20s%s%n", "", "MENÚ ADMINISTRAR EQUIPOS");
+            System.out.printf("%s%n", "=".repeat(50));
+            System.out.printf("%-5s%-30s%n", "[1]", "Agregar equipo");
+            System.out.printf("%-5s%-30s%n", "[2]", "Consultar equipos");
+            System.out.printf("%-5s%-30s%n", "[3]", "Editar equipo");
+            System.out.printf("%-5s%-30s%n", "[4]", "Eliminar equipo");
+            System.out.printf("%-5s%-30s%n", "[5]", "Buscar equipo por ID");
+            System.out.printf("%-5s%-30s%n", "[0]", "Volver al menú anterior");
+            System.out.printf("%s%n", "─".repeat(50));
+            System.out.printf("%-5s", ">: ");
 
             opcion = leerEnteroPositivo();
 
             switch (opcion) {
                 case 1 -> agregarEquipo();
                 case 2 -> consultarEquipos();
-                case 3 -> eliminarEquipo();
-                case 0 -> System.out.println("Volviendo al menú principal...");
-                default -> System.out.println("[!] Opción inválida.");
+                case 3 -> editarEquipo();
+                case 4 -> eliminarEquipo();
+                case 5 -> buscarEquipoPorId();
+                case 0 -> System.out.printf("%-25s%n", "🔄 Volviendo al menú principal...");
+                default -> System.out.printf("%-25s%n", "❌ Opción inválida");
             }
         } while (opcion != 0);
     }
@@ -51,23 +58,158 @@ public class MenuEquipo extends MenuBase {
         System.out.print("¿Está disponible? (true/false): ");
         boolean disponible = leerBooleano();
 
-        reservaActual.crearEquipo(nombre, categoria, disponible);
-        System.out.println("[✓] Equipo agregado exitosamente.");
+        // Crear nuevo equipo
+        Equipo nuevoEquipo = new Equipo(nombre, categoria, disponible);
+        
+        // Usar el método de la interfaz IAdministrarCRUD
+        String resultado = nuevoEquipo.nuevo(nuevoEquipo);
+        System.out.println(resultado);
+        
+        if (resultado.contains("creado correctamente")) {
+            reservaActual.crearEquipo(nuevoEquipo);
+            System.out.println("\n[✓] Información del equipo creado:");
+            System.out.println("ID: " + nuevoEquipo.getIdEquipo());
+            System.out.println("Código: " + nuevoEquipo.getCodigoEquipo());
+            System.out.println("Nombre: " + nuevoEquipo.getNombre());
+            System.out.println("Categoría: " + nuevoEquipo.getCategoria());
+            System.out.println("Disponible: " + (nuevoEquipo.getDisponibilidad() ? "Sí" : "No"));
+            System.out.println("Estado: " + nuevoEquipo.getEstado().getDescripcion());
+        }
     }
 
     private void consultarEquipos() {
         System.out.println("\n[2] Consultar Equipos");
-        System.out.println(reservaActual.listarEquipos());
+        String listado = reservaActual.listarEquipos();
+        if (listado.contains("No hay equipos")) {
+            System.out.println("[!] No hay equipos para mostrar.");
+        } else {
+            System.out.println("=== EQUIPOS DE LA RESERVA ===");
+            System.out.println(listado);
+        }
+    }
+
+    private void editarEquipo() {
+        System.out.println("\n[3] Editar Equipo");
+        Equipo[] equipos = reservaActual.getEquipos();
+        
+        if (equipos.length == 0) {
+            System.out.println("[!] No hay equipos para editar.");
+            return;
+        }
+        
+        System.out.println("=== LISTA DE EQUIPOS ===");
+        for (int i = 0; i < equipos.length; i++) {
+            System.out.println("[" + i + "] " + equipos[i]);
+        }
+
+        System.out.print("\nSeleccione el índice del equipo a editar: ");
+        int indice = leerEnteroPositivo();
+
+        if (indice < 0 || indice >= equipos.length) {
+            System.out.println("[!] Índice inválido.");
+            return;
+        }
+
+        Equipo equipoAEditar = equipos[indice];
+        System.out.println("\nEditando equipo: " + equipoAEditar);
+
+        System.out.print("Nuevo nombre (actual: " + equipoAEditar.getNombre() + "): ");
+        String nuevoNombre = entrada.nextLine();
+        if (!nuevoNombre.trim().isEmpty()) {
+            nuevoNombre = validacion.ValidacionTexto(nuevoNombre, "nombre");
+        } else {
+            nuevoNombre = equipoAEditar.getNombre();
+        }
+
+        System.out.print("Nueva categoría (actual: " + equipoAEditar.getCategoria() + "): ");
+        String nuevaCategoria = entrada.nextLine();
+        if (!nuevaCategoria.trim().isEmpty()) {
+            nuevaCategoria = validacion.ValidacionTexto(nuevaCategoria, "categoría");
+        } else {
+            nuevaCategoria = equipoAEditar.getCategoria();
+        }
+
+        System.out.print("¿Está disponible? (actual: " + (equipoAEditar.getDisponibilidad() ? "Sí" : "No") + ") (true/false): ");
+        String disponibilidadStr = entrada.nextLine();
+        boolean nuevaDisponibilidad = equipoAEditar.getDisponibilidad();
+        if (!disponibilidadStr.trim().isEmpty()) {
+            nuevaDisponibilidad = disponibilidadStr.toLowerCase().equals("true");
+        }
+
+        // Crear equipo actualizado
+        Equipo equipoActualizado = new Equipo(nuevoNombre, nuevaCategoria, nuevaDisponibilidad);
+        equipoActualizado.setEstado(equipoAEditar.getEstado());
+        
+        // Usar el método de la interfaz IAdministrarCRUD
+        String resultado = equipoAEditar.editar(equipoActualizado);
+        System.out.println(resultado);
+        
+        if (resultado.contains("editado correctamente")) {
+            reservaActual.actualizarEquipo(indice, equipoActualizado);
+            System.out.println("[✓] Equipo actualizado correctamente.");
+        }
     }
 
     private void eliminarEquipo() {
-        System.out.println("\n[3] Eliminar Equipo");
-        System.out.println(reservaActual.listarEquipos());
+        System.out.println("\n[4] Eliminar Equipo");
+        Equipo[] equipos = reservaActual.getEquipos();
         
+        if (equipos.length == 0) {
+            System.out.println("[!] No hay equipos para eliminar.");
+            return;
+        }
+        
+        System.out.println("=== LISTA DE EQUIPOS ===");
+        for (int i = 0; i < equipos.length; i++) {
+            System.out.println("[" + i + "] " + equipos[i]);
+        }
+
         System.out.print("\nSeleccione el índice del equipo a eliminar: ");
-        int indice = leerEnteroPositivo() - 1;
+        int indice = leerEnteroPositivo();
+
+        if (indice < 0 || indice >= equipos.length) {
+            System.out.println("[!] Índice inválido.");
+            return;
+        }
+
+        Equipo equipoAEliminar = equipos[indice];
+        System.out.println("¿Está seguro de eliminar el equipo: " + equipoAEliminar + "? (s/n): ");
+        String confirmacion = entrada.nextLine().toLowerCase();
         
-        String resultado = reservaActual.eliminarEquipo(indice);
-        System.out.println(resultado);
+        if (confirmacion.equals("s") || confirmacion.equals("si") || confirmacion.equals("sí")) {
+            // Usar el método de la interfaz IAdministrarCRUD
+            String resultado = equipoAEliminar.borrar(equipoAEliminar);
+            System.out.println(resultado);
+            
+            if (resultado.contains("eliminado correctamente")) {
+                String resultadoEliminacion = reservaActual.eliminarEquipo(indice);
+                System.out.println(resultadoEliminacion);
+            }
+        } else {
+            System.out.println("[!] Operación cancelada.");
+        }
+    }
+
+    private void buscarEquipoPorId() {
+        System.out.println("\n[5] Buscar Equipo por ID");
+        System.out.print("Ingrese el ID del equipo: ");
+        int id = leerEnteroPositivo();
+        
+        Equipo[] equipos = reservaActual.getEquipos();
+        Equipo equipoEncontrado = null;
+        
+        for (Equipo equipo : equipos) {
+            if (equipo.getIdEquipo() == id) {
+                equipoEncontrado = equipo;
+                break;
+            }
+        }
+        
+        if (equipoEncontrado != null) {
+            System.out.println("\n[✓] Equipo encontrado:");
+            System.out.println(equipoEncontrado);
+        } else {
+            System.out.println("[!] No se encontró un equipo con el ID: " + id);
+        }
     }
 } 

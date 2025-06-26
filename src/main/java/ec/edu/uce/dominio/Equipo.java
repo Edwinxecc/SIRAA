@@ -1,14 +1,17 @@
 package ec.edu.uce.dominio;
 
+import java.util.Comparator;
+
 /**
  * Representa un equipo disponible para reservas en el sistema SIRAA.
  * Esta clase maneja la información y el estado de los equipos que pueden ser asignados a las reservas.
  */
-public class Equipo {
+public class Equipo implements IAdministrarCRUD, Comparable<Equipo> {
     // Variables static final para generación automática de códigos
     private static final String PREFIJO_CODIGO = "EQ";
     private static int contadorEquipos = 0;
-    
+
+    private int idEquipo;
     private String codigoEquipo;
     private String nombre;
     private String categoria;
@@ -21,6 +24,7 @@ public class Equipo {
         this.categoria = categoria;
         this.disponibilidad = disponibilidad;
         this.estado = disponibilidad ? Estado.CONFIRMADA : Estado.CANCELADA;
+        this.idEquipo = generarIdEquipo();
         this.codigoEquipo = generarCodigoEquipo();
     }
 
@@ -34,9 +38,14 @@ public class Equipo {
         this.estado = equipo.getEstado();
     }
 
+    // Método para generar IDs automáticos
+    private int generarIdEquipo() {
+        contadorEquipos++;
+        return contadorEquipos;
+    }
+
     // Método para generar códigos automáticos
     private String generarCodigoEquipo() {
-        contadorEquipos++;
         return PREFIJO_CODIGO + String.format("%04d", contadorEquipos);
     }
 
@@ -45,24 +54,30 @@ public class Equipo {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Equipo)) return false;
-        
+
         Equipo otroEquipo = (Equipo) obj;
-        return this.codigoEquipo.equals(otroEquipo.codigoEquipo) &&
-               this.nombre.equals(otroEquipo.nombre) &&
-               this.categoria.equals(otroEquipo.categoria);
+        return this.idEquipo == otroEquipo.idEquipo &&
+                this.codigoEquipo.equals(otroEquipo.codigoEquipo) &&
+                this.nombre.equals(otroEquipo.nombre) &&
+                this.categoria.equals(otroEquipo.categoria);
     }
 
     // Método para validar duplicados
     public boolean validarDuplicado(Object obj) {
         if (!(obj instanceof Equipo)) return false;
-        
+
         Equipo otroEquipo = (Equipo) obj;
-        return this.codigoEquipo.equals(otroEquipo.codigoEquipo) ||
-               (this.nombre.equals(otroEquipo.nombre) && 
-                this.categoria.equals(otroEquipo.categoria));
+        return this.idEquipo == otroEquipo.idEquipo ||
+                this.codigoEquipo.equals(otroEquipo.codigoEquipo) ||
+                (this.nombre.equals(otroEquipo.nombre) &&
+                        this.categoria.equals(otroEquipo.categoria));
     }
 
     // Getters y Setters
+    public int getIdEquipo() {
+        return idEquipo;
+    }
+
     public String getCodigoEquipo() {
         return codigoEquipo;
     }
@@ -123,17 +138,151 @@ public class Equipo {
 
     // Método auxiliar para imprimir detalles
     public void mostrarInfo() {
-        System.out.println("Equipo [" + codigoEquipo + "]: " + nombre + 
-                         " | Categoría: " + categoria + 
-                         " | Disponible: " + (disponibilidad ? "Sí" : "No") +
-                         " | Estado: " + estado);
+        System.out.println("Equipo [" + codigoEquipo + "] ID: " + idEquipo + " | " + nombre +
+                " | Categoría: " + categoria +
+                " | Disponible: " + (disponibilidad ? "Sí" : "No") +
+                " | Estado: " + estado);
     }
 
     @Override
     public String toString() {
-        return "Equipo [" + codigoEquipo + "]: " + nombre + 
-               " | Categoría: " + categoria + 
-               " | Disponible: " + (disponibilidad ? "Sí" : "No") +
-               " | Estado: " + estado;
+        return String.format("┌─ EQUIPO ────────────────────────────────────────────────────────────┐%n" +
+                           "│ Código: %-15s │ ID: %-8d │ Categoría: %-20s │%n" +
+                           "│ Nombre: %-50s │%n" +
+                           "│ Disponible: %-8s │ Estado: %-20s │%n" +
+                           "└─────────────────────────────────────────────────────────────────────┘",
+                           codigoEquipo, idEquipo, categoria,
+                           nombre,
+                           disponibilidad ? "Sí" : "No", estado.getDescripcion());
     }
+
+    // ========================
+    // Métodos de la interfaz IAdministrarCRUD
+    // ========================
+
+    @Override
+    public String nuevo(Object obj) {
+        if (!(obj instanceof Equipo)) {
+            return "[!] El objeto no es un Equipo válido.";
+        }
+        Equipo equipoNuevo = (Equipo) obj;
+        if (validarDuplicado(equipoNuevo)) {
+            return "[!] El equipo ya existe.";
+        }
+        // Aquí se simula la creación del equipo
+        return "[✓] Equipo creado correctamente.";
+    }
+
+    @Override
+    public String editar(Object obj) {
+        if (!(obj instanceof Equipo)) {
+            return "[!] El objeto no es un Equipo válido.";
+        }
+        Equipo equipoEditado = (Equipo) obj;
+        // Aquí se simula la edición del equipo
+        this.nombre = equipoEditado.getNombre();
+        this.categoria = equipoEditado.getCategoria();
+        this.disponibilidad = equipoEditado.getDisponibilidad();
+        this.estado = equipoEditado.getEstado();
+        return "[✓] Equipo editado correctamente.";
+    }
+
+    @Override
+    public String borrar(Object obj) {
+        if (!(obj instanceof Equipo)) {
+            return "[!] El objeto no es un Equipo válido.";
+        }
+        Equipo equipoABorrar = (Equipo) obj;
+        if (this.equals(equipoABorrar)) {
+            // Aquí se simula la eliminación del equipo
+            return "[✓] Equipo eliminado correctamente.";
+        }
+        return "[!] Equipo no encontrado.";
+    }
+
+    @Override
+    public Object buscarPorId(Integer id) {
+        if (id == null || id < 0) {
+            return null;
+        }
+        if (id == this.idEquipo) {
+            return this;
+        }
+        return null;
+    }
+
+    @Override
+    public String listar() {
+        return toString();
+    }
+
+    // ========================
+    // Métodos de la interfaz Comparable
+    // ========================
+
+    @Override
+    public int compareTo(Equipo otroEquipo) {
+        return this.nombre.compareTo(otroEquipo.nombre);
+    }
+
+    // ========================
+    // Comparadores Estáticos
+    // ========================
+
+    /**
+     * Comparador para ordenar equipos por nombre
+     */
+    public static final Comparator<Equipo> COMPARADOR_POR_NOMBRE = new Comparator<Equipo>() {
+        @Override
+        public int compare(Equipo e1, Equipo e2) {
+            return e1.getNombre().compareTo(e2.getNombre());
+        }
+    };
+
+    /**
+     * Comparador para ordenar equipos por categoría
+     */
+    public static final Comparator<Equipo> COMPARADOR_POR_CATEGORIA = new Comparator<Equipo>() {
+        @Override
+        public int compare(Equipo e1, Equipo e2) {
+            return e1.getCategoria().compareTo(e2.getCategoria());
+        }
+    };
+
+    /**
+     * Comparador para ordenar equipos por disponibilidad (disponibles primero)
+     */
+    public static final Comparator<Equipo> COMPARADOR_POR_DISPONIBILIDAD = new Comparator<Equipo>() {
+        @Override
+        public int compare(Equipo e1, Equipo e2) {
+            // Disponibles primero (true antes que false)
+            if (e1.getDisponibilidad() && !e2.getDisponibilidad()) {
+                return -1;
+            } else if (!e1.getDisponibilidad() && e2.getDisponibilidad()) {
+                return 1;
+            } else {
+                return e1.getNombre().compareTo(e2.getNombre()); // Si tienen la misma disponibilidad, ordenar por nombre
+            }
+        }
+    };
+
+    /**
+     * Comparador para ordenar equipos por ID (ascendente)
+     */
+    public static final Comparator<Equipo> COMPARADOR_POR_ID = new Comparator<Equipo>() {
+        @Override
+        public int compare(Equipo e1, Equipo e2) {
+            return Integer.compare(e1.getIdEquipo(), e2.getIdEquipo());
+        }
+    };
+
+    /**
+     * Comparador para ordenar equipos por estado
+     */
+    public static final Comparator<Equipo> COMPARADOR_POR_ESTADO = new Comparator<Equipo>() {
+        @Override
+        public int compare(Equipo e1, Equipo e2) {
+            return e1.getEstado().getDescripcion().compareTo(e2.getEstado().getDescripcion());
+        }
+    };
 }

@@ -13,13 +13,17 @@ public class MenuFacultad extends MenuBase {
     public void mostrarMenu() {
         int opcion;
         do {
-            System.out.println("\n=== MENÚ GESTIONAR FACULTADES ===");
-            System.out.println("[1] Crear Facultad");
-            System.out.println("[2] Mostrar Facultades");
-            System.out.println("[3] Editar Facultad");
-            System.out.println("[4] Eliminar Facultad");
-            System.out.println("[0] Salir");
-            System.out.print("Selecciona una opción: ");
+            System.out.printf("%n%s%n", "=".repeat(50));
+            System.out.printf("%-20s%s%n", "", "MENÚ GESTIONAR FACULTADES");
+            System.out.printf("%s%n", "=".repeat(50));
+            System.out.printf("%-5s%-30s%n", "[1]", "Crear Facultad");
+            System.out.printf("%-5s%-30s%n", "[2]", "Mostrar Facultades");
+            System.out.printf("%-5s%-30s%n", "[3]", "Editar Facultad");
+            System.out.printf("%-5s%-30s%n", "[4]", "Eliminar Facultad");
+            System.out.printf("%-5s%-30s%n", "[5]", "Buscar Facultad por ID");
+            System.out.printf("%-5s%-30s%n", "[0]", "Salir");
+            System.out.printf("%s%n", "─".repeat(50));
+            System.out.printf("%-25s", "Selecciona una opción: ");
 
             opcion = leerEnteroPositivo();
 
@@ -28,50 +32,102 @@ public class MenuFacultad extends MenuBase {
                 case 2 -> mostrarFacultades();
                 case 3 -> editarFacultad();
                 case 4 -> eliminarFacultad();
-                case 0 -> System.out.println("Volviendo al menú principal...");
-                default -> System.out.println("[!] Opción no válida. Intenta nuevamente.");
+                case 5 -> buscarFacultadPorId();
+                case 0 -> System.out.printf("%-25s%n", "🔄 Volviendo al menú principal...");
+                default -> System.out.printf("%-25s%n", "❌ Opción no válida. Intenta nuevamente");
             }
         } while (opcion != 0);
     }
 
     private void crearFacultad() {
         System.out.println("\n[1] Crear Facultad");
-        
+
         System.out.print("Nombre de la facultad: ");
         String nombre = entrada.nextLine();
         nombre = validacion.ValidacionTexto(nombre, "nombre");
 
-        System.out.print("Cantidad de auditorios: ");
+        System.out.print("Cantidad inicial de auditorios: ");
         int cantidad = leerEnteroPositivo();
 
-        facultad.crearAuditorio();
-        System.out.println("[✓] Facultad creada correctamente.");
+        // Crear nueva facultad
+        Facultad nuevaFacultad = new Facultad(nombre, cantidad);
+        
+        // Usar el método de la interfaz IAdministrarCRUD
+        String resultado = nuevaFacultad.nuevo(nuevaFacultad);
+        System.out.println(resultado);
+        
+        if (resultado.contains("creada correctamente")) {
+            System.out.println("\n[✓] Información de la facultad creada:");
+            System.out.println("ID: " + nuevaFacultad.getIdFacultad());
+            System.out.println("Código: " + nuevaFacultad.getCodigoFacultad());
+            System.out.println("Nombre: " + nuevaFacultad.getNombre());
+            System.out.println("Auditorios: " + nuevaFacultad.getNumAuditorios());
+            System.out.println("Usuarios: " + nuevaFacultad.getNumUsuarios());
+        }
     }
 
     private void mostrarFacultades() {
         System.out.println("\n[2] Mostrar Facultades");
-        System.out.println(facultad.toString());
+        System.out.println("=== INFORMACIÓN DE LA FACULTAD ACTUAL ===");
+        System.out.println(facultad);
+        System.out.println("\n=== AUDITORIOS ===");
         System.out.println(facultad.listarAuditorios());
+        System.out.println("\n=== USUARIOS ===");
         System.out.println(facultad.listarUsuarios());
     }
 
     private void editarFacultad() {
         System.out.println("\n[3] Editar Facultad");
-        
-        System.out.print("Nuevo nombre: ");
+        System.out.println("Facultad actual: " + facultad);
+
+        System.out.print("Nuevo nombre (actual: " + facultad.getNombre() + "): ");
         String nuevoNombre = entrada.nextLine();
-        nuevoNombre = validacion.ValidacionTexto(nuevoNombre, "nombre");
+        if (!nuevoNombre.trim().isEmpty()) {
+            nuevoNombre = validacion.ValidacionTexto(nuevoNombre, "nombre");
+        } else {
+            nuevoNombre = facultad.getNombre();
+        }
 
-        System.out.print("Nueva cantidad de auditorios: ");
-        int nuevaCantidad = leerEnteroPositivo();
-
-        facultad.setNombre(nuevoNombre);
-        facultad.setNumAuditorios(nuevaCantidad);
-        System.out.println("[✓] Facultad editada correctamente.");
+        // Crear facultad actualizada
+        Facultad facultadActualizada = new Facultad(nuevoNombre, facultad.getNumAuditorios());
+        facultadActualizada.setNumAuditorios(facultad.getNumAuditorios());
+        
+        // Usar el método de la interfaz IAdministrarCRUD
+        String resultado = facultad.editar(facultadActualizada);
+        System.out.println(resultado);
+        
+        if (resultado.contains("editada correctamente")) {
+            System.out.println("[✓] Facultad actualizada correctamente.");
+        }
     }
 
     private void eliminarFacultad() {
         System.out.println("\n[4] Eliminar Facultad");
-        System.out.println("[!] Esta operación no está disponible en esta versión del sistema.");
+        System.out.println("Facultad actual: " + facultad);
+        System.out.println("¿Está seguro de eliminar esta facultad? (s/n): ");
+        String confirmacion = entrada.nextLine().toLowerCase();
+        
+        if (confirmacion.equals("s") || confirmacion.equals("si") || confirmacion.equals("sí")) {
+            // Usar el método de la interfaz IAdministrarCRUD
+            String resultado = facultad.borrar(facultad);
+            System.out.println(resultado);
+        } else {
+            System.out.println("[!] Operación cancelada.");
+        }
     }
-} 
+
+    private void buscarFacultadPorId() {
+        System.out.println("\n[5] Buscar Facultad por ID");
+        System.out.print("Ingrese el ID de la facultad: ");
+        int id = leerEnteroPositivo();
+        
+        Object resultado = facultad.buscarPorId(id);
+        if (resultado != null && resultado instanceof Facultad) {
+            Facultad facultadEncontrada = (Facultad) resultado;
+            System.out.println("\n[✓] Facultad encontrada:");
+            System.out.println(facultadEncontrada);
+        } else {
+            System.out.println("[!] No se encontró una facultad con el ID: " + id);
+        }
+    }
+}

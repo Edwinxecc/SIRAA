@@ -28,14 +28,20 @@ public class TestFacultad {
 
         // Eliminar un usuario
         System.out.println("Eliminando el usuario en el índice 0 (luis Caiza)...");
-        f.eliminarUsuario(0); // Elimina el primer usuario (Luis Caiza)
+        Usuario[] usuarios = f.getUsuarios();
+        if (usuarios.length > 0) {
+            f.eliminarUsuario(usuarios[0].getCodigoUsuario());
+        }
         System.out.println("Usuarios después de la eliminación:");
         System.out.println(f.listarUsuarios());
         System.out.println("-----------------------------------");
 
         // Actualizar un usuario (ejemplo, actualizamos "Lewandowski")
         System.out.println("Actualizando el usuario en el índice 0 (Lewandowski)..."); // Ahora Lewandowski está en el índice 0
-        f.actualizarUsuario(0, "Robert", "Lewandowski", "robert.l@example.com");
+        if (usuarios.length > 0) {
+            Usuario usuarioActualizado = new Usuario("Robert", "Lewandowski", "robert.l@example.com");
+            f.actualizarUsuario(usuarios[0].getCodigoUsuario(), usuarioActualizado);
+        }
         System.out.println("Usuarios después de la actualización:");
         System.out.println(f.listarUsuarios());
         System.out.println("-----------------------------------");
@@ -59,14 +65,20 @@ public class TestFacultad {
 
         // Eliminar un auditorio
         System.out.println("Eliminando el auditorio en el índice 0 (Sin nombre)...");
-        f.eliminarAuditorio(0); // Elimina el primer auditorio
+        Auditorio[] auditorios = f.getAuditorios();
+        if (auditorios.length > 0) {
+            f.eliminarAuditorio(auditorios[0].getCodigoAuditorio());
+        }
         System.out.println("Auditorios después de la eliminación:");
         System.out.println(f.listarAuditorios());
         System.out.println("-----------------------------------");
 
         // Actualizar un auditorio (ejemplo, actualizamos "Hola")
         System.out.println("Actualizando el auditorio en el índice 0 (Hola)..."); // Ahora "Hola" está en el índice 0
-        f.actualizarAuditorio(0, "Auditorio Principal", 200);
+        if (auditorios.length > 0) {
+            Auditorio auditorioActualizado = new Auditorio("Auditorio Principal", 200);
+            f.actualizarAuditorio(auditorios[0].getCodigoAuditorio(), auditorioActualizado);
+        }
         System.out.println("Auditorios después de la actualización:");
         System.out.println(f.listarAuditorios());
         System.out.println("-----------------------------------");

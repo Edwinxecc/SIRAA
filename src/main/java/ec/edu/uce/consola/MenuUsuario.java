@@ -5,6 +5,7 @@ import ec.edu.uce.dominio.Facultad;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class MenuUsuario extends MenuBase {
     private final Facultad facultad;
@@ -80,17 +81,25 @@ public class MenuUsuario extends MenuBase {
     private void consultarUsuario() {
         System.out.printf("%n%s%n", "=".repeat(40));
         System.out.printf("%-25s%n", "🔍 [2] Consultar Usuario");
-        List<Usuario> usuarios = new ArrayList<>(Arrays.asList(facultad.getUsuarios()));
+        facultad.inicializar();
+        java.util.List<Usuario> usuarios = new java.util.ArrayList<>(java.util.Arrays.asList(facultad.getUsuarios()));
+        // Orden natural (Comparable)
+        java.util.List<Usuario> usuariosComparable = new java.util.ArrayList<>(usuarios);
+        java.util.Collections.sort(usuariosComparable);
+        System.out.println("=== LISTA DE USUARIOS (ORDEN NATURAL - Comparable) ===");
+        for (Usuario usuario : usuariosComparable) {
+            System.out.printf("Código: %s | %s%n", usuario.getCodigoUsuario(), usuario);
+        }
+        System.out.println("\n--- ORDENADOS POR APELLIDO (Comparator) ---\n");
+        // Orden por apellido (Comparator)
+        java.util.List<Usuario> usuariosComparator = new java.util.ArrayList<>(usuarios);
+        usuariosComparator.sort(new ec.edu.uce.dominio.OrdenarUsuarioApellido());
+        for (Usuario usuario : usuariosComparator) {
+            System.out.printf("Código: %s | %s%n", usuario.getCodigoUsuario(), usuario);
+        }
         if (usuarios.isEmpty()) {
             System.out.printf("%-25s%n", "❌ No hay ningún usuario creado");
             return;
-        }
-        System.out.printf("%n%s%n", "=".repeat(50));
-        System.out.printf("%-20s%s%n", "", "LISTA DE USUARIOS");
-        System.out.printf("%s%n", "=".repeat(50));
-        for (int i = 0; i < usuarios.size(); i++) {
-            Usuario usuario = usuarios.get(i);
-            System.out.printf("[" + i + "] Código: %s | %s%n", usuario.getCodigoUsuario(), usuario);
         }
         // Opción para buscar por ID
         System.out.printf("%n%-50s", "¿Desea buscar un usuario por ID? (s/n): ");

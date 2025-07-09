@@ -14,7 +14,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
     // Variables static final para generación automática de códigos
     private static final String PREFIJO_CODIGO = "AUD";
     private static int contadorAuditorios = 0;
-    
+
     private int idAuditorio;
     private String codigoAuditorio;
     private String nombre;
@@ -29,6 +29,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
         this.numReservas = 0;
         this.idAuditorio = generarIdAuditorio();
         this.codigoAuditorio = generarCodigoAuditorio();
+        inicializar();
     }
 
     public Auditorio(){
@@ -148,21 +149,21 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
         if (estado == null) {
             return "[!] Estado no válido.";
         }
-        
+
         StringBuilder texto = new StringBuilder();
         texto.append("=== RESERVAS ").append(estado.getDescripcion().toUpperCase()).append(" ===\n");
         int contador = 0;
-        
+
         for (Reserva reserva : reservas.values()) {
             if (reserva != null && reserva.getEstado() == estado) {
                 texto.append("[").append(contador++).append("] ").append(reserva).append("\n");
             }
         }
-        
+
         if (contador == 0) {
             return "[!] No hay reservas con estado: " + estado.getDescripcion();
         }
-        
+
         return texto.toString();
     }
 
@@ -187,7 +188,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
         if (codigoReserva == null || codigoReserva.trim().isEmpty()) {
             return null;
         }
-        
+
         return reservas.get(codigoReserva);
     }
 
@@ -237,7 +238,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      */
     public boolean validarDuplicadoReserva(Reserva reserva) {
         if (reserva == null) return false;
-        
+
         return reservas.containsKey(reserva.getCodigoReserva());
     }
 
@@ -251,15 +252,15 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
         if (fechaInicio == null || fechaFin == null) {
             return false;
         }
-        
+
         for (Reserva reserva : reservas.values()) {
-            if (reserva != null && 
-                (reserva.getEstado() == Estado.CONFIRMADA || 
-                 reserva.getEstado() == Estado.EN_PROCESO)) {
-                
+            if (reserva != null &&
+                    (reserva.getEstado() == Estado.CONFIRMADA ||
+                            reserva.getEstado() == Estado.EN_PROCESO)) {
+
                 // Verificar si hay solapamiento de fechas
-                if (!(fechaFin.before(reserva.getFechaInicio()) || 
-                      fechaInicio.after(reserva.getFechaFin()))) {
+                if (!(fechaFin.before(reserva.getFechaInicio()) ||
+                        fechaInicio.after(reserva.getFechaFin()))) {
                     return false; // Hay conflicto de fechas
                 }
             }
@@ -332,22 +333,22 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      */
     public boolean validarDuplicadoAuditorio(Auditorio auditorio) {
         if (auditorio == null) return false;
-        return this.idAuditorio == auditorio.idAuditorio || 
-               this.codigoAuditorio.equals(auditorio.codigoAuditorio) ||
-               this.nombre.equals(auditorio.nombre);
+        return this.idAuditorio == auditorio.idAuditorio ||
+                this.codigoAuditorio.equals(auditorio.codigoAuditorio) ||
+                this.nombre.equals(auditorio.nombre);
     }
 
     // toString
     @Override
     public String toString() {
         return String.format("┌─ AUDITORIO ────────────────────────────────────────────────────────┐%n" +
-                           "│ Código: %-15s │ ID: %-8d │ Capacidad: %-8d personas │%n" +
-                           "│ Nombre: %-50s │%n" +
-                           "│ Reservas Activas: %-3d │ Estado: %-20s │%n" +
-                           "└─────────────────────────────────────────────────────────────────────┘",
-                           codigoAuditorio, idAuditorio, capacidad,
-                           nombre,
-                           numReservas, "Disponible");
+                        "│ Código: %-15s │ ID: %-8d │ Capacidad: %-8d personas │%n" +
+                        "│ Nombre: %-50s │%n" +
+                        "│ Reservas Activas: %-3d │ Estado: %-20s │%n" +
+                        "└─────────────────────────────────────────────────────────────────────┘",
+                codigoAuditorio, idAuditorio, capacidad,
+                nombre,
+                numReservas, "Disponible");
     }
 
     // equals
@@ -355,18 +356,32 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Auditorio)) return false;
-        
+
         Auditorio otro = (Auditorio) obj;
         return this.idAuditorio == otro.idAuditorio &&
-               this.codigoAuditorio.equals(otro.codigoAuditorio) &&
-               this.nombre.equals(otro.nombre) && 
-               this.capacidad == otro.capacidad;
+                this.codigoAuditorio.equals(otro.codigoAuditorio) &&
+                this.nombre.equals(otro.nombre) &&
+                this.capacidad == otro.capacidad;
     }
 
     // Comparable
+    /**
+     * Criterio natural de comparación: por ID (ascendente) y luego por nombre (ascendente)
+     */
     @Override
-    public int compareTo(Auditorio otro) {
-        return this.nombre.compareTo(otro.nombre);
+    public int compareTo(Auditorio o) {
+        if (this.idAuditorio < o.idAuditorio) {
+            return -1;
+        } else if (this.idAuditorio > o.idAuditorio) {
+            return 1;
+        }
+        // Si los id son iguales, comparar por nombre
+        if (this.nombre.compareTo(o.nombre) < 0) {
+            return -1;
+        } else if (this.nombre.compareTo(o.nombre) > 0) {
+            return 1;
+        }
+        return 0;
     }
 
     // ========================
@@ -378,13 +393,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      */
     public void ordenarReservasPorFecha() {
         Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, new Comparator<Reserva>() {
-            @Override
-            public int compare(Reserva r1, Reserva r2) {
-                return r1.getFechaInicio().compareTo(r2.getFechaInicio());
-            }
-        });
-        // Actualizar el arreglo interno
+        Arrays.sort(reservasActivas, new OrdenarReservaFechaInicio());
         reservas.clear();
         for (Reserva reserva : reservasActivas) {
             reservas.put(reserva.getCodigoReserva(), reserva);
@@ -396,13 +405,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      */
     public void ordenarReservasPorEstado() {
         Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, new Comparator<Reserva>() {
-            @Override
-            public int compare(Reserva r1, Reserva r2) {
-                return r1.getEstado().getDescripcion().compareTo(r2.getEstado().getDescripcion());
-            }
-        });
-        // Actualizar el arreglo interno
+        Arrays.sort(reservasActivas, new OrdenarReservaEstado());
         reservas.clear();
         for (Reserva reserva : reservasActivas) {
             reservas.put(reserva.getCodigoReserva(), reserva);
@@ -414,50 +417,15 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      */
     public void ordenarReservasPorId() {
         Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, new Comparator<Reserva>() {
-            @Override
-            public int compare(Reserva r1, Reserva r2) {
-                return Integer.compare(r1.getIdReserva(), r2.getIdReserva());
-            }
-        });
-        // Actualizar el arreglo interno
+        Arrays.sort(reservasActivas, (r1, r2) -> Integer.compare(r1.getIdReserva(), r2.getIdReserva()));
         reservas.clear();
         for (Reserva reserva : reservasActivas) {
             reservas.put(reserva.getCodigoReserva(), reserva);
         }
     }
 
-    // ========================
-    // Comparadores Estáticos
-    // ========================
-
-    /**
-     * Comparador para ordenar auditorios por capacidad (ascendente)
-     */
-    public static final Comparator<Auditorio> COMPARADOR_POR_CAPACIDAD = new Comparator<Auditorio>() {
-        @Override
-        public int compare(Auditorio a1, Auditorio a2) {
-            return Integer.compare(a1.getCapacidad(), a2.getCapacidad());
-        }
-    };
-
-    /**
-     * Comparador para ordenar auditorios por número de reservas (descendente)
-     */
-    public static final Comparator<Auditorio> COMPARADOR_POR_NUM_RESERVAS = new Comparator<Auditorio>() {
-        @Override
-        public int compare(Auditorio a1, Auditorio a2) {
-            return Integer.compare(a2.getNumReservas(), a1.getNumReservas()); // Descendente
-        }
-    };
-
-    /**
-     * Comparador para ordenar auditorios por ID (ascendente)
-     */
-    public static final Comparator<Auditorio> COMPARADOR_POR_ID = new Comparator<Auditorio>() {
-        @Override
-        public int compare(Auditorio a1, Auditorio a2) {
-            return Integer.compare(a1.getIdAuditorio(), a2.getIdAuditorio());
-        }
-    };
+    private void inicializar() {
+        // Aquí puedes agregar datos de ejemplo si lo deseas, por ejemplo:
+        // crearReserva(new Reserva());
+    }
 }

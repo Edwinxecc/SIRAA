@@ -72,4 +72,4 @@ public class MenuCredenciales extends MenuBase {
     private boolean validarCorreoInstitucional(String correo) {
         return correo != null && correo.trim().endsWith("@uce.edu.ec");
     }
-} 
+}

@@ -33,6 +33,7 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
         this.estado = Estado.CONFIRMADA;
         this.idUsuario = generarIdUsuario();
         this.codigoUsuario = generarCodigoUsuario();
+        inicializar();
     }
 
     public Usuario(){
@@ -272,19 +273,27 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     @Override
     public String toString() {
         return String.format("┌─ USUARIO ──────────────────────────────────────────────────────────┐%n" +
-                           "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
-                           "│ Nombre: %-20s │ Apellido: %-20s │%n" +
-                           "│ Correo: %-50s │%n" +
-                           "│ Reservas Activas: %-3d │%n" +
-                           "└─────────────────────────────────────────────────────────────────────┘",
-                           codigoUsuario, idUsuario, estado.getDescripcion(),
-                           nombre, apellido,
-                           correo, reservas.size());
+                        "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
+                        "│ Nombre: %-20s │ Apellido: %-20s │%n" +
+                        "│ Correo: %-50s │%n" +
+                        "│ Reservas Activas: %-3d │%n" +
+                        "└─────────────────────────────────────────────────────────────────────┘",
+                codigoUsuario, idUsuario, estado.getDescripcion(),
+                nombre, apellido,
+                correo, reservas.size());
     }
 
+    /**
+     * Criterio natural de comparación: por idUsuario (ascendente)
+     */
     @Override
-    public int compareTo(Usuario otroUsuario) {
-        return Integer.compare(this.idUsuario, otroUsuario.idUsuario);
+    public int compareTo(Usuario o) {
+        if (this.idUsuario < o.idUsuario) {
+            return -1;
+        } else if (this.idUsuario > o.idUsuario) {
+            return 1;
+        }
+        return 0;
     }
 
     // ========================
@@ -330,6 +339,8 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     /**
      * Ordena las reservas del usuario por ID (ascendente)
      */
+
+
     public void ordenarReservasPorId() {
         Reserva[] reservasActivas = getReservas();
         Arrays.sort(reservasActivas, new Comparator<Reserva>() {
@@ -344,56 +355,4 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
             reservas.put(r.getCodigoReserva(), r);
         }
     }
-
-    // ========================
-    // Comparadores Estáticos
-    // ========================
-
-    /**
-     * Comparador para ordenar usuarios por nombre
-     */
-    public static final Comparator<Usuario> COMPARADOR_POR_NOMBRE = new Comparator<Usuario>() {
-        @Override
-        public int compare(Usuario u1, Usuario u2) {
-            int comparacionNombre = u1.getNombre().compareTo(u2.getNombre());
-            if (comparacionNombre != 0) {
-                return comparacionNombre;
-            }
-            return u1.getApellido().compareTo(u2.getApellido());
-        }
-    };
-
-    /**
-     * Comparador para ordenar usuarios por apellido
-     */
-    public static final Comparator<Usuario> COMPARADOR_POR_APELLIDO = new Comparator<Usuario>() {
-        @Override
-        public int compare(Usuario u1, Usuario u2) {
-            int comparacionApellido = u1.getApellido().compareTo(u2.getApellido());
-            if (comparacionApellido != 0) {
-                return comparacionApellido;
-            }
-            return u1.getNombre().compareTo(u2.getNombre());
-        }
-    };
-
-    /**
-     * Comparador para ordenar usuarios por correo
-     */
-    public static final Comparator<Usuario> COMPARADOR_POR_CORREO = new Comparator<Usuario>() {
-        @Override
-        public int compare(Usuario u1, Usuario u2) {
-            return u1.getCorreo().compareTo(u2.getCorreo());
-        }
-    };
-
-    /**
-     * Comparador para ordenar usuarios por número de reservas (descendente)
-     */
-    public static final Comparator<Usuario> COMPARADOR_POR_NUM_RESERVAS = new Comparator<Usuario>() {
-        @Override
-        public int compare(Usuario u1, Usuario u2) {
-            return Integer.compare(u2.getNumReservas(), u1.getNumReservas()); // Descendente
-        }
-    };
 }

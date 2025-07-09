@@ -33,6 +33,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
         this.estado = Estado.PENDIENTE;
         this.idReserva = generarIdReserva();
         this.codigoReserva = generarCodigoReserva();
+        inicializar();
     }
 
     public Reserva(){
@@ -215,15 +216,15 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     @Override
     public String toString() {
         return String.format("┌─ RESERVA ───────────────────────────────────────────────────────────┐%n" +
-                           "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
-                           "│ Fecha Inicio: %-30s │%n" +
-                           "│ Fecha Fin: %-32s │%n" +
-                           "│ Equipos Asignados: %-3d │ Tipo: %-20s │%n" +
-                           "└─────────────────────────────────────────────────────────────────────┘",
-                           codigoReserva, idReserva, estado.getDescripcion(),
-                           fechaInicio.toString(),
-                           fechaFin.toString(),
-                           numEquipos, tipoReserva());
+                        "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
+                        "│ Fecha Inicio: %-30s │%n" +
+                        "│ Fecha Fin: %-32s │%n" +
+                        "│ Equipos Asignados: %-3d │ Tipo: %-20s │%n" +
+                        "└─────────────────────────────────────────────────────────────────────┘",
+                codigoReserva, idReserva, estado.getDescripcion(),
+                fechaInicio.toString(),
+                fechaFin.toString(),
+                numEquipos, tipoReserva());
     }
 
     // ========================
@@ -289,9 +290,23 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     // Métodos de la interfaz Comparable
     // ========================
 
+    /**
+     * Criterio natural de comparación: por idReserva y luego por fechaInicio
+     */
     @Override
-    public int compareTo(Reserva otraReserva) {
-        return this.idReserva - otraReserva.idReserva;
+    public int compareTo(Reserva o) {
+        if (this.idReserva < o.idReserva) {
+            return -1;
+        } else if (this.idReserva > o.idReserva) {
+            return 1;
+        }
+        // Si los id son iguales, comparar por fechaInicio
+        if (this.fechaInicio.compareTo(o.fechaInicio) < 0) {
+            return -1;
+        } else if (this.fechaInicio.compareTo(o.fechaInicio) > 0) {
+            return 1;
+        }
+        return 0;
     }
 
     // ========================
@@ -303,8 +318,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
      */
     public void ordenarEquiposPorNombre() {
         Equipo[] equiposActivos = getEquipos();
-        Arrays.sort(equiposActivos, Equipo.COMPARADOR_POR_NOMBRE);
-        // Actualizar el arreglo interno
+        Arrays.sort(equiposActivos, new OrdenarEquipoNombre());
         System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
     }
 
@@ -313,8 +327,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
      */
     public void ordenarEquiposPorCategoria() {
         Equipo[] equiposActivos = getEquipos();
-        Arrays.sort(equiposActivos, Equipo.COMPARADOR_POR_CATEGORIA);
-        // Actualizar el arreglo interno
+        Arrays.sort(equiposActivos, new OrdenarEquipoCategoria());
         System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
     }
 
@@ -323,8 +336,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
      */
     public void ordenarEquiposPorDisponibilidad() {
         Equipo[] equiposActivos = getEquipos();
-        Arrays.sort(equiposActivos, Equipo.COMPARADOR_POR_DISPONIBILIDAD);
-        // Actualizar el arreglo interno
+        Arrays.sort(equiposActivos, new OrdenarEquipoDisponibilidad());
         System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
     }
 
@@ -333,8 +345,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
      */
     public void ordenarEquiposPorId() {
         Equipo[] equiposActivos = getEquipos();
-        Arrays.sort(equiposActivos, Equipo.COMPARADOR_POR_ID);
-        // Actualizar el arreglo interno
+        Arrays.sort(equiposActivos, new OrdenarEquipoId());
         System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
     }
 
@@ -342,43 +353,14 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     // Comparadores Estáticos
     // ========================
 
-    /**
-     * Comparador para ordenar reservas por fecha de inicio (ascendente)
-     */
-    public static final Comparator<Reserva> COMPARADOR_POR_FECHA_INICIO = new Comparator<Reserva>() {
-        @Override
-        public int compare(Reserva r1, Reserva r2) {
-            return r1.getFechaInicio().compareTo(r2.getFechaInicio());
-        }
-    };
+    // Eliminar los comparadores estáticos (COMPARADOR_POR_FECHA_INICIO, COMPARADOR_POR_FECHA_FIN, COMPARADOR_POR_ESTADO, COMPARADOR_POR_NUM_EQUIPOS)
 
-    /**
-     * Comparador para ordenar reservas por fecha de fin (ascendente)
-     */
-    public static final Comparator<Reserva> COMPARADOR_POR_FECHA_FIN = new Comparator<Reserva>() {
-        @Override
-        public int compare(Reserva r1, Reserva r2) {
-            return r1.getFechaFin().compareTo(r2.getFechaFin());
+    // Método para inicializar equipos de ejemplo
+    public void inicializar() {
+        if (equipos.isEmpty()) {
+            crearEquipo(new Equipo("Proyector", "Audiovisual", true));
+            crearEquipo(new Equipo("Micrófono", "Audio", true));
+            crearEquipo(new Equipo("Laptop", "Computo", false));
         }
-    };
-
-    /**
-     * Comparador para ordenar reservas por estado
-     */
-    public static final Comparator<Reserva> COMPARADOR_POR_ESTADO = new Comparator<Reserva>() {
-        @Override
-        public int compare(Reserva r1, Reserva r2) {
-            return r1.getEstado().getDescripcion().compareTo(r2.getEstado().getDescripcion());
-        }
-    };
-
-    /**
-     * Comparador para ordenar reservas por número de equipos (descendente)
-     */
-    public static final Comparator<Reserva> COMPARADOR_POR_NUM_EQUIPOS = new Comparator<Reserva>() {
-        @Override
-        public int compare(Reserva r1, Reserva r2) {
-            return Integer.compare(r2.getEquipos().length, r1.getEquipos().length); // Descendente
-        }
-    };
+    }
 }

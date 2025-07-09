@@ -77,7 +77,10 @@ public class TestRelacionAuditorioReserva {
         
         // 8. Actualizar estado de una reserva
         System.out.println("\n8. Actualizando estado de reserva...");
-        auditorio.actualizarEstadoReserva(1, Estado.EN_PROCESO);
+        Reserva[] reservas = auditorio.getReservas();
+        if (reservas.length > 1) {
+            auditorio.actualizarEstadoReserva(reservas[1].getCodigoReserva(), Estado.EN_PROCESO);
+        }
         System.out.println("Estado actualizado. Nueva lista:");
         System.out.println(auditorio.listarReservas());
         
@@ -104,9 +107,8 @@ public class TestRelacionAuditorioReserva {
         
         // 11. Eliminar una reserva
         System.out.println("\n11. Eliminando reserva...");
-        if (auditorio.getReservas().length > 0) {
-            Reserva reservaEliminar = auditorio.getReservas()[0];
-            auditorio.eliminarReserva(reservaEliminar.getCodigoReserva());
+        if (reservas.length > 0) {
+            auditorio.eliminarReserva(reservas[0].getCodigoReserva());
             System.out.println("Reserva eliminada. Nueva lista:");
             System.out.println(auditorio.listarReservas());
         } else {

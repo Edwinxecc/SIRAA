@@ -20,7 +20,8 @@ public class TestOrdenacionUniversidad {
         
         // Limpiar facultades existentes para el test
         while (universidad.getNumFacultades() > 0) {
-            universidad.eliminarFacultad(0);
+            Facultad[] facultades = universidad.getFacultades();
+            universidad.eliminarFacultad(facultades[0].getCodigoFacultad());
         }
         
         // Agregar algunas facultades para probar ordenación
@@ -45,8 +46,8 @@ public class TestOrdenacionUniversidad {
         Universidad u2 = Universidad.getInstancia();
         
         // Deberían ser iguales ya que es la misma instancia
-        assertEquals(0, Universidad.COMPARADOR_POR_NUM_FACULTADES.compare(u1, u2),
-                "El comparador debe retornar 0 para la misma instancia");
+        assertEquals(0, new OrdenarUniversidadNumFacultades().compare(u1, u2),
+                "El comparador debe retornar 0 para universidades con igual número de facultades");
     }
     
     @Test
@@ -171,9 +172,9 @@ public class TestOrdenacionUniversidad {
         Universidad universidad3 = Universidad.getInstancia();
         
         // Verificar transitividad del comparador por número de facultades
-        int resultado1 = Universidad.COMPARADOR_POR_NUM_FACULTADES.compare(universidad1, universidad2);
-        int resultado2 = Universidad.COMPARADOR_POR_NUM_FACULTADES.compare(universidad2, universidad3);
-        int resultado3 = Universidad.COMPARADOR_POR_NUM_FACULTADES.compare(universidad1, universidad3);
+        int resultado1 = new OrdenarUniversidadNumFacultades().compare(universidad1, universidad2);
+        int resultado2 = new OrdenarUniversidadNumFacultades().compare(universidad2, universidad3);
+        int resultado3 = new OrdenarUniversidadNumFacultades().compare(universidad1, universidad3);
         
         // Como son la misma instancia, todos deben ser 0
         assertEquals(0, resultado1, "El comparador debe retornar 0 para la misma instancia");

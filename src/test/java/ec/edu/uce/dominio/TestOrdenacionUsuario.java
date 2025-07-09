@@ -58,7 +58,7 @@ public class TestOrdenacionUsuario {
     void testComparatorPorNombre() {
         // Test para verificar ordenación por nombre
         Usuario[] usuariosOrdenados = usuarios.clone();
-        Arrays.sort(usuariosOrdenados, Usuario.COMPARADOR_POR_NOMBRE);
+        Arrays.sort(usuariosOrdenados, new OrdenarUsuarioNombre());
         
         // Verificar que están ordenados alfabéticamente por nombre
         String[] nombresEsperados = {"Ana", "Carlos", "Juan", "Luis", "María"};
@@ -72,7 +72,7 @@ public class TestOrdenacionUsuario {
     void testComparatorPorApellido() {
         // Test para verificar ordenación por apellido
         Usuario[] usuariosOrdenados = usuarios.clone();
-        Arrays.sort(usuariosOrdenados, Usuario.COMPARADOR_POR_APELLIDO);
+        Arrays.sort(usuariosOrdenados, new ec.edu.uce.dominio.OrdenarUsuarioApellido());
         
         // Verificar que están ordenados alfabéticamente por apellido
         String[] apellidosEsperados = {"García", "López", "Martínez", "Pérez", "Rodríguez"};
@@ -86,7 +86,7 @@ public class TestOrdenacionUsuario {
     void testComparatorPorCorreo() {
         // Test para verificar ordenación por correo
         Usuario[] usuariosOrdenados = usuarios.clone();
-        Arrays.sort(usuariosOrdenados, Usuario.COMPARADOR_POR_CORREO);
+        Arrays.sort(usuariosOrdenados, new ec.edu.uce.dominio.OrdenarUsuarioCorreo());
         
         // Verificar que están ordenados alfabéticamente por correo
         String[] correosEsperados = {
@@ -106,7 +106,7 @@ public class TestOrdenacionUsuario {
     void testComparatorPorNumReservas() {
         // Test para verificar ordenación por número de reservas (descendente)
         Usuario[] usuariosOrdenados = usuarios.clone();
-        Arrays.sort(usuariosOrdenados, Usuario.COMPARADOR_POR_NUM_RESERVAS);
+        Arrays.sort(usuariosOrdenados, new ec.edu.uce.dominio.OrdenarUsuarioNumReservas());
         
         // Verificar que están ordenados por número de reservas descendente
         int[] numReservasEsperadas = {3, 2, 1, 0, 0}; // Juan(3), Carlos(2), Ana(1), María(0), Luis(0)
@@ -215,9 +215,9 @@ public class TestOrdenacionUsuario {
         Usuario usuario3 = usuarios[2];
         
         // Verificar transitividad del comparador por nombre
-        int resultado1 = Usuario.COMPARADOR_POR_NOMBRE.compare(usuario1, usuario2);
-        int resultado2 = Usuario.COMPARADOR_POR_NOMBRE.compare(usuario2, usuario3);
-        int resultado3 = Usuario.COMPARADOR_POR_NOMBRE.compare(usuario1, usuario3);
+        int resultado1 = new OrdenarUsuarioNombre().compare(usuario1, usuario2);
+        int resultado2 = new OrdenarUsuarioNombre().compare(usuario2, usuario3);
+        int resultado3 = new OrdenarUsuarioNombre().compare(usuario1, usuario3);
         
         if (resultado1 > 0 && resultado2 > 0) {
             assertTrue(resultado3 > 0, "El comparador debe ser transitivo");

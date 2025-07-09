@@ -42,13 +42,13 @@ public class OrdenacionUtil {
         }
         // Ordenar por nombre (Comparator)
         System.out.println("\n--- Ordenados por nombre (Comparator) ---");
-        Arrays.sort(usuarios, Usuario.COMPARADOR_POR_NOMBRE);
+        Arrays.sort(usuarios, new OrdenarUsuarioNombre());
         for (Usuario usuario : usuarios) {
             System.out.println(usuario);
         }
         // Ordenar por apellido (Comparator)
         System.out.println("\n--- Ordenados por apellido (Comparator) ---");
-        Arrays.sort(usuarios, Usuario.COMPARADOR_POR_APELLIDO);
+        Arrays.sort(usuarios, new OrdenarUsuarioApellido());
         for (Usuario usuario : usuarios) {
             System.out.println(usuario);
         }
@@ -79,7 +79,7 @@ public class OrdenacionUtil {
             System.out.println(auditorio);
         }
         System.out.println("\n--- Ordenados por capacidad (Comparator) ---");
-        Arrays.sort(auditorios, Auditorio.COMPARADOR_POR_CAPACIDAD);
+        Arrays.sort(auditorios, new OrdenarAuditorioCapacidad());
         for (Auditorio auditorio : auditorios) {
             System.out.println(auditorio);
         }
@@ -110,7 +110,7 @@ public class OrdenacionUtil {
             System.out.println(facultad);
         }
         System.out.println("\n--- Ordenadas por ID (Comparator) ---");
-        Arrays.sort(facultades, Facultad.COMPARADOR_POR_ID);
+        Arrays.sort(facultades, new OrdenarFacultadId());
         for (Facultad facultad : facultades) {
             System.out.println(facultad);
         }
@@ -121,18 +121,18 @@ public class OrdenacionUtil {
      */
     public static void demostrarOrdenacionReservas() {
         System.out.println("\n=== DEMOSTRACIÓN ORDENACIÓN DE RESERVAS ===");
-        
+
         // Crear algunas reservas de ejemplo
         Date fecha1 = new Date(2024, 0, 15, 9, 0);
         Date fecha2 = new Date(2024, 0, 15, 11, 0);
         Date fecha3 = new Date(2024, 0, 16, 14, 0);
         Date fecha4 = new Date(2024, 0, 16, 16, 0);
-        
+
         Reserva[] reservas = {
-            new Reserva(fecha3, fecha4),
-            new Reserva(fecha1, fecha2),
-            new ReservaPrioritaria(fecha2, fecha3, Estado.PRIORIDAD_ALTA, "Evento importante"),
-            new ReservaPrioritaria(fecha1, fecha2, Estado.PRIORIDAD_BAJA, "Reunión regular")
+                new Reserva(fecha3, fecha4),
+                new Reserva(fecha1, fecha2),
+                new ReservaPrioritaria(fecha2, fecha3, Estado.PRIORIDAD_ALTA, "Evento importante"),
+                new ReservaPrioritaria(fecha1, fecha2, Estado.PRIORIDAD_BAJA, "Reunión regular")
         };
 
         System.out.println("Reservas originales:");
@@ -142,14 +142,14 @@ public class OrdenacionUtil {
 
         // Ordenar por fecha de inicio (Comparator)
         System.out.println("\n--- Ordenadas por fecha de inicio (Comparator) ---");
-        Arrays.sort(reservas, Reserva.COMPARADOR_POR_FECHA_INICIO);
+        Arrays.sort(reservas, new OrdenarReservaFechaInicio());
         for (Reserva reserva : reservas) {
             System.out.println(reserva);
         }
 
         // Ordenar por estado (Comparator)
         System.out.println("\n--- Ordenadas por estado (Comparator) ---");
-        Arrays.sort(reservas, Reserva.COMPARADOR_POR_ESTADO);
+        Arrays.sort(reservas, new OrdenarReservaEstado());
         for (Reserva reserva : reservas) {
             System.out.println(reserva);
         }
@@ -174,18 +174,25 @@ public class OrdenacionUtil {
         for (Equipo equipo : equipos) {
             System.out.println(equipo);
         }
-        System.out.println("\n--- Ordenados por nombre (Comparable) ---");
+        // Ordenar por ID (Comparable)
+        System.out.println("\n--- Ordenados por ID (Comparable) ---");
         Arrays.sort(equipos);
         for (Equipo equipo : equipos) {
             System.out.println(equipo);
         }
+        // Ordenar por nombre (Comparator)
+        System.out.println("\n--- Ordenados por nombre (Comparator) ---");
+        Arrays.sort(equipos, new OrdenarEquipoNombre());
+        for (Equipo equipo : equipos) {
+            System.out.println(equipo);
+        }
         System.out.println("\n--- Ordenados por disponibilidad (Comparator) ---");
-        Arrays.sort(equipos, Equipo.COMPARADOR_POR_DISPONIBILIDAD);
+        Arrays.sort(equipos, new OrdenarEquipoDisponibilidad());
         for (Equipo equipo : equipos) {
             System.out.println(equipo);
         }
         System.out.println("\n--- Ordenados por categoría (Comparator) ---");
-        Arrays.sort(equipos, Equipo.COMPARADOR_POR_CATEGORIA);
+        Arrays.sort(equipos, new OrdenarEquipoCategoria());
         for (Equipo equipo : equipos) {
             System.out.println(equipo);
         }
@@ -197,14 +204,14 @@ public class OrdenacionUtil {
     public static void ejecutarTodasLasDemostraciones() {
         System.out.println("🚀 INICIANDO DEMOSTRACIONES DE ORDENACIÓN SIRAA");
         System.out.println("=".repeat(60));
-        
+
         demostrarOrdenacionUsuarios();
         demostrarOrdenacionAuditorios();
         demostrarOrdenacionFacultades();
         demostrarOrdenacionReservas();
         demostrarOrdenacionEquipos();
-        
+
         System.out.println("\n" + "=".repeat(60));
         System.out.println("✅ TODAS LAS DEMOSTRACIONES COMPLETADAS");
     }
-} 
+}

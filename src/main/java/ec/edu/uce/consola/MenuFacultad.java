@@ -54,11 +54,11 @@ public class MenuFacultad extends MenuBase {
 
         // Crear nueva facultad
         Facultad nuevaFacultad = new Facultad(nombre, cantidad);
-        
+
         // Usar el método de la interfaz IAdministrarCRUD
         String resultado = nuevaFacultad.nuevo(nuevaFacultad);
         System.out.println(resultado);
-        
+
         if (resultado.contains("creada correctamente")) {
             System.out.println("\n[✓] Información de la facultad creada:");
             System.out.println("ID: " + nuevaFacultad.getIdFacultad());
@@ -71,25 +71,26 @@ public class MenuFacultad extends MenuBase {
 
     private void mostrarFacultades() {
         System.out.println("\n[2] Mostrar Facultades");
-        System.out.println("=== INFORMACIÓN DE LA FACULTAD ACTUAL ===");
-        System.out.println(facultad);
-        System.out.println("\n=== AUDITORIOS ===");
-        List<ec.edu.uce.dominio.Auditorio> auditorios = new ArrayList<>(Arrays.asList(facultad.getAuditorios()));
-        if (auditorios.isEmpty()) {
-            System.out.println("[!] No hay auditorios registrados.");
-        } else {
-            for (ec.edu.uce.dominio.Auditorio a : auditorios) {
-                System.out.println("Código: " + a.getCodigoAuditorio() + " | " + a);
-            }
+        ec.edu.uce.dominio.Universidad universidad = ec.edu.uce.dominio.Universidad.getInstancia();
+        universidad.inicializar();
+        java.util.List<ec.edu.uce.dominio.Facultad> facultades = new java.util.ArrayList<>(java.util.Arrays.asList(universidad.getFacultades()));
+        // Inicializar cada facultad antes de mostrar
+        for (ec.edu.uce.dominio.Facultad f : facultades) {
+            f.inicializar();
         }
-        System.out.println("\n=== USUARIOS ===");
-        List<ec.edu.uce.dominio.Usuario> usuarios = new ArrayList<>(Arrays.asList(facultad.getUsuarios()));
-        if (usuarios.isEmpty()) {
-            System.out.println("[!] No hay usuarios registrados.");
-        } else {
-            for (ec.edu.uce.dominio.Usuario u : usuarios) {
-                System.out.println("Código: " + u.getCodigoUsuario() + " | " + u);
-            }
+        // Orden natural (Comparable)
+        java.util.List<ec.edu.uce.dominio.Facultad> facultadesComparable = new java.util.ArrayList<>(facultades);
+        java.util.Collections.sort(facultadesComparable);
+        System.out.println("=== LISTA DE FACULTADES (ORDEN NATURAL - Comparable) ===");
+        for (ec.edu.uce.dominio.Facultad f : facultadesComparable) {
+            System.out.println("Código: " + f.getCodigoFacultad() + " | Nombre: " + f.getNombre());
+        }
+        System.out.println("\n--- ORDENADAS POR NOMBRE (Comparator) ---\n");
+        // Orden por nombre (Comparator)
+        java.util.List<ec.edu.uce.dominio.Facultad> facultadesComparator = new java.util.ArrayList<>(facultades);
+        facultadesComparator.sort(new ec.edu.uce.dominio.OrdenarFacultadNombre());
+        for (ec.edu.uce.dominio.Facultad f : facultadesComparator) {
+            System.out.println("Código: " + f.getCodigoFacultad() + " | Nombre: " + f.getNombre());
         }
     }
 
@@ -108,11 +109,11 @@ public class MenuFacultad extends MenuBase {
         // Crear facultad actualizada
         Facultad facultadActualizada = new Facultad(nuevoNombre, facultad.getNumAuditorios());
         facultadActualizada.setNumAuditorios(facultad.getNumAuditorios());
-        
+
         // Usar el método de la interfaz IAdministrarCRUD
         String resultado = facultad.editar(facultadActualizada);
         System.out.println(resultado);
-        
+
         if (resultado.contains("editada correctamente")) {
             System.out.println("[✓] Facultad actualizada correctamente.");
         }
@@ -123,7 +124,7 @@ public class MenuFacultad extends MenuBase {
         System.out.println("Facultad actual: " + facultad);
         System.out.print("¿Está seguro de eliminar esta facultad? (s/n): ");
         String confirmacion = entrada.nextLine().toLowerCase();
-        
+
         if (confirmacion.equals("s") || confirmacion.equals("si") || confirmacion.equals("sí")) {
             // Usar el método de la interfaz IAdministrarCRUD
             String resultado = facultad.borrar(facultad);
@@ -137,7 +138,7 @@ public class MenuFacultad extends MenuBase {
         System.out.println("\n[5] Buscar Facultad por ID");
         System.out.print("Ingrese el ID de la facultad: ");
         int id = leerEnteroPositivo();
-        
+
         Object resultado = facultad.buscarPorId(id);
         if (resultado != null && resultado instanceof Facultad) {
             Facultad facultadEncontrada = (Facultad) resultado;

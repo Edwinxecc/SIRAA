@@ -38,7 +38,10 @@ public class TestUniverisdad { // El nombre de la clase corregido a TestUniversi
 
         // Eliminar una facultad
         System.out.println("Eliminando la facultad en el índice 0 (Civil)...");
-        uni.eliminarFacultad(0); // Elimina la primera facultad
+        Facultad[] facultades = uni.getFacultades();
+        if (facultades.length > 0) {
+            uni.eliminarFacultad(facultades[0].getCodigoFacultad());
+        }
         System.out.println("Facultades después de la eliminación:");
         System.out.println(uni.listarNombresFacultades());
         System.out.println("Número actual de facultades: " + uni.getNumFacultades());
@@ -46,7 +49,11 @@ public class TestUniverisdad { // El nombre de la clase corregido a TestUniversi
 
         // Actualizar una facultad (ejemplo, actualizamos "Ingeniería" que ahora está en el índice 0)
         System.out.println("Actualizando el nombre de la facultad en el índice 0 (Ingeniería)...");
-        uni.actualizarFacultad(0, "Facultad de Sistemas");
+        Facultad[] facultades2 = uni.getFacultades();
+        if (facultades2.length > 0) {
+            facultades2[0].setNombre("Facultad de Sistemas");
+            uni.actualizarFacultad(facultades2[0]);
+        }
         System.out.println("Facultades después de la actualización:");
         System.out.println(uni.listarNombresFacultades());
         System.out.println("-----------------------------------");

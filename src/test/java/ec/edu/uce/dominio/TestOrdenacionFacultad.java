@@ -64,7 +64,7 @@ public class TestOrdenacionFacultad {
     void testComparatorPorNumAuditorios() {
         // Test para verificar ordenación por número de auditorios (descendente)
         Facultad[] facultadesOrdenadas = facultades.clone();
-        Arrays.sort(facultadesOrdenadas, Facultad.COMPARADOR_POR_NUM_AUDITORIOS);
+        Arrays.sort(facultadesOrdenadas, new OrdenarFacultadNumAuditorios());
         
         // Verificar que están ordenadas por número de auditorios descendente
         int[] numAuditoriosEsperados = {3, 2, 1, 0, 0}; // Medicina(3), Ingeniería(2), Ciencias(1), Derecho(0), Economía(0)
@@ -78,7 +78,7 @@ public class TestOrdenacionFacultad {
     void testComparatorPorNumUsuarios() {
         // Test para verificar ordenación por número de usuarios (descendente)
         Facultad[] facultadesOrdenadas = facultades.clone();
-        Arrays.sort(facultadesOrdenadas, Facultad.COMPARADOR_POR_NUM_USUARIOS);
+        Arrays.sort(facultadesOrdenadas, new OrdenarFacultadNumUsuarios());
         
         // Verificar que están ordenadas por número de usuarios descendente
         int[] numUsuariosEsperados = {3, 2, 1, 0, 0}; // Medicina(3), Ingeniería(2), Ciencias(1), Derecho(0), Economía(0)
@@ -92,7 +92,7 @@ public class TestOrdenacionFacultad {
     void testComparatorPorId() {
         // Test para verificar ordenación por ID usando Comparator
         Facultad[] facultadesOrdenadas = facultades.clone();
-        Arrays.sort(facultadesOrdenadas, Facultad.COMPARADOR_POR_ID);
+        Arrays.sort(facultadesOrdenadas, new OrdenarFacultadId());
         
         // Verificar que están ordenadas por ID ascendente
         for (int i = 0; i < facultadesOrdenadas.length - 1; i++) {
@@ -294,9 +294,9 @@ public class TestOrdenacionFacultad {
         Facultad facultad3 = facultades[2];
         
         // Verificar transitividad del comparador por número de auditorios
-        int resultado1 = Facultad.COMPARADOR_POR_NUM_AUDITORIOS.compare(facultad1, facultad2);
-        int resultado2 = Facultad.COMPARADOR_POR_NUM_AUDITORIOS.compare(facultad2, facultad3);
-        int resultado3 = Facultad.COMPARADOR_POR_NUM_AUDITORIOS.compare(facultad1, facultad3);
+        int resultado1 = new OrdenarFacultadNumAuditorios().compare(facultad1, facultad2);
+        int resultado2 = new OrdenarFacultadNumAuditorios().compare(facultad2, facultad3);
+        int resultado3 = new OrdenarFacultadNumAuditorios().compare(facultad1, facultad3);
         
         if (resultado1 > 0 && resultado2 > 0) {
             assertTrue(resultado3 > 0, "El comparador debe ser transitivo");

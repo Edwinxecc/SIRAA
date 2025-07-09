@@ -43,7 +43,7 @@ public class SubMenu {
             System.out.printf("%-25s%n", "💡 Vaya a 'Gestionar Reservas' y cree una nueva reserva");
             return;
         }
-        
+
         // Mostrar reservas disponibles para seleccionar
         System.out.printf("%n%s%n", "=".repeat(50));
         System.out.printf("%-20s%s%n", "", "RESERVAS DISPONIBLES");
@@ -51,7 +51,7 @@ public class SubMenu {
         for (int i = 0; i < reservas.length; i++) {
             System.out.printf("%-5s%s%n", "[" + i + "]", reservas[i]);
         }
-        
+
         System.out.printf("%n%-50s", "Seleccione el índice de la reserva para administrar equipos: ");
         java.util.Scanner entrada = new java.util.Scanner(System.in);
         int indice = 0;
@@ -61,12 +61,12 @@ public class SubMenu {
             System.out.printf("%-25s%n", "❌ Índice inválido");
             return;
         }
-        
+
         if (indice < 0 || indice >= reservas.length) {
             System.out.printf("%-25s%n", "❌ Índice inválido");
             return;
         }
-        
+
         // Crear nuevo menú de equipos con la reserva seleccionada
         MenuEquipo menuEquipoActual = new MenuEquipo(reservas[indice]);
         menuEquipoActual.mostrarMenu();

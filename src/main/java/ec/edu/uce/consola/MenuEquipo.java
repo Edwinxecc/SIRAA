@@ -62,11 +62,11 @@ public class MenuEquipo extends MenuBase {
 
         // Crear nuevo equipo
         Equipo nuevoEquipo = new Equipo(nombre, categoria, disponible);
-        
+
         // Usar el método de la interfaz IAdministrarCRUD
         String resultado = nuevoEquipo.nuevo(nuevoEquipo);
         System.out.println(resultado);
-        
+
         if (resultado.contains("creado correctamente")) {
             reservaActual.crearEquipo(nuevoEquipo);
             System.out.println("\n[✓] Información del equipo creado:");
@@ -81,12 +81,24 @@ public class MenuEquipo extends MenuBase {
 
     private void consultarEquipos() {
         System.out.println("\n[2] Consultar Equipos");
-        String listado = reservaActual.listarEquipos();
-        if (listado.contains("No hay equipos")) {
+        reservaActual.inicializar();
+        java.util.List<ec.edu.uce.dominio.Equipo> equipos = new java.util.ArrayList<>(java.util.Arrays.asList(reservaActual.getEquipos()));
+        // Orden natural (Comparable)
+        java.util.List<ec.edu.uce.dominio.Equipo> equiposComparable = new java.util.ArrayList<>(equipos);
+        java.util.Collections.sort(equiposComparable);
+        System.out.println("=== EQUIPOS DE LA RESERVA (ORDEN NATURAL - Comparable) ===");
+        for (ec.edu.uce.dominio.Equipo equipo : equiposComparable) {
+            System.out.println(equipo);
+        }
+        System.out.println("\n--- ORDENADOS POR NOMBRE (Comparator) ---\n");
+        // Orden por nombre (Comparator)
+        java.util.List<ec.edu.uce.dominio.Equipo> equiposComparator = new java.util.ArrayList<>(equipos);
+        equiposComparator.sort(new ec.edu.uce.dominio.OrdenarEquipoNombre());
+        for (ec.edu.uce.dominio.Equipo equipo : equiposComparator) {
+            System.out.println(equipo);
+        }
+        if (equipos.isEmpty()) {
             System.out.println("[!] No hay equipos para mostrar.");
-        } else {
-            System.out.println("=== EQUIPOS DE LA RESERVA ===");
-            System.out.println(listado);
         }
     }
 
@@ -175,17 +187,17 @@ public class MenuEquipo extends MenuBase {
         System.out.println("\n[5] Buscar Equipo por ID");
         System.out.print("Ingrese el ID del equipo: ");
         int id = leerEnteroPositivo();
-        
+
         Equipo[] equipos = reservaActual.getEquipos();
         Equipo equipoEncontrado = null;
-        
+
         for (Equipo equipo : equipos) {
             if (equipo.getIdEquipo() == id) {
                 equipoEncontrado = equipo;
                 break;
             }
         }
-        
+
         if (equipoEncontrado != null) {
             System.out.println("\n[✓] Equipo encontrado:");
             System.out.println(equipoEncontrado);
@@ -193,4 +205,4 @@ public class MenuEquipo extends MenuBase {
             System.out.println("[!] No se encontró un equipo con el ID: " + id);
         }
     }
-} 
+}

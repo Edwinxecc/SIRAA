@@ -147,13 +147,13 @@ public class Equipo implements IAdministrarCRUD, Comparable<Equipo> {
     @Override
     public String toString() {
         return String.format("┌─ EQUIPO ────────────────────────────────────────────────────────────┐%n" +
-                           "│ Código: %-15s │ ID: %-8d │ Categoría: %-20s │%n" +
-                           "│ Nombre: %-50s │%n" +
-                           "│ Disponible: %-8s │ Estado: %-20s │%n" +
-                           "└─────────────────────────────────────────────────────────────────────┘",
-                           codigoEquipo, idEquipo, categoria,
-                           nombre,
-                           disponibilidad ? "Sí" : "No", estado.getDescripcion());
+                        "│ Código: %-15s │ ID: %-8d │ Categoría: %-20s │%n" +
+                        "│ Nombre: %-50s │%n" +
+                        "│ Disponible: %-8s │ Estado: %-20s │%n" +
+                        "└─────────────────────────────────────────────────────────────────────┘",
+                codigoEquipo, idEquipo, categoria,
+                nombre,
+                disponibilidad ? "Sí" : "No", estado.getDescripcion());
     }
 
     // ========================
@@ -220,9 +220,23 @@ public class Equipo implements IAdministrarCRUD, Comparable<Equipo> {
     // Métodos de la interfaz Comparable
     // ========================
 
+    /**
+     * Criterio natural de comparación: por ID y luego por nombre
+     */
     @Override
-    public int compareTo(Equipo otroEquipo) {
-        return this.nombre.compareTo(otroEquipo.nombre);
+    public int compareTo(Equipo o) {
+        if (this.idEquipo < o.idEquipo) {
+            return -1;
+        } else if (this.idEquipo > o.idEquipo) {
+            return 1;
+        }
+        // Si los id son iguales, comparar por nombre
+        if (this.nombre.compareTo(o.nombre) < 0) {
+            return -1;
+        } else if (this.nombre.compareTo(o.nombre) > 0) {
+            return 1;
+        }
+        return 0;
     }
 
     // ========================

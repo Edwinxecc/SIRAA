@@ -66,33 +66,20 @@ public class TestOrdenacionCompleto {
         System.out.println("📋 Usuarios originales:");
         mostrarUsuarios(usuarios);
         
-        // Test Comparable (por ID)
-        Usuario[] usuariosPorId = usuarios.clone();
-        Arrays.sort(usuariosPorId);
-        System.out.println("\n📊 Usuarios ordenados por ID (Comparable):");
-        mostrarUsuarios(usuariosPorId);
-        
-        // Test Comparator por nombre
-        Usuario[] usuariosPorNombre = usuarios.clone();
-        Arrays.sort(usuariosPorNombre, Usuario.COMPARADOR_POR_NOMBRE);
-        System.out.println("\n📊 Usuarios ordenados por nombre:");
-        mostrarUsuarios(usuariosPorNombre);
-        
-        // Test Comparator por apellido
-        Usuario[] usuariosPorApellido = usuarios.clone();
-        Arrays.sort(usuariosPorApellido, Usuario.COMPARADOR_POR_APELLIDO);
+        // Ejemplo de uso para usuarios:
+        Arrays.sort(usuarios, new ec.edu.uce.dominio.OrdenarUsuarioApellido());
         System.out.println("\n📊 Usuarios ordenados por apellido:");
-        mostrarUsuarios(usuariosPorApellido);
+        mostrarUsuarios(usuarios);
         
         // Test Comparator por correo
         Usuario[] usuariosPorCorreo = usuarios.clone();
-        Arrays.sort(usuariosPorCorreo, Usuario.COMPARADOR_POR_CORREO);
+        Arrays.sort(usuariosPorCorreo, new ec.edu.uce.dominio.OrdenarUsuarioCorreo());
         System.out.println("\n📊 Usuarios ordenados por correo:");
         mostrarUsuarios(usuariosPorCorreo);
         
         // Test Comparator por número de reservas
         Usuario[] usuariosPorReservas = usuarios.clone();
-        Arrays.sort(usuariosPorReservas, Usuario.COMPARADOR_POR_NUM_RESERVAS);
+        Arrays.sort(usuariosPorReservas, new ec.edu.uce.dominio.OrdenarUsuarioNumReservas());
         System.out.println("\n📊 Usuarios ordenados por número de reservas (descendente):");
         mostrarUsuarios(usuariosPorReservas);
         
@@ -132,21 +119,20 @@ public class TestOrdenacionCompleto {
         System.out.println("📋 Auditorios originales:");
         mostrarAuditorios(auditorios);
         
-        // Test Comparable (por ID)
-        Auditorio[] auditoriosPorId = auditorios.clone();
-        Arrays.sort(auditoriosPorId);
-        System.out.println("\n📊 Auditorios ordenados por ID (Comparable):");
-        mostrarAuditorios(auditoriosPorId);
+        // Ejemplo de uso para auditorios:
+        Arrays.sort(auditorios, new ec.edu.uce.dominio.OrdenarAuditorioNombre());
+        System.out.println("\n📊 Auditorios ordenados por nombre:");
+        mostrarAuditorios(auditorios);
         
         // Test Comparator por capacidad
         Auditorio[] auditoriosPorCapacidad = auditorios.clone();
-        Arrays.sort(auditoriosPorCapacidad, Auditorio.COMPARADOR_POR_CAPACIDAD);
+        Arrays.sort(auditoriosPorCapacidad, new OrdenarAuditorioCapacidad());
         System.out.println("\n📊 Auditorios ordenados por capacidad (ascendente):");
         mostrarAuditorios(auditoriosPorCapacidad);
         
         // Test Comparator por número de reservas
         Auditorio[] auditoriosPorReservas = auditorios.clone();
-        Arrays.sort(auditoriosPorReservas, Auditorio.COMPARADOR_POR_NUM_RESERVAS);
+        Arrays.sort(auditoriosPorReservas, new OrdenarAuditorioNumReservas());
         System.out.println("\n📊 Auditorios ordenados por número de reservas (descendente):");
         mostrarAuditorios(auditoriosPorReservas);
         
@@ -193,21 +179,20 @@ public class TestOrdenacionCompleto {
         System.out.println("📋 Facultades originales:");
         mostrarFacultades(facultades);
         
-        // Test Comparable (por ID)
-        Facultad[] facultadesPorId = facultades.clone();
-        Arrays.sort(facultadesPorId);
-        System.out.println("\n📊 Facultades ordenadas por ID (Comparable):");
-        mostrarFacultades(facultadesPorId);
+        // Ejemplo de uso para facultades:
+        Arrays.sort(facultades, new ec.edu.uce.dominio.OrdenarFacultadNombre());
+        System.out.println("\n📊 Facultades ordenadas por nombre:");
+        mostrarFacultades(facultades);
         
         // Test Comparator por número de auditorios
         Facultad[] facultadesPorAuditorios = facultades.clone();
-        Arrays.sort(facultadesPorAuditorios, Facultad.COMPARADOR_POR_NUM_AUDITORIOS);
+        Arrays.sort(facultadesPorAuditorios, new OrdenarFacultadNumAuditorios());
         System.out.println("\n📊 Facultades ordenadas por número de auditorios (descendente):");
         mostrarFacultades(facultadesPorAuditorios);
         
         // Test Comparator por número de usuarios
         Facultad[] facultadesPorUsuarios = facultades.clone();
-        Arrays.sort(facultadesPorUsuarios, Facultad.COMPARADOR_POR_NUM_USUARIOS);
+        Arrays.sort(facultadesPorUsuarios, new OrdenarFacultadNumUsuarios());
         System.out.println("\n📊 Facultades ordenadas por número de usuarios (descendente):");
         mostrarFacultades(facultadesPorUsuarios);
         
@@ -239,7 +224,8 @@ public class TestOrdenacionCompleto {
         
         // Limpiar facultades existentes
         while (universidad.getNumFacultades() > 0) {
-            universidad.eliminarFacultad(0);
+            Facultad[] facultades = universidad.getFacultades();
+            universidad.eliminarFacultad(facultades[0].getCodigoFacultad());
         }
         
         // Crear facultades de prueba
@@ -291,27 +277,20 @@ public class TestOrdenacionCompleto {
         System.out.println("📋 Reservas originales:");
         mostrarReservas(reservas);
         
-        // Test Comparable (por ID)
-        Reserva[] reservasPorId = reservas.clone();
-        Arrays.sort(reservasPorId);
-        System.out.println("\n📊 Reservas ordenadas por ID (Comparable):");
-        mostrarReservas(reservasPorId);
-        
-        // Test Comparator por fecha de inicio
-        Reserva[] reservasPorFecha = reservas.clone();
-        Arrays.sort(reservasPorFecha, Reserva.COMPARADOR_POR_FECHA_INICIO);
+        // Ejemplo de uso para reservas:
+        Arrays.sort(reservas, new ec.edu.uce.dominio.OrdenarReservaFechaInicio());
         System.out.println("\n📊 Reservas ordenadas por fecha de inicio:");
-        mostrarReservas(reservasPorFecha);
+        mostrarReservas(reservas);
         
         // Test Comparator por fecha de fin
         Reserva[] reservasPorFechaFin = reservas.clone();
-        Arrays.sort(reservasPorFechaFin, Reserva.COMPARADOR_POR_FECHA_FIN);
+        Arrays.sort(reservasPorFechaFin, new OrdenarReservaFechaFin());
         System.out.println("\n📊 Reservas ordenadas por fecha de fin:");
         mostrarReservas(reservasPorFechaFin);
         
         // Test Comparator por estado
         Reserva[] reservasPorEstado = reservas.clone();
-        Arrays.sort(reservasPorEstado, Reserva.COMPARADOR_POR_ESTADO);
+        Arrays.sort(reservasPorEstado, new OrdenarReservaEstado());
         System.out.println("\n📊 Reservas ordenadas por estado:");
         mostrarReservas(reservasPorEstado);
         
@@ -334,33 +313,32 @@ public class TestOrdenacionCompleto {
         System.out.println("📋 Equipos originales:");
         mostrarEquipos(equipos);
         
-        // Test Comparable (por nombre)
-        Equipo[] equiposPorNombre = equipos.clone();
-        Arrays.sort(equiposPorNombre);
+        // Ejemplo de uso para equipos:
+        Arrays.sort(equipos, new ec.edu.uce.dominio.OrdenarEquipoNombre());
         System.out.println("\n📊 Equipos ordenados por nombre (Comparable):");
-        mostrarEquipos(equiposPorNombre);
+        mostrarEquipos(equipos);
         
         // Test Comparator por categoría
         Equipo[] equiposPorCategoria = equipos.clone();
-        Arrays.sort(equiposPorCategoria, Equipo.COMPARADOR_POR_CATEGORIA);
+        Arrays.sort(equiposPorCategoria, new OrdenarEquipoCategoria());
         System.out.println("\n📊 Equipos ordenados por categoría:");
         mostrarEquipos(equiposPorCategoria);
         
         // Test Comparator por disponibilidad
         Equipo[] equiposPorDisponibilidad = equipos.clone();
-        Arrays.sort(equiposPorDisponibilidad, Equipo.COMPARADOR_POR_DISPONIBILIDAD);
+        Arrays.sort(equiposPorDisponibilidad, new OrdenarEquipoDisponibilidad());
         System.out.println("\n📊 Equipos ordenados por disponibilidad (disponibles primero):");
         mostrarEquipos(equiposPorDisponibilidad);
         
         // Test Comparator por estado
         Equipo[] equiposPorEstado = equipos.clone();
-        Arrays.sort(equiposPorEstado, Equipo.COMPARADOR_POR_ESTADO);
+        Arrays.sort(equiposPorEstado, new OrdenarEquipoEstado());
         System.out.println("\n📊 Equipos ordenados por estado:");
         mostrarEquipos(equiposPorEstado);
         
         // Test Comparator por ID
         Equipo[] equiposPorId = equipos.clone();
-        Arrays.sort(equiposPorId, Equipo.COMPARADOR_POR_ID);
+        Arrays.sort(equiposPorId, new OrdenarEquipoId());
         System.out.println("\n📊 Equipos ordenados por ID:");
         mostrarEquipos(equiposPorId);
         

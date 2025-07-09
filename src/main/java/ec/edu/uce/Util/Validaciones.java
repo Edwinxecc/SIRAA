@@ -30,7 +30,7 @@ public class Validaciones {
 
         return texto;
     }
-    
+
     /**
      * Valida que un correo sea institucional (@uce.edu.ec).
      * @param correo Correo a validar
@@ -42,7 +42,7 @@ public class Validaciones {
         }
         return correo.endsWith("@uce.edu.ec");
     }
-    
+
     /**
      * Valida que un número esté en un rango específico.
      * @param numero Número a validar
@@ -53,7 +53,7 @@ public class Validaciones {
     public boolean validarRango(int numero, int min, int max) {
         return numero >= min && numero <= max;
     }
-    
+
     /**
      * Valida que una cadena no esté vacía o sea null.
      * @param texto Texto a validar

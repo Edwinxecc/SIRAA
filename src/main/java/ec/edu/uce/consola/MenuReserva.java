@@ -87,11 +87,11 @@ public class MenuReserva extends MenuBase {
 
         // Crear nueva reserva
         Reserva nuevaReserva = new Reserva(inicio, fin);
-        
+
         // Usar el método de la interfaz IAdministrarCRUD
         String resultado = nuevaReserva.nuevo(nuevaReserva);
         System.out.println(resultado);
-        
+
         if (resultado.contains("creada correctamente")) {
             usuarioActual.crearReserva(nuevaReserva);
             System.out.println("\n[✓] Información de la reserva creada:");
@@ -156,11 +156,11 @@ public class MenuReserva extends MenuBase {
 
         // Crear la reserva prioritaria
         ReservaPrioritaria nuevaReserva = new ReservaPrioritaria(inicio, fin, estado, motivo);
-        
+
         // Usar el método de la interfaz IAdministrarCRUD
         String resultado = nuevaReserva.nuevo(nuevaReserva);
         System.out.println(resultado);
-        
+
         if (resultado.contains("creada correctamente")) {
             usuarioActual.crearReserva(nuevaReserva);
             System.out.println("\n[✓] Información de la reserva prioritaria creada:");
@@ -176,24 +176,36 @@ public class MenuReserva extends MenuBase {
 
     private void mostrarReservas() {
         System.out.println("\n[3] Ver Reservas");
-        String listado = usuarioActual.listarReservas();
-        if (listado.contains("No hay reservas")) {
+        usuarioActual.inicializar();
+        java.util.List<ec.edu.uce.dominio.Reserva> reservas = new java.util.ArrayList<>(java.util.Arrays.asList(usuarioActual.getReservas()));
+        // Orden natural (Comparable)
+        java.util.List<ec.edu.uce.dominio.Reserva> reservasComparable = new java.util.ArrayList<>(reservas);
+        java.util.Collections.sort(reservasComparable);
+        System.out.println("=== RESERVAS DEL USUARIO (ORDEN NATURAL - Comparable) ===");
+        for (ec.edu.uce.dominio.Reserva reserva : reservasComparable) {
+            System.out.println(reserva);
+        }
+        System.out.println("\n--- ORDENADAS POR CÓDIGO (Comparator) ---\n");
+        // Orden por código (Comparator)
+        java.util.List<ec.edu.uce.dominio.Reserva> reservasComparator = new java.util.ArrayList<>(reservas);
+        reservasComparator.sort(new ec.edu.uce.dominio.OrdenarReservaFechaInicio());
+        for (ec.edu.uce.dominio.Reserva reserva : reservasComparator) {
+            System.out.println(reserva);
+        }
+        if (reservas.isEmpty()) {
             System.out.println("[!] No hay reservas para mostrar.");
-        } else {
-            System.out.println("=== RESERVAS DEL USUARIO ===");
-            System.out.println(listado);
         }
     }
 
     private void editarReserva() {
         System.out.println("\n[4] Editar Reserva");
         Reserva[] reservas = usuarioActual.getReservas();
-        
+
         if (reservas.length == 0) {
             System.out.println("[!] No hay reservas para editar.");
             return;
         }
-        
+
         System.out.println("=== LISTA DE RESERVAS ===");
         for (int i = 0; i < reservas.length; i++) {
             System.out.println("[" + i + "] " + reservas[i]);
@@ -230,11 +242,11 @@ public class MenuReserva extends MenuBase {
         // Crear reserva actualizada
         Reserva reservaActualizada = new Reserva(inicio, fin);
         reservaActualizada.setEstado(reservaAEditar.getEstado());
-        
+
         // Usar el método de la interfaz IAdministrarCRUD
         String resultado = reservaAEditar.editar(reservaActualizada);
         System.out.println(resultado);
-        
+
         if (resultado.contains("editada correctamente")) {
             usuarioActual.actualizarReserva(reservaAEditar.getCodigoReserva(), reservaActualizada);
             System.out.println("[✓] Reserva actualizada correctamente.");
@@ -244,12 +256,12 @@ public class MenuReserva extends MenuBase {
     private void eliminarReserva() {
         System.out.println("\n[5] Eliminar Reserva");
         Reserva[] reservas = usuarioActual.getReservas();
-        
+
         if (reservas.length == 0) {
             System.out.println("[!] No hay reservas para eliminar.");
             return;
         }
-        
+
         System.out.println("=== LISTA DE RESERVAS ===");
         for (int i = 0; i < reservas.length; i++) {
             System.out.println("[" + i + "] " + reservas[i]);
@@ -266,12 +278,12 @@ public class MenuReserva extends MenuBase {
         Reserva reservaAEliminar = reservas[indice];
         System.out.println("¿Está seguro de eliminar la reserva: " + reservaAEliminar + "? (s/n): ");
         String confirmacion = entrada.nextLine().toLowerCase();
-        
+
         if (confirmacion.equals("s") || confirmacion.equals("si") || confirmacion.equals("sí")) {
             // Usar el método de la interfaz IAdministrarCRUD
             String resultado = reservaAEliminar.borrar(reservaAEliminar);
             System.out.println(resultado);
-            
+
             if (resultado.contains("eliminada correctamente")) {
                 usuarioActual.eliminarReserva(reservaAEliminar.getCodigoReserva());
                 System.out.println("[✓] Reserva eliminada correctamente.");
@@ -285,17 +297,17 @@ public class MenuReserva extends MenuBase {
         System.out.println("\n[6] Buscar Reserva por ID");
         System.out.print("Ingrese el ID de la reserva: ");
         int id = leerEnteroPositivo();
-        
+
         Reserva[] reservas = usuarioActual.getReservas();
         Reserva reservaEncontrada = null;
-        
+
         for (Reserva reserva : reservas) {
             if (reserva.getIdReserva() == id) {
                 reservaEncontrada = reserva;
                 break;
             }
         }
-        
+
         if (reservaEncontrada != null) {
             System.out.println("\n[✓] Reserva encontrada:");
             System.out.println(reservaEncontrada);
@@ -308,4 +320,4 @@ public class MenuReserva extends MenuBase {
     public Usuario getUsuarioActual() {
         return usuarioActual;
     }
-} 
+}

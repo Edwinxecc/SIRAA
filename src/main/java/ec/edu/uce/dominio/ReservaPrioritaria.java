@@ -209,60 +209,20 @@ public class ReservaPrioritaria extends Reserva {
     public String toString() {
         // Concatena la representación de la clase padre con la información específica de prioridad.
         return String.format("┌─ RESERVA PRIORITARIA ───────────────────────────────────────────────┐%n" +
-                           "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
-                           "│ Fecha Inicio: %-30s │%n" +
-                           "│ Fecha Fin: %-32s │%n" +
-                           "│ Equipos Asignados: %-3d │ Tipo: %-20s │%n" +
-                           "│ Nivel de Prioridad: %-20s │%n" +
-                           "│ Motivo: %-50s │%n" +
-                           "│ Requiere Aprobación: %-8s │%n" +
-                           "└─────────────────────────────────────────────────────────────────────┘",
-                           getCodigoReserva(), getIdReserva(), getEstado().getDescripcion(),
-                           getFechaInicio().toString(),
-                           getFechaFin().toString(),
-                           getEquipos().length, tipoReserva(),
-                           getEstado().getDescripcion(),
-                           motivoPrioridad,
-                           requiereAprobacion() ? "Sí" : "No");
+                        "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
+                        "│ Fecha Inicio: %-30s │%n" +
+                        "│ Fecha Fin: %-32s │%n" +
+                        "│ Equipos Asignados: %-3d │ Tipo: %-20s │%n" +
+                        "│ Nivel de Prioridad: %-20s │%n" +
+                        "│ Motivo: %-50s │%n" +
+                        "│ Requiere Aprobación: %-8s │%n" +
+                        "└─────────────────────────────────────────────────────────────────────┘",
+                getCodigoReserva(), getIdReserva(), getEstado().getDescripcion(),
+                getFechaInicio().toString(),
+                getFechaFin().toString(),
+                getEquipos().length, tipoReserva(),
+                getEstado().getDescripcion(),
+                motivoPrioridad,
+                requiereAprobacion() ? "Sí" : "No");
     }
-
-    // ========================
-    // Comparadores Estáticos para Reservas Prioritarias
-    // ========================
-
-    /**
-     * Comparador para ordenar reservas prioritarias por nivel de prioridad (descendente)
-     */
-    public static final Comparator<ReservaPrioritaria> COMPARADOR_POR_NIVEL_PRIORIDAD = new Comparator<ReservaPrioritaria>() {
-        @Override
-        public int compare(ReservaPrioritaria r1, ReservaPrioritaria r2) {
-            return Integer.compare(r2.getNivelPrioridad(), r1.getNivelPrioridad()); // Descendente
-        }
-    };
-
-    /**
-     * Comparador para ordenar reservas prioritarias por motivo
-     */
-    public static final Comparator<ReservaPrioritaria> COMPARADOR_POR_MOTIVO = new Comparator<ReservaPrioritaria>() {
-        @Override
-        public int compare(ReservaPrioritaria r1, ReservaPrioritaria r2) {
-            return r1.getMotivoPrioridad().compareTo(r2.getMotivoPrioridad());
-        }
-    };
-
-    /**
-     * Comparador para ordenar reservas prioritarias por fecha de inicio y nivel de prioridad
-     */
-    public static final Comparator<ReservaPrioritaria> COMPARADOR_POR_FECHA_Y_PRIORIDAD = new Comparator<ReservaPrioritaria>() {
-        @Override
-        public int compare(ReservaPrioritaria r1, ReservaPrioritaria r2) {
-            // Primero por fecha de inicio
-            int fechaComparison = r1.getFechaInicio().compareTo(r2.getFechaInicio());
-            if (fechaComparison != 0) {
-                return fechaComparison;
-            }
-            // Luego por nivel de prioridad (descendente)
-            return Integer.compare(r2.getNivelPrioridad(), r1.getNivelPrioridad());
-        }
-    };
 }

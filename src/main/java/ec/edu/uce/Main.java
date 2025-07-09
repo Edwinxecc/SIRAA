@@ -17,5 +17,8 @@ public class Main {
         // Crear y mostrar el menú principal
         Menu menuPrincipal = new Menu(facultadPrincipal);
         menuPrincipal.menuDeInicio();
+        /*
+        implementar los metodos en menu, inicializar los objetos
+         */
     }
 }

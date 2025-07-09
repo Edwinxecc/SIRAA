@@ -59,7 +59,7 @@ public class TestOrdenacionAuditorio {
     void testComparatorPorCapacidad() {
         // Test para verificar ordenación por capacidad (ascendente)
         Auditorio[] auditoriosOrdenados = auditorios.clone();
-        Arrays.sort(auditoriosOrdenados, Auditorio.COMPARADOR_POR_CAPACIDAD);
+        Arrays.sort(auditoriosOrdenados, new OrdenarAuditorioCapacidad());
         
         // Verificar que están ordenados por capacidad ascendente
         int[] capacidadesEsperadas = {100, 120, 150, 200, 300};
@@ -73,7 +73,7 @@ public class TestOrdenacionAuditorio {
     void testComparatorPorNumReservas() {
         // Test para verificar ordenación por número de reservas (descendente)
         Auditorio[] auditoriosOrdenados = auditorios.clone();
-        Arrays.sort(auditoriosOrdenados, Auditorio.COMPARADOR_POR_NUM_RESERVAS);
+        Arrays.sort(auditoriosOrdenados, new OrdenarAuditorioNumReservas());
         
         // Verificar que están ordenados por número de reservas descendente
         int[] numReservasEsperadas = {3, 2, 1, 1, 0}; // C(3), A(2), B(1), D(1), E(0)
@@ -87,7 +87,7 @@ public class TestOrdenacionAuditorio {
     void testComparatorPorId() {
         // Test para verificar ordenación por ID usando Comparator
         Auditorio[] auditoriosOrdenados = auditorios.clone();
-        Arrays.sort(auditoriosOrdenados, Auditorio.COMPARADOR_POR_ID);
+        Arrays.sort(auditoriosOrdenados, new OrdenarAuditorioId());
         
         // Verificar que están ordenados por ID ascendente
         for (int i = 0; i < auditoriosOrdenados.length - 1; i++) {
@@ -195,9 +195,9 @@ public class TestOrdenacionAuditorio {
         Auditorio auditorio3 = auditorios[2];
         
         // Verificar transitividad del comparador por capacidad
-        int resultado1 = Auditorio.COMPARADOR_POR_CAPACIDAD.compare(auditorio1, auditorio2);
-        int resultado2 = Auditorio.COMPARADOR_POR_CAPACIDAD.compare(auditorio2, auditorio3);
-        int resultado3 = Auditorio.COMPARADOR_POR_CAPACIDAD.compare(auditorio1, auditorio3);
+        int resultado1 = new OrdenarAuditorioCapacidad().compare(auditorio1, auditorio2);
+        int resultado2 = new OrdenarAuditorioCapacidad().compare(auditorio2, auditorio3);
+        int resultado3 = new OrdenarAuditorioCapacidad().compare(auditorio1, auditorio3);
         
         if (resultado1 > 0 && resultado2 > 0) {
             assertTrue(resultado3 > 0, "El comparador debe ser transitivo");

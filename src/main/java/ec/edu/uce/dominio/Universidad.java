@@ -3,8 +3,8 @@ package ec.edu.uce.dominio;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Map;
-import java.util.HashMap;
+import ec.edu.uce.datos.FacultadDAO;
+import ec.edu.uce.datos.FacultadDAOMemoriaImp;
 
 /**
  * Representa una universidad en el sistema SIRAA.
@@ -15,11 +15,12 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     // 1. Atributo estático privado que almacena la única instancia
     private static Universidad instancia;
 
-    private Map<String, Facultad> facultades;
+    private FacultadDAO facultadDAO;
 
     // 2. Constructor privado para evitar que se cree con new desde fuera
     private Universidad() {
-        this.facultades = new HashMap<>();
+        this.facultadDAO = new FacultadDAOMemoriaImp();
+        inicializar();
     }
 
     // 3. Método público estático que devuelve la instancia única
@@ -33,13 +34,11 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     // Getters y setters
 
     public int getNumFacultades() {
-        return facultades.size();
+        return facultadDAO.consultarFacultades().length;
     }
 
     public void setNumFacultades(int numFacultades) {
-        if (numFacultades >= 0){
-            // This method is no longer used as the number of facultades is managed by the map
-        }
+        // No se usa, el número de facultades lo gestiona el DAO
     }
 
     /**
@@ -49,7 +48,7 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      */
     public boolean validarDuplicado(Facultad facultad) {
         if (facultad == null) return false;
-        return facultades.containsKey(facultad.getCodigoFacultad());
+        return facultadDAO.buscarPorCodigo(facultad.getCodigoFacultad()) != null;
     }
 
     // Métodos CRUD de Facultad
@@ -79,31 +78,20 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
             System.out.println("La facultad ya existe y no se puede agregar duplicada.");
             return;
         }
-        facultades.put(facultad.getCodigoFacultad(), facultad);
+        facultadDAO.crear(facultad);
     }
 
     public Facultad[] getFacultades() {
-        return facultades.values().toArray(new Facultad[0]);
+        return facultadDAO.consultarFacultades();
     }
 
     /**
-     * Obtiene una facultad por su índice.
+     * Obtiene una facultad por su código.
      * @param codigo Código de la facultad.
-     * @return La facultad en el índice especificado o null si el índice es inválido.
+     * @return La facultad con el código especificado o null si no existe.
      */
     public Facultad getFacultad(String codigo) {
-        return facultades.get(codigo);
-    }
-
-    /**
-     * Actualiza el nombre de una facultad.
-     * @param codigo Código de la facultad a actualizar.
-     * @param nuevoNombre Nuevo nombre de la facultad.
-     */
-    public void actualizarFacultad(String codigo, Facultad facultad) {
-        if (facultades.containsKey(codigo) && facultad != null) {
-            facultades.put(codigo, facultad);
-        }
+        return facultadDAO.buscarPorCodigo(codigo);
     }
 
     /**
@@ -112,16 +100,16 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      */
     public void actualizarFacultad(Facultad facultad) {
         if (facultad != null) {
-            facultades.put(facultad.getCodigoFacultad(), facultad);
+            facultadDAO.editar(facultad);
         }
     }
 
     /**
-     * Elimina una facultad por su índice.
+     * Elimina una facultad por su código.
      * @param codigo Código de la facultad a eliminar.
      */
     public void eliminarFacultad(String codigo) {
-        facultades.remove(codigo);
+        facultadDAO.eliminar(codigo);
     }
 
     /**
@@ -130,7 +118,7 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      */
     public void eliminarFacultad(Facultad facultad) {
         if (facultad == null) return;
-        facultades.remove(facultad.getCodigoFacultad());
+        facultadDAO.eliminar(facultad.getCodigoFacultad());
     }
 
     /**
@@ -138,11 +126,12 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      * @return Una cadena con la lista de facultades.
      */
     public String listarNombresFacultades() {
-        if (facultades.isEmpty()) {
+        Facultad[] facultades = facultadDAO.consultarFacultades();
+        if (facultades.length == 0) {
             return "[!] No hay facultades registradas.";
         }
         StringBuilder texto = new StringBuilder();
-        for (Facultad f : facultades.values()) {
+        for (Facultad f : facultades) {
             texto.append(f).append("\r\n");
         }
         return texto.toString();
@@ -164,11 +153,11 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
     @Override
     public String toString() {
         return String.format("┌─ UNIVERSIDAD ──────────────────────────────────────────────────────┐%n" +
-                           "│ Nombre: %-50s │%n" +
-                           "│ Facultades Registradas: %-3d │%n" +
-                           "└─────────────────────────────────────────────────────────────────────┘",
-                           "Universidad Central del Ecuador (UCE)",
-                           getNumFacultades());
+                        "│ Nombre: %-50s │%n" +
+                        "│ Facultades Registradas: %-3d │%n" +
+                        "└─────────────────────────────────────────────────────────────────────┘",
+                "Universidad Central del Ecuador (UCE)",
+                getNumFacultades());
     }
 
     // Métodos de la interfaz IAdministrarCRUD
@@ -192,13 +181,8 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
             return "[!] El objeto no es una Facultad válida.";
         }
         Facultad facultadEditada = (Facultad) obj;
-        for (Facultad f : facultades.values()) {
-            if (f.equals(facultadEditada)) {
-                actualizarFacultad(f.getCodigoFacultad(), facultadEditada);
-                return "[✓] Facultad editada correctamente.";
-            }
-        }
-        return "[!] Facultad no encontrada.";
+        actualizarFacultad(facultadEditada);
+        return "[✓] Facultad editada correctamente.";
     }
 
     @Override
@@ -207,21 +191,17 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
             return "[!] El objeto no es una Facultad válida.";
         }
         Facultad facultadABorrar = (Facultad) obj;
-        for (Facultad f : facultades.values()) {
-            if (f.equals(facultadABorrar)) {
-                eliminarFacultad(f.getCodigoFacultad());
-                return "[✓] Facultad eliminada correctamente.";
-            }
-        }
-        return "[!] Facultad no encontrada.";
+        eliminarFacultad(facultadABorrar);
+        return "[✓] Facultad eliminada correctamente.";
     }
 
     @Override
     public Object buscarPorId(Integer id) {
-        if (id == null || id < 0 || id >= getNumFacultades()) {
+        Facultad[] facultades = facultadDAO.consultarFacultades();
+        if (id == null || id < 0 || id >= facultades.length) {
             return null;
         }
-        return getFacultad(id.toString());
+        return facultades[id];
     }
 
     @Override
@@ -229,9 +209,19 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
         return listarNombresFacultades();
     }
 
+    /**
+     * Criterio natural de comparación: por nombre de universidad (ascendente)
+     */
     @Override
-    public int compareTo(Universidad otraUniversidad) {
-        return this.toString().compareTo(otraUniversidad.toString());
+    public int compareTo(Universidad o) {
+        // Si existiera un idUniversidad, comparar primero por id
+        // Como no hay, comparar solo por nombre
+        if ("Universidad Central del Ecuador (UCE)".compareTo("Universidad Central del Ecuador (UCE)") < 0) {
+            return -1;
+        } else if ("Universidad Central del Ecuador (UCE)".compareTo("Universidad Central del Ecuador (UCE)") > 0) {
+            return 1;
+        }
+        return 0;
     }
 
     // ========================
@@ -251,7 +241,7 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      */
     public void ordenarFacultadesPorNumAuditorios() {
         Facultad[] facultadesActivas = getFacultades();
-        Arrays.sort(facultadesActivas, Facultad.COMPARADOR_POR_NUM_AUDITORIOS);
+        Arrays.sort(facultadesActivas, new OrdenarFacultadNumAuditorios());
     }
 
     /**
@@ -259,7 +249,7 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      */
     public void ordenarFacultadesPorNumUsuarios() {
         Facultad[] facultadesActivas = getFacultades();
-        Arrays.sort(facultadesActivas, Facultad.COMPARADOR_POR_NUM_USUARIOS);
+        Arrays.sort(facultadesActivas, new OrdenarFacultadNumUsuarios());
     }
 
     /**
@@ -267,20 +257,6 @@ public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
      */
     public void ordenarFacultadesPorId() {
         Facultad[] facultadesActivas = getFacultades();
-        Arrays.sort(facultadesActivas, Facultad.COMPARADOR_POR_ID);
+        Arrays.sort(facultadesActivas, new OrdenarFacultadId());
     }
-
-    // ========================
-    // Comparadores Estáticos
-    // ========================
-
-    /**
-     * Comparador para ordenar universidades por número de facultades (descendente)
-     */
-    public static final Comparator<Universidad> COMPARADOR_POR_NUM_FACULTADES = new Comparator<Universidad>() {
-        @Override
-        public int compare(Universidad u1, Universidad u2) {
-            return Integer.compare(u2.getNumFacultades(), u1.getNumFacultades()); // Descendente
-        }
-    };
 }

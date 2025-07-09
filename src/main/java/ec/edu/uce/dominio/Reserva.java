@@ -348,13 +348,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
         Arrays.sort(equiposActivos, new OrdenarEquipoId());
         System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
     }
-
-    // ========================
-    // Comparadores Estáticos
-    // ========================
-
-    // Eliminar los comparadores estáticos (COMPARADOR_POR_FECHA_INICIO, COMPARADOR_POR_FECHA_FIN, COMPARADOR_POR_ESTADO, COMPARADOR_POR_NUM_EQUIPOS)
-
+    
     // Método para inicializar equipos de ejemplo
     public void inicializar() {
         if (equipos.isEmpty()) {

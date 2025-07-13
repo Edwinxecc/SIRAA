@@ -410,30 +410,12 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
     /**
      * Comparador para ordenar facultades por número de auditorios (descendente)
      */
-    public static final Comparator<Facultad> COMPARADOR_POR_NUM_AUDITORIOS = new Comparator<Facultad>() {
-        @Override
-        public int compare(Facultad f1, Facultad f2) {
-            return Integer.compare(f2.getNumAuditorios(), f1.getNumAuditorios()); // Descendente
-        }
-    };
 
     /**
      * Comparador para ordenar facultades por número de usuarios (descendente)
      */
-    public static final Comparator<Facultad> COMPARADOR_POR_NUM_USUARIOS = new Comparator<Facultad>() {
-        @Override
-        public int compare(Facultad f1, Facultad f2) {
-            return Integer.compare(f2.getNumUsuarios(), f1.getNumUsuarios()); // Descendente
-        }
-    };
 
     /**
      * Comparador para ordenar facultades por ID (ascendente)
      */
-    public static final Comparator<Facultad> COMPARADOR_POR_ID = new Comparator<Facultad>() {
-        @Override
-        public int compare(Facultad f1, Facultad f2) {
-            return Integer.compare(f1.getIdFacultad(), f2.getIdFacultad());
-        }
-    };
 }

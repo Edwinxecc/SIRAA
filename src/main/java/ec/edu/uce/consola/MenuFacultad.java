@@ -74,22 +74,28 @@ public class MenuFacultad extends MenuBase {
         ec.edu.uce.dominio.Universidad universidad = ec.edu.uce.dominio.Universidad.getInstancia();
         universidad.inicializar();
         java.util.List<ec.edu.uce.dominio.Facultad> facultades = new java.util.ArrayList<>(java.util.Arrays.asList(universidad.getFacultades()));
-        // Inicializar cada facultad antes de mostrar
         for (ec.edu.uce.dominio.Facultad f : facultades) {
             f.inicializar();
         }
-        // Orden natural (Comparable)
-        java.util.List<ec.edu.uce.dominio.Facultad> facultadesComparable = new java.util.ArrayList<>(facultades);
-        java.util.Collections.sort(facultadesComparable);
-        System.out.println("=== LISTA DE FACULTADES (ORDEN NATURAL - Comparable) ===");
-        for (ec.edu.uce.dominio.Facultad f : facultadesComparable) {
-            System.out.println("Código: " + f.getCodigoFacultad() + " | Nombre: " + f.getNombre());
+        if (facultades.isEmpty()) {
+            System.out.println("[!] No hay facultades para mostrar.");
+            return;
         }
-        System.out.println("\n--- ORDENADAS POR NOMBRE (Comparator) ---\n");
-        // Orden por nombre (Comparator)
-        java.util.List<ec.edu.uce.dominio.Facultad> facultadesComparator = new java.util.ArrayList<>(facultades);
-        facultadesComparator.sort(new ec.edu.uce.dominio.OrdenarFacultadNombre());
-        for (ec.edu.uce.dominio.Facultad f : facultadesComparator) {
+        System.out.println("¿Por qué criterio desea ordenar las facultades?");
+        System.out.println("[1] ID (orden natural)");
+        System.out.println("[2] Nombre");
+        System.out.println("[3] Número de auditorios");
+        System.out.println("[4] Número de usuarios");
+        System.out.print(">: ");
+        int criterio = leerEnteroPositivo();
+        switch (criterio) {
+            case 2 -> facultades.sort(new ec.edu.uce.dominio.OrdenarFacultadNombre());
+            case 3 -> facultades.sort(new ec.edu.uce.dominio.OrdenarFacultadNumAuditorios());
+            case 4 -> facultades.sort(new ec.edu.uce.dominio.OrdenarFacultadNumUsuarios());
+            default -> java.util.Collections.sort(facultades);
+        }
+        System.out.println("=== LISTA DE FACULTADES ORDENADA ===");
+        for (ec.edu.uce.dominio.Facultad f : facultades) {
             System.out.println("Código: " + f.getCodigoFacultad() + " | Nombre: " + f.getNombre());
         }
     }

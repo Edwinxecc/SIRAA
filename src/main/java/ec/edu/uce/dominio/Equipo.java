@@ -246,57 +246,20 @@ public class Equipo implements IAdministrarCRUD, Comparable<Equipo> {
     /**
      * Comparador para ordenar equipos por nombre
      */
-    public static final Comparator<Equipo> COMPARADOR_POR_NOMBRE = new Comparator<Equipo>() {
-        @Override
-        public int compare(Equipo e1, Equipo e2) {
-            return e1.getNombre().compareTo(e2.getNombre());
-        }
-    };
 
     /**
      * Comparador para ordenar equipos por categoría
      */
-    public static final Comparator<Equipo> COMPARADOR_POR_CATEGORIA = new Comparator<Equipo>() {
-        @Override
-        public int compare(Equipo e1, Equipo e2) {
-            return e1.getCategoria().compareTo(e2.getCategoria());
-        }
-    };
 
     /**
      * Comparador para ordenar equipos por disponibilidad (disponibles primero)
      */
-    public static final Comparator<Equipo> COMPARADOR_POR_DISPONIBILIDAD = new Comparator<Equipo>() {
-        @Override
-        public int compare(Equipo e1, Equipo e2) {
-            // Disponibles primero (true antes que false)
-            if (e1.getDisponibilidad() && !e2.getDisponibilidad()) {
-                return -1;
-            } else if (!e1.getDisponibilidad() && e2.getDisponibilidad()) {
-                return 1;
-            } else {
-                return e1.getNombre().compareTo(e2.getNombre()); // Si tienen la misma disponibilidad, ordenar por nombre
-            }
-        }
-    };
 
     /**
      * Comparador para ordenar equipos por ID (ascendente)
      */
-    public static final Comparator<Equipo> COMPARADOR_POR_ID = new Comparator<Equipo>() {
-        @Override
-        public int compare(Equipo e1, Equipo e2) {
-            return Integer.compare(e1.getIdEquipo(), e2.getIdEquipo());
-        }
-    };
 
     /**
      * Comparador para ordenar equipos por estado
      */
-    public static final Comparator<Equipo> COMPARADOR_POR_ESTADO = new Comparator<Equipo>() {
-        @Override
-        public int compare(Equipo e1, Equipo e2) {
-            return e1.getEstado().getDescripcion().compareTo(e2.getEstado().getDescripcion());
-        }
-    };
 }

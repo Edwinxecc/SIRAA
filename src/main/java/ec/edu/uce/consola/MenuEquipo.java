@@ -83,22 +83,28 @@ public class MenuEquipo extends MenuBase {
         System.out.println("\n[2] Consultar Equipos");
         reservaActual.inicializar();
         java.util.List<ec.edu.uce.dominio.Equipo> equipos = new java.util.ArrayList<>(java.util.Arrays.asList(reservaActual.getEquipos()));
-        // Orden natural (Comparable)
-        java.util.List<ec.edu.uce.dominio.Equipo> equiposComparable = new java.util.ArrayList<>(equipos);
-        java.util.Collections.sort(equiposComparable);
-        System.out.println("=== EQUIPOS DE LA RESERVA (ORDEN NATURAL - Comparable) ===");
-        for (ec.edu.uce.dominio.Equipo equipo : equiposComparable) {
-            System.out.println(equipo);
-        }
-        System.out.println("\n--- ORDENADOS POR NOMBRE (Comparator) ---\n");
-        // Orden por nombre (Comparator)
-        java.util.List<ec.edu.uce.dominio.Equipo> equiposComparator = new java.util.ArrayList<>(equipos);
-        equiposComparator.sort(new ec.edu.uce.dominio.OrdenarEquipoNombre());
-        for (ec.edu.uce.dominio.Equipo equipo : equiposComparator) {
-            System.out.println(equipo);
-        }
         if (equipos.isEmpty()) {
             System.out.println("[!] No hay equipos para mostrar.");
+            return;
+        }
+        System.out.println("¿Por qué criterio desea ordenar los equipos?");
+        System.out.println("[1] ID (orden natural)");
+        System.out.println("[2] Nombre");
+        System.out.println("[3] Categoría");
+        System.out.println("[4] Disponibilidad");
+        System.out.println("[5] Estado");
+        System.out.print(">: ");
+        int criterio = leerEnteroPositivo();
+        switch (criterio) {
+            case 2 -> equipos.sort(new ec.edu.uce.dominio.OrdenarEquipoNombre());
+            case 3 -> equipos.sort(new ec.edu.uce.dominio.OrdenarEquipoCategoria());
+            case 4 -> equipos.sort(new ec.edu.uce.dominio.OrdenarEquipoDisponibilidad());
+            case 5 -> equipos.sort(new ec.edu.uce.dominio.OrdenarEquipoEstado());
+            default -> java.util.Collections.sort(equipos);
+        }
+        System.out.println("=== EQUIPOS DE LA RESERVA ORDENADOS ===");
+        for (ec.edu.uce.dominio.Equipo equipo : equipos) {
+            System.out.println(equipo);
         }
     }
 

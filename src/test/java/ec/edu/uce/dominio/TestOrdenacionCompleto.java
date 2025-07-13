@@ -314,7 +314,7 @@ public class TestOrdenacionCompleto {
         mostrarEquipos(equipos);
         
         // Ejemplo de uso para equipos:
-        Arrays.sort(equipos, new ec.edu.uce.dominio.OrdenarEquipoNombre());
+        Arrays.sort(equipos, new OrdenarEquipoNombre());
         System.out.println("\n📊 Equipos ordenados por nombre (Comparable):");
         mostrarEquipos(equipos);
         

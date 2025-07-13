@@ -178,22 +178,28 @@ public class MenuReserva extends MenuBase {
         System.out.println("\n[3] Ver Reservas");
         usuarioActual.inicializar();
         java.util.List<ec.edu.uce.dominio.Reserva> reservas = new java.util.ArrayList<>(java.util.Arrays.asList(usuarioActual.getReservas()));
-        // Orden natural (Comparable)
-        java.util.List<ec.edu.uce.dominio.Reserva> reservasComparable = new java.util.ArrayList<>(reservas);
-        java.util.Collections.sort(reservasComparable);
-        System.out.println("=== RESERVAS DEL USUARIO (ORDEN NATURAL - Comparable) ===");
-        for (ec.edu.uce.dominio.Reserva reserva : reservasComparable) {
-            System.out.println(reserva);
-        }
-        System.out.println("\n--- ORDENADAS POR CÓDIGO (Comparator) ---\n");
-        // Orden por código (Comparator)
-        java.util.List<ec.edu.uce.dominio.Reserva> reservasComparator = new java.util.ArrayList<>(reservas);
-        reservasComparator.sort(new ec.edu.uce.dominio.OrdenarReservaFechaInicio());
-        for (ec.edu.uce.dominio.Reserva reserva : reservasComparator) {
-            System.out.println(reserva);
-        }
         if (reservas.isEmpty()) {
             System.out.println("[!] No hay reservas para mostrar.");
+            return;
+        }
+        System.out.println("¿Por qué criterio desea ordenar las reservas?");
+        System.out.println("[1] ID (orden natural)");
+        System.out.println("[2] Fecha de inicio");
+        System.out.println("[3] Fecha de fin");
+        System.out.println("[4] Estado");
+        System.out.println("[5] Número de equipos");
+        System.out.print(">: ");
+        int criterio = leerEnteroPositivo();
+        switch (criterio) {
+            case 2 -> reservas.sort(new ec.edu.uce.dominio.OrdenarReservaFechaInicio());
+            case 3 -> reservas.sort(new ec.edu.uce.dominio.OrdenarReservaFechaFin());
+            case 4 -> reservas.sort(new ec.edu.uce.dominio.OrdenarReservaEstado());
+            case 5 -> reservas.sort(new ec.edu.uce.dominio.OrdenarReservaNumEquipos());
+            default -> java.util.Collections.sort(reservas);
+        }
+        System.out.println("=== RESERVAS DEL USUARIO ORDENADAS ===");
+        for (ec.edu.uce.dominio.Reserva reserva : reservas) {
+            System.out.println(reserva);
         }
     }
 

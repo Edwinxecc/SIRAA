@@ -23,7 +23,7 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
     private String codigoFacultad;
     private String nombre;
     private int numAuditorios; // Lleva la cuenta de auditorios "reales"
-    private int numUsuarios;   // Lleva la cuenta de usuarios "reales"
+    private int numUsuarios = 0;   // Lleva la cuenta de usuarios "reales"
     private UsuarioDAO usuarioDAO;
     private AuditorioDAO auditorioDAO;
 
@@ -36,7 +36,7 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         this.numUsuarios = 0;
         this.idFacultad = generarIdFacultad();
         this.codigoFacultad = generarCodigoFacultad();
-        inicializar();
+        //inicializar();
     }
 
     // Constructor que recibe solo el nombre
@@ -158,15 +158,21 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
     // Crear Auditorio - Sobrecarga
     public void crearAuditorio() {
         crearAuditorio(new Auditorio());
+        numAuditorios++;
     }
 
     public void crearAuditorio(Auditorio auditorio){
         if (auditorio == null) return;
         if (auditorioDAO.buscarPorCodigo(auditorio.getCodigoAuditorio()) != null) {
-            System.out.println("[!] Auditorio duplicado. No se puede agregar.");
+            System.err.println("[!] Auditorio duplicado. No se puede agregar.");
             return;
         }
         auditorioDAO.crear(auditorio);
+        numAuditorios++;
+    }
+
+    public void crearAuditorio(){
+
     }
 
     // Listar Auditorios
@@ -403,19 +409,4 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
         // Actualizar el arreglo interno si es necesario
     }
 
-    // ========================
-    // Comparadores Estáticos
-    // ========================
-
-    /**
-     * Comparador para ordenar facultades por número de auditorios (descendente)
-     */
-
-    /**
-     * Comparador para ordenar facultades por número de usuarios (descendente)
-     */
-
-    /**
-     * Comparador para ordenar facultades por ID (ascendente)
-     */
-}
+  }

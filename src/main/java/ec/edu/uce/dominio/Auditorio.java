@@ -1,9 +1,9 @@
 package ec.edu.uce.dominio;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Date;
 
 /**
  * Representa un auditorio en el sistema SIRAA.
@@ -101,7 +101,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      * @param fechaInicio Fecha de inicio
      * @param fechaFin Fecha de fin
      */
-    public void crearReserva(int idReserva, java.util.Date fechaInicio, java.util.Date fechaFin) {
+    public void crearReserva(int idReserva, Date fechaInicio, Date fechaFin) {
         crearReserva(new Reserva(idReserva, fechaInicio, fechaFin));
     }
 
@@ -112,7 +112,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
     public void crearReserva(Reserva reserva) {
         if (reserva == null) return;
         if (reservas.containsKey(reserva.getCodigoReserva())) {
-            System.out.println("La reserva ya existe y no se puede agregar duplicada.");
+            System.err.println("La reserva ya existe y no se puede agregar duplicada.");
             return;
         }
         reservas.put(reserva.getCodigoReserva(), reserva);

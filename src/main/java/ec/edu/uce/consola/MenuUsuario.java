@@ -1,11 +1,11 @@
 package ec.edu.uce.consola;
 
+//import ec.edu.uce.dominio
 import ec.edu.uce.dominio.Usuario;
 import ec.edu.uce.dominio.Facultad;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class MenuUsuario extends MenuBase {
     private final Facultad facultad;

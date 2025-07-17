@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
+import ec.edu.uce.Util.Validaciones;
 
 /**
  * Representa una facultad en el sistema SIRAA.
  * Esta clase maneja la información de las facultades, incluyendo sus auditorios y usuarios.
  */
-public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
+public class Facultad implements IAdministrarCRUD, Comparable<Facultad>, java.io.Serializable {
     // Variables static final para generación automática de códigos
     private static final String PREFIJO_CODIGO = "FAC";
     private static int contadorFacultades = 0;
@@ -24,6 +26,10 @@ public class Facultad implements IAdministrarCRUD, Comparable<Facultad> {
     private List<Auditorio> auditorios;
     private Map<Facultad, List<Auditorio>> relacionFacultadAuditorio = new HashMap<>();
     private Map<Facultad, List<Usuario>> relacionFacultadUsuario = new HashMap<>();
+
+    private transient Scanner entrada;
+    private transient Validaciones validacion;
+    private transient Universidad uni;
 
     // Constructor completo
     public Facultad(String nombre, int capacidadInicialAuditorios){

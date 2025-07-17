@@ -1,17 +1,22 @@
 package ec.edu.uce.dominio;
 
 import java.util.Date;
+import java.util.Scanner;
+import ec.edu.uce.Util.Validaciones;
 
 /**
  * Representa una reserva prioritaria en el sistema SIRAA.
  * Esta clase extiende la funcionalidad básica de Reserva añadiendo un nivel de prioridad.
  */
-public class ReservaPrioritaria extends Reserva {
+public class ReservaPrioritaria extends Reserva implements java.io.Serializable {
     // Constantes para la clase
     private static final Estado ESTADO_DEFAULT = Estado.PRIORIDAD_BAJA;
     private static final int MAX_EQUIPOS_PRIORITARIOS = 5;
 
     private String motivoPrioridad;
+
+    private transient Scanner entrada;
+    private transient Validaciones validacion;
 
     /**
      * Constructor completo para ReservaPrioritaria.

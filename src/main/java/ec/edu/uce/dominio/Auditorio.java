@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Scanner;
+import ec.edu.uce.Util.Validaciones;
 /**
  * Representa un auditorio en el sistema SIRAA.
  * Esta clase maneja la información y las reservas de un auditorio.
  * Implementa la relación uno a muchos (1:0..n) con Reserva usando ArrayList.
  */
-public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
+public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio>, java.io.Serializable {
     // Variables static final para generación automática de códigos
     private static final String PREFIJO_CODIGO = "AUD";
     private static int contadorAuditorios = 0;
@@ -21,8 +22,11 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
     private int capacidad;
     private int numReservas = 0;
     private List<Reserva> reservas;
-    private Facultad facultad; // Referencia a la facultad a la que pertenece
+    private transient Facultad facultad; // Referencia a la facultad a la que pertenece
     private Map<Auditorio, List<Reserva>> relacionAuditorioReserva = new HashMap<>();
+
+    private transient Scanner entrada;
+    private transient Validaciones validacion;
 
     public Auditorio(String nombre, int capacidad, Facultad facultad){
         this.nombre = nombre;

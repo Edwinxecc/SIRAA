@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
+import ec.edu.uce.Util.Validaciones;
 
 /**
  * Representa una reserva de auditorio en el sistema SIRAA.
  * Esta clase maneja la información de las reservas, incluyendo usuario, auditorio, fechas y equipos asignados.
  */
-public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no es abstracta
+public class Reserva implements IAdministrarCRUD, Comparable<Reserva>, java.io.Serializable { // Ya no es abstracta
 
     // Variables static final para generación automática de códigos
     private static final String PREFIJO_CODIGO = "RES";
@@ -27,6 +29,9 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     private Usuario usuario; // Referencia al usuario que hizo la reserva
     private Auditorio auditorio; // Referencia al auditorio reservado
     private Map<Reserva, List<Equipo>> relacionReservaEquipo = new HashMap<>();
+
+    private transient Scanner entrada;
+    private transient Validaciones validacion;
 
     // Constructores
     public Reserva(int idReserva, Date fechaInicio, Date fechaFin){

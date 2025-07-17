@@ -11,9 +11,9 @@ import java.util.Map;
  * Esta clase maneja la información de las facultades.
  * Implementa el patrón Singleton para asegurar una única instancia de Universidad.
  */
-public class Universidad implements IAdministrarCRUD, Comparable<Universidad> {
+public class Universidad implements IAdministrarCRUD, Comparable<Universidad>, java.io.Serializable {
     // 1. Atributo estático privado que almacena la única instancia
-    private static Universidad instancia;
+    private static transient Universidad instancia;
 
     private List<Facultad> facultades;
     private Map<Universidad, List<Facultad>> relacionUniversidadFacultad = new HashMap<>();

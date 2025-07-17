@@ -1,10 +1,14 @@
 package ec.edu.uce.dominio;
 
+import java.util.Scanner;
+import ec.edu.uce.Util.Validaciones;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Representa un equipo disponible para reservas en el sistema SIRAA.
  * Esta clase maneja la información y el estado de los equipos que pueden ser asignados a las reservas.
  */
-public class Equipo implements IAdministrarCRUD, Comparable<Equipo> {
+public class Equipo implements IAdministrarCRUD, Comparable<Equipo>, java.io.Serializable {
     // Variables static final para generación automática de códigos
     private static final String PREFIJO_CODIGO = "EQ";
     private static int contadorEquipos = 0;
@@ -15,6 +19,9 @@ public class Equipo implements IAdministrarCRUD, Comparable<Equipo> {
     private String categoria;
     private boolean disponibilidad;
     private Estado estado;
+
+    private transient Scanner entrada;
+    private transient Validaciones validacion;
 
     // Constructores
     public Equipo(String nombre, String categoria, boolean disponibilidad) {

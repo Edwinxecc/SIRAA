@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
+import ec.edu.uce.Util.Validaciones;
 
 /**
  * Representa un usuario del sistema SIRAA.
  * Esta clase maneja la información personal y las reservas de un usuario.
  */
-public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
+public class Usuario implements IAdministrarCRUD, Comparable<Usuario>, java.io.Serializable {
     // Variables static final para generación automática de códigos
     private static final String PREFIJO_CODIGO = "USR";
     private static int contadorUsuarios = 0;
@@ -25,6 +27,10 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     private List<Reserva> reservas;
     private Estado estado;
     private Map<Usuario, List<Reserva>> relacionUsuarioReserva = new HashMap<>();
+
+    private transient Scanner entrada;
+    private transient Validaciones validacion;
+    private transient Facultad fac;
 
     // Constructores
     public Usuario(String nombre, String apellido, String correo){

@@ -18,7 +18,8 @@ public class JFrameReserva extends JFrame {
     private JButton registrarseButton;
 
     private Facultad facultad; // Asumimos una sola facultad para demo
-    private Universidad universidad = Universidad.getInstancia();
+    private Universidad universidad;
+    private static final String ARCHIVO_UNIVERSIDAD = "universidad.dat";
 
     public JFrameReserva() {
         setTitle("Login - SIRAA");
@@ -28,10 +29,19 @@ public class JFrameReserva extends JFrame {
         setContentPane(panel1);
         setVisible(true);
 
+        // Al iniciar, intentar cargar universidad desde archivo
+        Object cargada = PersistenciaUtil.cargarObjeto(ARCHIVO_UNIVERSIDAD);
+        if (cargada != null && cargada instanceof Universidad) {
+            universidad = (Universidad) cargada;
+        } else {
+            universidad = Universidad.getInstancia();
+        }
+
         // Demo: usar la primera facultad existente o crear una
         if (universidad.getFacultades().isEmpty()) {
             facultad = new Facultad("Demo Facultad", 5);
             universidad.crearFacultad(facultad);
+            PersistenciaUtil.guardarObjeto(universidad, ARCHIVO_UNIVERSIDAD);
         } else {
             facultad = universidad.getFacultades().get(0);
         }
@@ -47,6 +57,7 @@ public class JFrameReserva extends JFrame {
                 }
                 Usuario usuario = buscarUsuario(nombre, apellido);
                 if (usuario != null) {
+                    PersistenciaUtil.guardarObjeto(universidad, ARCHIVO_UNIVERSIDAD);
                     abrirVentanaPrincipal(usuario);
                 } else {
                     JOptionPane.showMessageDialog(panel1, "Usuario no encontrado. Regístrese primero.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -67,6 +78,7 @@ public class JFrameReserva extends JFrame {
                 if (usuario == null) {
                     usuario = new Usuario(nombre, apellido, nombre.toLowerCase() + "." + apellido.toLowerCase() + "@uce.edu.ec");
                     facultad.crearUsuario(usuario);
+                    PersistenciaUtil.guardarObjeto(universidad, ARCHIVO_UNIVERSIDAD);
                     JOptionPane.showMessageDialog(panel1, "Usuario registrado exitosamente.");
                     abrirVentanaPrincipal(usuario);
                 } else {
@@ -87,6 +99,7 @@ public class JFrameReserva extends JFrame {
 
     private void abrirVentanaPrincipal(Usuario usuario) {
         // Abrir la ventana principal y cerrar el login
+        PersistenciaUtil.guardarObjeto(universidad, ARCHIVO_UNIVERSIDAD);
         this.dispose();
         TabbedPaneSample.mainWithUsuario(usuario, facultad);
     }

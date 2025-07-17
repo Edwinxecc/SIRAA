@@ -3,6 +3,8 @@ package ec.edu.uce.gui;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import ec.edu.uce.dominio.PersistenciaUtil;
+import ec.edu.uce.dominio.Universidad;
 
 public class TabbedPaneSample {
     public static void main(String[] args) {
@@ -22,6 +24,55 @@ public class TabbedPaneSample {
 
             JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
             tabbedPane.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+            // ====== Barra superior con botones Guardar y Cargar ======
+            JPanel topBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            JButton guardarBtn = new JButton("Guardar");
+            JButton cargarBtn = new JButton("Cargar");
+            topBar.add(guardarBtn);
+            topBar.add(cargarBtn);
+            frame.add(topBar, BorderLayout.NORTH);
+
+            guardarBtn.addActionListener(e -> {
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                JOptionPane.showMessageDialog(frame, "Datos guardados correctamente.");
+            });
+            cargarBtn.addActionListener(e -> {
+                Object cargada = PersistenciaUtil.cargarObjeto("universidad.dat");
+                if (cargada != null && cargada instanceof Universidad) {
+                    // Actualizar referencias y refrescar tablas
+                    // Actualizar facultad y usuario si existen en la nueva universidad
+                    Universidad nuevaUni = (Universidad) cargada;
+                    // Buscar la facultad y usuario actuales en la nueva instancia
+                    ec.edu.uce.dominio.Facultad nuevaFacultad = null;
+                    for (ec.edu.uce.dominio.Facultad f : nuevaUni.getFacultades()) {
+                        if (f.getIdFacultad() == facultad.getIdFacultad()) {
+                            nuevaFacultad = f; break;
+                        }
+                    }
+                    if (nuevaFacultad != null) {
+                        facultad = nuevaFacultad;
+                        // Buscar usuario
+                        ec.edu.uce.dominio.Usuario nuevoUsuario = null;
+                        for (ec.edu.uce.dominio.Usuario u : facultad.getUsuarios()) {
+                            if (u.getIdUsuario() == usuario.getIdUsuario()) {
+                                nuevoUsuario = u; break;
+                            }
+                        }
+                        if (nuevoUsuario != null) {
+                            usuario = nuevoUsuario;
+                        }
+                    }
+                    // Refrescar todas las tablas
+                    refreshUsuarios.run();
+                    refreshReservas.run();
+                    refreshFacultades.run();
+                    refreshEquipos.run();
+                    JOptionPane.showMessageDialog(frame, "Datos cargados y actualizados correctamente.");
+                } else {
+                    JOptionPane.showMessageDialog(frame, "No se pudo cargar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            });
 
             // Panel de contenido para 'Gestionar Usuario'
             JPanel usuarioPanel = new JPanel(new GridLayout(1, 3, 30, 0));
@@ -629,6 +680,7 @@ public class TabbedPaneSample {
                 }
                 facultad.crearUsuario(new ec.edu.uce.dominio.Usuario(nombre, apellido, correo));
                 refreshUsuarios.run();
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
             });
             // Actualizar usuario
             actualizarUsuarioBtn.addActionListener(e -> {
@@ -650,6 +702,7 @@ public class TabbedPaneSample {
                     }
                 }
                 refreshUsuarios.run();
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
             });
             // Eliminar usuario
             eliminarUsuarioBtn.addActionListener(e -> {
@@ -665,6 +718,7 @@ public class TabbedPaneSample {
                 }
                 facultad.eliminarUsuario(toRemove);
                 refreshUsuarios.run();
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
             });
             usuarioTable.getSelectionModel().addListSelectionListener(e -> {
                 int row = usuarioTable.getSelectedRow();
@@ -734,6 +788,7 @@ public class TabbedPaneSample {
                     }
                     usuario.crearReserva(new ec.edu.uce.dominio.Reserva(inicio, fin));
                     refreshReservas.run();
+                    PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame, "Formato de fecha y hora incorrecto. Usa yyyy-MM-dd HH:mm");
                 }
@@ -748,6 +803,7 @@ public class TabbedPaneSample {
                 }
                 if (toRemove != null) usuario.eliminarReserva(toRemove);
                 refreshReservas.run();
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
             });
             tabbedPane.addTab("Gestionar Reserva", reservaPanel);
 
@@ -786,6 +842,7 @@ public class TabbedPaneSample {
                 }
                 ec.edu.uce.dominio.Universidad.getInstancia().crearFacultad(new ec.edu.uce.dominio.Facultad(nombre, 5));
                 refreshFacultades.run();
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
             });
             eliminarFacultadBtn.addActionListener(e -> {
                 int row = facultadTable.getSelectedRow();
@@ -800,6 +857,7 @@ public class TabbedPaneSample {
                 }
                 ec.edu.uce.dominio.Universidad.getInstancia().eliminarFacultad(toRemove);
                 refreshFacultades.run();
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
             });
             tabbedPane.addTab("Gestionar Facultades", facultadPanel);
 
@@ -860,6 +918,7 @@ public class TabbedPaneSample {
                     JOptionPane.showMessageDialog(frame, "Error al crear equipo: " + ex.getMessage());
                 }
                 refreshEquipos.run();
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
             });
             eliminarEquipoBtn.addActionListener(e -> {
                 if (usuario.getReservas().isEmpty()) {
@@ -878,6 +937,7 @@ public class TabbedPaneSample {
                 }
                 r.eliminarEquipo(toRemove);
                 refreshEquipos.run();
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
             });
             tabbedPane.addTab("Gestionar Equipos", equipoPanel);
 

@@ -81,11 +81,11 @@ public class TabbedPaneSample {
             // 1. DECLARA LOS RUNNABLES PRIMERO
             // 2. Luego la barra de botones y sus listeners
             guardarBtn.addActionListener(e -> {
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
                 JOptionPane.showMessageDialog(frame, "Datos guardados correctamente.");
             });
             cargarBtn.addActionListener(e -> {
-                Object cargada = PersistenciaUtil.cargarObjeto("universidad.dat");
+                Object cargada = PersistenciaUtil.cargarObjeto("universidad.txt");
                 if (cargada != null && cargada instanceof Universidad) {
                     Universidad nuevaUni = (Universidad) cargada;
                     ec.edu.uce.dominio.Facultad nuevaFacultad = null;
@@ -157,7 +157,7 @@ public class TabbedPaneSample {
                 }
                 facultad[0].crearUsuario(new ec.edu.uce.dominio.Usuario(nombre, apellido, correo));
                 refreshUsuarios.run();
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
             });
             // Actualizar usuario
             actualizarUsuarioBtn.addActionListener(e -> {
@@ -179,7 +179,7 @@ public class TabbedPaneSample {
                     }
                 }
                 refreshUsuarios.run();
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
             });
             // Eliminar usuario
             eliminarUsuarioBtn.addActionListener(e -> {
@@ -195,7 +195,7 @@ public class TabbedPaneSample {
                 }
                 facultad[0].eliminarUsuario(toRemove);
                 refreshUsuarios.run();
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
             });
             usuarioTable.getSelectionModel().addListSelectionListener(e -> {
                 int row = usuarioTable.getSelectedRow();
@@ -256,7 +256,7 @@ public class TabbedPaneSample {
                     }
                     usuario[0].crearReserva(new ec.edu.uce.dominio.Reserva(inicio, fin));
                     refreshReservas.run();
-                    PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                    PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame, "Formato de fecha y hora incorrecto. Usa yyyy-MM-dd HH:mm");
                 }
@@ -271,7 +271,7 @@ public class TabbedPaneSample {
                 }
                 if (toRemove != null) usuario[0].eliminarReserva(toRemove);
                 refreshReservas.run();
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
             });
             tabbedPane.addTab("Gestionar Reserva", reservaPanel);
 
@@ -301,7 +301,7 @@ public class TabbedPaneSample {
                 }
                 ec.edu.uce.dominio.Universidad.getInstancia().crearFacultad(new ec.edu.uce.dominio.Facultad(nombre, 5));
                 refreshFacultades.run();
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
             });
             eliminarFacultadBtn.addActionListener(e -> {
                 int row = facultadTable.getSelectedRow();
@@ -316,7 +316,7 @@ public class TabbedPaneSample {
                 }
                 ec.edu.uce.dominio.Universidad.getInstancia().eliminarFacultad(toRemove);
                 refreshFacultades.run();
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
             });
             tabbedPane.addTab("Gestionar Facultades", facultadPanel);
 
@@ -364,7 +364,7 @@ public class TabbedPaneSample {
                     JOptionPane.showMessageDialog(frame, "Error al crear equipo: " + ex.getMessage());
                 }
                 refreshEquipos.run();
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
             });
             eliminarEquipoBtn.addActionListener(e -> {
                 if (usuario[0].getReservas().isEmpty()) {
@@ -383,7 +383,7 @@ public class TabbedPaneSample {
                 }
                 r.eliminarEquipo(toRemove);
                 refreshEquipos.run();
-                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.dat");
+                PersistenciaUtil.guardarObjeto(Universidad.getInstancia(), "universidad.txt");
             });
             tabbedPane.addTab("Gestionar Equipos", equipoPanel);
 

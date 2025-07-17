@@ -16,10 +16,11 @@ public class JFrameReserva extends JFrame {
     private JTextField JtextFieldApellido;
     private JButton ingresarButton;
     private JButton registrarseButton;
+    private JButton cargarButton;
 
     private Facultad facultad; // Asumimos una sola facultad para demo
     private Universidad universidad;
-    private static final String ARCHIVO_UNIVERSIDAD = "universidad.dat";
+    private static final String ARCHIVO_UNIVERSIDAD = "universidad.txt";
 
     public JFrameReserva() {
         setTitle("Login - SIRAA");
@@ -45,6 +46,19 @@ public class JFrameReserva extends JFrame {
         } else {
             facultad = universidad.getFacultades().get(0);
         }
+
+        cargarButton.addActionListener(e -> {
+            Object cargada2 = PersistenciaUtil.cargarObjeto(ARCHIVO_UNIVERSIDAD);
+            if (cargada2 != null && cargada2 instanceof Universidad) {
+                universidad = (Universidad) cargada2;
+                if (!universidad.getFacultades().isEmpty()) {
+                    facultad = universidad.getFacultades().get(0);
+                }
+                JOptionPane.showMessageDialog(panel1, "Datos cargados correctamente.");
+            } else {
+                JOptionPane.showMessageDialog(panel1, "No se pudo cargar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
         ingresarButton.addActionListener(new ActionListener() {
             @Override

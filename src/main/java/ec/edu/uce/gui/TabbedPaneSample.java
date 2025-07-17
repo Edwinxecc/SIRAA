@@ -617,6 +617,16 @@ public class TabbedPaneSample {
                 if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty()) {
                     JOptionPane.showMessageDialog(frame, "Completa todos los campos."); return;
                 }
+                // Validar duplicado
+                boolean existe = false;
+                for (ec.edu.uce.dominio.Usuario u : facultad.getUsuarios()) {
+                    if (u.getNombre().equalsIgnoreCase(nombre) && u.getApellido().equalsIgnoreCase(apellido)) {
+                        existe = true; break;
+                    }
+                }
+                if (existe) {
+                    JOptionPane.showMessageDialog(frame, "Ya existe un usuario con ese nombre y apellido."); return;
+                }
                 facultad.crearUsuario(new ec.edu.uce.dominio.Usuario(nombre, apellido, correo));
                 refreshUsuarios.run();
             });
@@ -624,12 +634,18 @@ public class TabbedPaneSample {
             actualizarUsuarioBtn.addActionListener(e -> {
                 int row = usuarioTable.getSelectedRow();
                 if (row == -1) { JOptionPane.showMessageDialog(frame, "Selecciona un usuario."); return; }
+                String nombre = nombreField.getText().trim();
+                String apellido = apellidoField.getText().trim();
+                String correo = correoField.getText().trim();
+                if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Completa todos los campos."); return;
+                }
                 int id = (int) usuarioTableModel.getValueAt(row, 0);
                 for (ec.edu.uce.dominio.Usuario u : facultad.getUsuarios()) {
                     if (u.getIdUsuario() == id) {
-                        u.setNombre(nombreField.getText().trim());
-                        u.setApellido(apellidoField.getText().trim());
-                        u.setCorreo(correoField.getText().trim());
+                        u.setNombre(nombre);
+                        u.setApellido(apellido);
+                        u.setCorreo(correo);
                         break;
                     }
                 }
@@ -644,7 +660,10 @@ public class TabbedPaneSample {
                 for (ec.edu.uce.dominio.Usuario u : facultad.getUsuarios()) {
                     if (u.getIdUsuario() == id) { toRemove = u; break; }
                 }
-                if (toRemove != null) facultad.eliminarUsuario(toRemove);
+                if (toRemove == null) {
+                    JOptionPane.showMessageDialog(frame, "Usuario no encontrado."); return;
+                }
+                facultad.eliminarUsuario(toRemove);
                 refreshUsuarios.run();
             });
             usuarioTable.getSelectionModel().addListSelectionListener(e -> {
@@ -665,12 +684,12 @@ public class TabbedPaneSample {
             JScrollPane reservaScroll = new JScrollPane(reservaTable);
             reservaPanel.add(reservaScroll, BorderLayout.CENTER);
             JPanel reservaActions = new JPanel();
-            JTextField fechaInicioField = new JTextField(12);
-            JTextField fechaFinField = new JTextField(12);
+            JTextField fechaInicioField = new JTextField(16); // yyyy-MM-dd HH:mm
+            JTextField fechaFinField = new JTextField(16);
             JButton crearReservaBtn = new JButton("Crear");
             JButton eliminarReservaBtn = new JButton("Eliminar");
-            reservaActions.add(new JLabel("Fecha Inicio (yyyy-MM-dd):")); reservaActions.add(fechaInicioField);
-            reservaActions.add(new JLabel("Fecha Fin (yyyy-MM-dd):")); reservaActions.add(fechaFinField);
+            reservaActions.add(new JLabel("Fecha Inicio (yyyy-MM-dd HH:mm):")); reservaActions.add(fechaInicioField);
+            reservaActions.add(new JLabel("Fecha Fin (yyyy-MM-dd HH:mm):")); reservaActions.add(fechaFinField);
             reservaActions.add(crearReservaBtn);
             reservaActions.add(eliminarReservaBtn);
             reservaPanel.add(reservaActions, BorderLayout.SOUTH);
@@ -682,14 +701,41 @@ public class TabbedPaneSample {
             };
             refreshReservas.run();
             crearReservaBtn.addActionListener(e -> {
+                String inicioStr = fechaInicioField.getText().trim();
+                String finStr = fechaFinField.getText().trim();
+                if (inicioStr.isEmpty() || finStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Completa ambos campos de fecha y hora."); return;
+                }
                 try {
-                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                    java.util.Date inicio = sdf.parse(fechaInicioField.getText().trim());
-                    java.util.Date fin = sdf.parse(fechaFinField.getText().trim());
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm");
+                    java.util.Date inicio = sdf.parse(inicioStr);
+                    java.util.Date fin = sdf.parse(finStr);
+                    if (!fin.after(inicio)) {
+                        JOptionPane.showMessageDialog(frame, "La fecha/hora de fin debe ser posterior a la de inicio."); return;
+                    }
+                    java.util.Calendar calInicio = java.util.Calendar.getInstance();
+                    java.util.Calendar calFin = java.util.Calendar.getInstance();
+                    calInicio.setTime(inicio);
+                    calFin.setTime(fin);
+                    // Validar año, mes, día
+                    if (calFin.get(java.util.Calendar.YEAR) < calInicio.get(java.util.Calendar.YEAR) ||
+                        (calFin.get(java.util.Calendar.YEAR) == calInicio.get(java.util.Calendar.YEAR) && calFin.get(java.util.Calendar.MONTH) < calInicio.get(java.util.Calendar.MONTH)) ||
+                        (calFin.get(java.util.Calendar.YEAR) == calInicio.get(java.util.Calendar.YEAR) && calFin.get(java.util.Calendar.MONTH) == calInicio.get(java.util.Calendar.MONTH) && calFin.get(java.util.Calendar.DAY_OF_MONTH) < calInicio.get(java.util.Calendar.DAY_OF_MONTH))) {
+                        JOptionPane.showMessageDialog(frame, "La fecha de fin no puede ser anterior a la de inicio."); return;
+                    }
+                    // Validar rango de horas
+                    long diffMs = fin.getTime() - inicio.getTime();
+                    long diffHrs = diffMs / (1000 * 60 * 60);
+                    if (diffHrs < 1) {
+                        JOptionPane.showMessageDialog(frame, "La reserva debe durar al menos 1 hora."); return;
+                    }
+                    if (diffHrs > 3) {
+                        JOptionPane.showMessageDialog(frame, "La reserva no puede durar más de 3 horas."); return;
+                    }
                     usuario.crearReserva(new ec.edu.uce.dominio.Reserva(inicio, fin));
                     refreshReservas.run();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(frame, "Formato de fecha incorrecto.");
+                    JOptionPane.showMessageDialog(frame, "Formato de fecha y hora incorrecto. Usa yyyy-MM-dd HH:mm");
                 }
             });
             eliminarReservaBtn.addActionListener(e -> {
@@ -730,6 +776,14 @@ public class TabbedPaneSample {
             crearFacultadBtn.addActionListener(e -> {
                 String nombre = nombreFacultadField.getText().trim();
                 if (nombre.isEmpty()) { JOptionPane.showMessageDialog(frame, "Ingrese nombre de facultad."); return; }
+                // Validar duplicado
+                boolean existe = false;
+                for (ec.edu.uce.dominio.Facultad f : ec.edu.uce.dominio.Universidad.getInstancia().getFacultades()) {
+                    if (f.getNombre().equalsIgnoreCase(nombre)) { existe = true; break; }
+                }
+                if (existe) {
+                    JOptionPane.showMessageDialog(frame, "Ya existe una facultad con ese nombre."); return;
+                }
                 ec.edu.uce.dominio.Universidad.getInstancia().crearFacultad(new ec.edu.uce.dominio.Facultad(nombre, 5));
                 refreshFacultades.run();
             });
@@ -741,7 +795,10 @@ public class TabbedPaneSample {
                 for (ec.edu.uce.dominio.Facultad f : ec.edu.uce.dominio.Universidad.getInstancia().getFacultades()) {
                     if (f.getIdFacultad() == id) { toRemove = f; break; }
                 }
-                if (toRemove != null) ec.edu.uce.dominio.Universidad.getInstancia().eliminarFacultad(toRemove);
+                if (toRemove == null) {
+                    JOptionPane.showMessageDialog(frame, "Facultad no encontrada."); return;
+                }
+                ec.edu.uce.dominio.Universidad.getInstancia().eliminarFacultad(toRemove);
                 refreshFacultades.run();
             });
             tabbedPane.addTab("Gestionar Facultades", facultadPanel);
@@ -787,6 +844,16 @@ public class TabbedPaneSample {
                     JOptionPane.showMessageDialog(frame, "Ingrese nombre y categoría."); return;
                 }
                 ec.edu.uce.dominio.Reserva r = usuario.getReservas().get(0);
+                // Validar duplicado
+                boolean existe = false;
+                for (ec.edu.uce.dominio.Equipo eq : r.getEquipos()) {
+                    if (eq.getNombre().equalsIgnoreCase(nombre) && eq.getCategoria().equalsIgnoreCase(categoria)) {
+                        existe = true; break;
+                    }
+                }
+                if (existe) {
+                    JOptionPane.showMessageDialog(frame, "Ya existe un equipo con ese nombre y categoría en la reserva."); return;
+                }
                 try {
                     r.crearEquipo(new ec.edu.uce.dominio.Equipo(nombre, categoria, disponible));
                 } catch (Exception ex) {
@@ -806,7 +873,10 @@ public class TabbedPaneSample {
                 for (ec.edu.uce.dominio.Equipo eq : r.getEquipos()) {
                     if (eq.getIdEquipo() == id) { toRemove = eq; break; }
                 }
-                if (toRemove != null) r.eliminarEquipo(toRemove);
+                if (toRemove == null) {
+                    JOptionPane.showMessageDialog(frame, "Equipo no encontrado."); return;
+                }
+                r.eliminarEquipo(toRemove);
                 refreshEquipos.run();
             });
             tabbedPane.addTab("Gestionar Equipos", equipoPanel);

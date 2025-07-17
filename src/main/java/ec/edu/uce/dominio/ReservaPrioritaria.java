@@ -1,7 +1,6 @@
 package ec.edu.uce.dominio;
 
 import java.util.Date;
-import java.util.Comparator;
 
 /**
  * Representa una reserva prioritaria en el sistema SIRAA.
@@ -97,12 +96,18 @@ public class ReservaPrioritaria extends Reserva {
     }
 
     @Override
-    public void crearEquipo(String nombre, String categoria, boolean disponible) {
-        // Se asegura de que no se agreguen más equipos de los permitidos para reservas prioritarias.
-        if (getEquipos().length >= MAX_EQUIPOS_PRIORITARIOS) {
-            throw new IllegalStateException("No se pueden agregar más equipos a una reserva prioritaria");
+    public void crearEquipo(String nombre, String categoria, boolean disponible) throws ReservaException {
+        try {
+            // Se asegura de que no se agreguen más equipos de los permitidos para reservas prioritarias.
+            if (getEquipos().size() >= MAX_EQUIPOS_PRIORITARIOS) {
+                throw new ReservaException("No se pueden agregar más de " + MAX_EQUIPOS_PRIORITARIOS + " equipos a una reserva prioritaria");
+            }
+            super.crearEquipo(nombre, categoria, disponible);
+        } catch (ReservaException e) {
+            throw e; // Re-lanzar la excepción personalizada
+        } catch (Exception e) {
+            throw new ReservaException("Error al crear equipo en reserva prioritaria", e);
         }
-        super.crearEquipo(nombre, categoria, disponible);
     }
 
     // ========================
@@ -111,11 +116,15 @@ public class ReservaPrioritaria extends Reserva {
 
     public void inicializar() {
         // Crear 5 equipos de ejemplo
-        crearEquipo("Proyector", "Visual", true);
-        crearEquipo("Micrófono", "Audio", true);
-        crearEquipo("Laptop", "Computación", true);
-        crearEquipo("Cámara", "Video", false);
-        crearEquipo("Pantalla", "Visual", true);
+        try {
+            crearEquipo("Proyector", "Visual", true);
+            crearEquipo("Micrófono", "Audio", true);
+            crearEquipo("Laptop", "Computación", true);
+            crearEquipo("Cámara", "Video", false);
+            crearEquipo("Pantalla", "Visual", true);
+        } catch (ReservaException e) {
+            System.out.println("[!] Error al inicializar equipos: " + e.getMessage());
+        }
     }
 
     @Override
@@ -207,22 +216,19 @@ public class ReservaPrioritaria extends Reserva {
 
     @Override
     public String toString() {
-        // Concatena la representación de la clase padre con la información específica de prioridad.
-        return String.format("┌─ RESERVA PRIORITARIA ───────────────────────────────────────────────┐%n" +
+        return String.format("┌─ RESERVA PRIORITARIA ──────────────────────────────────────────────┐%n" +
                         "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
                         "│ Fecha Inicio: %-30s │%n" +
                         "│ Fecha Fin: %-32s │%n" +
                         "│ Equipos Asignados: %-3d │ Tipo: %-20s │%n" +
-                        "│ Nivel de Prioridad: %-20s │%n" +
-                        "│ Motivo: %-50s │%n" +
-                        "│ Requiere Aprobación: %-8s │%n" +
+                        "│ Motivo Prioridad: %-50s │%n" +
+                        "│ Nivel Prioridad: %-3d │ Requiere Aprobación: %-8s │%n" +
                         "└─────────────────────────────────────────────────────────────────────┘",
                 getCodigoReserva(), getIdReserva(), getEstado().getDescripcion(),
                 getFechaInicio().toString(),
                 getFechaFin().toString(),
-                getEquipos().length, tipoReserva(),
-                getEstado().getDescripcion(),
+                getEquipos().size(), tipoReserva(),
                 motivoPrioridad,
-                requiereAprobacion() ? "Sí" : "No");
+                getNivelPrioridad(), requiereAprobacion() ? "Sí" : "No");
     }
 }

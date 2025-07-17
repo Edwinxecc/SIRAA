@@ -20,6 +20,9 @@ public class Validaciones {
      * @return Texto validado sin números
      */
     public String ValidacionTexto(String textoInicial, String campo) {
+        assert textoInicial != null : "El texto inicial no puede ser nulo";
+        assert campo != null : "El campo no puede ser nulo";
+        
         Scanner entrada = new Scanner(System.in);
         String texto = textoInicial;
 
@@ -37,7 +40,9 @@ public class Validaciones {
      * @return true si el correo es válido, false en caso contrario
      */
     public boolean validarCorreoInstitucional(String correo) {
-        if (correo == null || correo.trim().isEmpty()) {
+        assert correo != null : "El correo no puede ser nulo";
+        
+        if (correo.trim().isEmpty()) {
             return false;
         }
         return correo.endsWith("@uce.edu.ec");

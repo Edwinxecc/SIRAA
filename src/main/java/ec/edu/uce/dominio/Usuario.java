@@ -2,10 +2,11 @@
 package ec.edu.uce.dominio;
 
 import java.util.Date;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Representa un usuario del sistema SIRAA.
@@ -21,19 +22,20 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     private String nombre;
     private String apellido;
     private String correo;
-    private Map<String, Reserva> reservas;
+    private List<Reserva> reservas;
     private Estado estado;
+    private Map<Usuario, List<Reserva>> relacionUsuarioReserva = new HashMap<>();
 
     // Constructores
     public Usuario(String nombre, String apellido, String correo){
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
-        this.reservas = new HashMap<>();
+        this.reservas = new ArrayList<>();
         this.estado = Estado.CONFIRMADA;
         this.idUsuario = generarIdUsuario();
         this.codigoUsuario = generarCodigoUsuario();
-        inicializar();
+        //inicializar();
     }
 
     public Usuario(){
@@ -126,8 +128,12 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
         this.correo = correo;
     }
 
-    public Reserva[] getReservas() {
-        return reservas.values().toArray(new Reserva[0]);
+    public List<Reserva> getReservas() {
+        return new ArrayList<>(reservas);
+    }
+
+    public Map<Usuario, List<Reserva>> getRelacionUsuarioReserva() {
+        return relacionUsuarioReserva;
     }
 
     public int getNumReservas() {
@@ -145,12 +151,14 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
     }
 
     public void crearReserva(Reserva reserva){
-        if (reserva == null) return;
-        if (reservas.containsKey(reserva.getCodigoReserva())) {
+        assert reserva != null : "La reserva no puede ser nula";
+        
+        if (validarDuplicadoReserva(reserva)) {
             System.out.println("[!] Reserva duplicada. No se puede agregar.");
             return;
         }
-        reservas.put(reserva.getCodigoReserva(), reserva);
+        reservas.add(reserva);
+        relacionUsuarioReserva.put(this, reservas);
     }
 
     public void crearReservaPrioritaria(Estado estado, String motivo) {
@@ -167,7 +175,7 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
             return "No hay reservas asignadas a este usuario.";
         }
         StringBuilder texto = new StringBuilder();
-        for (Reserva r : reservas.values()) {
+        for (Reserva r : reservas) {
             if (r != null && (!soloActivas || r.getEstado() != Estado.CANCELADA)) {
                 texto.append(r).append("\r\n");
             }
@@ -177,19 +185,41 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
 
     // Actualizar Reserva - Sobrecarga de métodos
     public void actualizarReserva(String codigo, Reserva nuevaReserva) {
-        if (reservas.containsKey(codigo) && nuevaReserva != null) {
-            reservas.put(codigo, nuevaReserva);
+        for (int i = 0; i < reservas.size(); i++) {
+            if (reservas.get(i) != null && reservas.get(i).getCodigoReserva().equals(codigo)) {
+                reservas.set(i, nuevaReserva);
+                relacionUsuarioReserva.put(this, reservas);
+                return;
+            }
         }
     }
 
     // Eliminar Reserva - Sobrecarga de métodos
     public void eliminarReserva(String codigo) {
-        reservas.remove(codigo);
+        reservas.removeIf(reserva -> reserva != null && reserva.getCodigoReserva().equals(codigo));
+        relacionUsuarioReserva.put(this, reservas);
     }
 
     public void eliminarReserva(Reserva reserva) {
         if (reserva == null) return;
-        reservas.remove(reserva.getCodigoReserva());
+        reservas.remove(reserva);
+        relacionUsuarioReserva.put(this, reservas);
+    }
+
+    /**
+     * Valida si una reserva ya existe (duplicado).
+     * @param reserva La reserva a validar.
+     * @return true si la reserva ya existe, false en caso contrario.
+     */
+    public boolean validarDuplicadoReserva(Reserva reserva) {
+        if (reserva == null) return false;
+
+        for (Reserva r : reservas) {
+            if (r != null && r.getCodigoReserva().equals(reserva.getCodigoReserva())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Métodos de la interfaz IAdministrarCRUD
@@ -202,7 +232,7 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
         Usuario usuarioNuevo = (Usuario) obj;
 
         // Validar duplicado por correo
-        for (Reserva r : reservas.values()) {
+        for (Reserva r : reservas) {
             if (r != null && r.validarDuplicado(usuarioNuevo)) {
                 return "[!] El usuario ya existe.";
             }
@@ -232,7 +262,7 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
             return "[!] El objeto no es un Usuario válido.";
         }
         Usuario usuarioABorrar = (Usuario) obj;
-        for (Reserva r : reservas.values()) {
+        for (Reserva r : reservas) {
             if (r != null && r.equals(usuarioABorrar)) {
                 eliminarReserva(r.getCodigoReserva());
                 return "[✓] Usuario eliminado correctamente.";
@@ -257,7 +287,6 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
         return toString();
     }
 
-    // ========================
     // Método inicializar
     // ========================
 
@@ -272,15 +301,7 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
 
     @Override
     public String toString() {
-        return String.format("┌─ USUARIO ──────────────────────────────────────────────────────────┐%n" +
-                        "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
-                        "│ Nombre: %-20s │ Apellido: %-20s │%n" +
-                        "│ Correo: %-50s │%n" +
-                        "│ Reservas Activas: %-3d │%n" +
-                        "└─────────────────────────────────────────────────────────────────────┘",
-                codigoUsuario, idUsuario, estado.getDescripcion(),
-                nombre, apellido,
-                correo, reservas.size());
+        return "| Codigo: " + codigoUsuario + "| Nombre: " + nombre + " | Apellido: " + apellido + "|";
     }
 
     /**
@@ -304,55 +325,35 @@ public class Usuario implements IAdministrarCRUD, Comparable<Usuario> {
      * Ordena las reservas del usuario por fecha de inicio (ascendente)
      */
     public void ordenarReservasPorFecha() {
-        Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, new Comparator<Reserva>() {
+        reservas.sort(new Comparator<Reserva>() {
             @Override
             public int compare(Reserva r1, Reserva r2) {
                 return r1.getFechaInicio().compareTo(r2.getFechaInicio());
             }
         });
-        // Actualizar el arreglo interno
-        reservas.clear();
-        for (Reserva r : reservasActivas) {
-            reservas.put(r.getCodigoReserva(), r);
-        }
     }
 
     /**
      * Ordena las reservas del usuario por estado
      */
     public void ordenarReservasPorEstado() {
-        Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, new Comparator<Reserva>() {
+        reservas.sort(new Comparator<Reserva>() {
             @Override
             public int compare(Reserva r1, Reserva r2) {
                 return r1.getEstado().getDescripcion().compareTo(r2.getEstado().getDescripcion());
             }
         });
-        // Actualizar el arreglo interno
-        reservas.clear();
-        for (Reserva r : reservasActivas) {
-            reservas.put(r.getCodigoReserva(), r);
-        }
     }
 
     /**
      * Ordena las reservas del usuario por ID (ascendente)
      */
-
-
     public void ordenarReservasPorId() {
-        Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, new Comparator<Reserva>() {
+        reservas.sort(new Comparator<Reserva>() {
             @Override
             public int compare(Reserva r1, Reserva r2) {
                 return Integer.compare(r1.getIdReserva(), r2.getIdReserva());
             }
         });
-        // Actualizar el arreglo interno
-        reservas.clear();
-        for (Reserva r : reservasActivas) {
-            reservas.put(r.getCodigoReserva(), r);
-        }
     }
 }

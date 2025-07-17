@@ -2,17 +2,21 @@ package ec.edu.uce;
 
 import ec.edu.uce.consola.Menu;
 import ec.edu.uce.dominio.Facultad;
-
+import ec.edu.uce.dominio.Universidad;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Iniciando Sistema SIRAA...");
-        System.out.println("Sistema Integrado de Reserva de Auditorios y Administración");
-        System.out.println("Universidad Central del Ecuador");
-        System.out.println("=================================================");
-
-        // Inicializar la facultad principal
-        Facultad facultadPrincipal = new Facultad("Facultad de Ingeniería", 3);
+        // Inicializar la universidad (Singleton)
+        Universidad universidad = Universidad.getInstancia();
+        
+        // Obtener la primera facultad para el menú (o crear una si no existe)
+        Facultad facultadPrincipal = null;
+        if (!universidad.getFacultades().isEmpty()) {
+            facultadPrincipal = universidad.getFacultades().get(0);
+        } else {
+            facultadPrincipal = new Facultad("Facultad de Ingeniería", 3);
+            universidad.crearFacultad(facultadPrincipal);
+        }
 
         // Crear y mostrar el menú principal
         Menu menuPrincipal = new Menu(facultadPrincipal);

@@ -1,9 +1,10 @@
 package ec.edu.uce.dominio;
 
 import java.util.Date;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Representa una reserva de auditorio en el sistema SIRAA.
@@ -20,19 +21,22 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     private String codigoReserva;
     private Date fechaInicio;
     private Date fechaFin;
-    private Map<String, Equipo> equipos;
+    private List<Equipo> equipos;
     private int numEquipos = 0;
     private Estado estado;
+    private Usuario usuario; // Referencia al usuario que hizo la reserva
+    private Auditorio auditorio; // Referencia al auditorio reservado
+    private Map<Reserva, List<Equipo>> relacionReservaEquipo = new HashMap<>();
 
     // Constructores
     public Reserva(int idReserva, Date fechaInicio, Date fechaFin){
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.equipos = new HashMap<>();
+        this.equipos = new ArrayList<>();
         this.estado = Estado.PENDIENTE;
         this.idReserva = generarIdReserva();
         this.codigoReserva = generarCodigoReserva();
-        inicializar();
+        //inicializar();
     }
 
     public Reserva(){
@@ -40,9 +44,11 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     }
 
     // Constructor con objeto Reserva
-    public Reserva(Reserva reserva) {
+    public Reserva(Reserva reserva) throws ReservaException {
         this(reserva.getFechaInicio(), reserva.getFechaFin());
         this.estado = reserva.getEstado();
+        this.usuario = reserva.getUsuario();
+        this.auditorio = reserva.getAuditorio();
         for (Equipo equipo : reserva.getEquipos()) {
             if (equipo != null) {
                 crearEquipo(equipo);
@@ -54,10 +60,17 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     public Reserva(Date fechaInicio, Date fechaFin) {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.equipos = new HashMap<>();
+        this.equipos = new ArrayList<>();
         this.estado = Estado.PENDIENTE;
         this.idReserva = generarIdReserva();
         this.codigoReserva = generarCodigoReserva();
+    }
+
+    // Constructor completo con usuario y auditorio
+    public Reserva(Date fechaInicio, Date fechaFin, Usuario usuario, Auditorio auditorio) {
+        this(fechaInicio, fechaFin);
+        this.usuario = usuario;
+        this.auditorio = auditorio;
     }
 
     // Método para generar IDs automáticos
@@ -140,25 +153,62 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
         }
     }
 
-    public Equipo[] getEquipos() {
-        return equipos.values().toArray(new Equipo[0]);
+    public List<Equipo> getEquipos() {
+        return new ArrayList<>(equipos);
+    }
+
+    public Map<Reserva, List<Equipo>> getRelacionReservaEquipo() {
+        return relacionReservaEquipo;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Auditorio getAuditorio() {
+        return auditorio;
+    }
+
+    public void setAuditorio(Auditorio auditorio) {
+        this.auditorio = auditorio;
     }
 
     // ========================
     // CRUD de Equipos
     // ========================
 
-    public void crearEquipo(String nombre, String categoria, boolean disponible) {
-        crearEquipo(new Equipo(nombre, categoria, disponible));
+    public void crearEquipo(String nombre, String categoria, boolean disponible) throws ReservaException {
+        try {
+            if (nombre == null || nombre.trim().isEmpty()) {
+                throw new ReservaException("El nombre del equipo no puede estar vacío");
+            }
+            if (categoria == null || categoria.trim().isEmpty()) {
+                throw new ReservaException("La categoría del equipo no puede estar vacía");
+            }
+            crearEquipo(new Equipo(nombre, categoria, disponible));
+        } catch (Exception e) {
+            throw new ReservaException("Error al crear equipo", e);
+        }
     }
 
-    public void crearEquipo(Equipo equipo) {
-        if (equipo == null) return;
-        if (equipos.containsKey(equipo.getCodigoEquipo())) {
-            System.out.println("[!] Equipo duplicado. No se puede agregar.");
-            return;
+    public void crearEquipo(Equipo equipo) throws ReservaException {
+        try {
+            if (equipo == null) {
+                throw new ReservaException("El equipo no puede ser nulo");
+            }
+            if (validarDuplicadoEquipo(equipo)) {
+                throw new ReservaException("El equipo ya existe");
+            }
+            equipos.add(equipo);
+            numEquipos = equipos.size();
+            relacionReservaEquipo.put(this, equipos);
+        } catch (Exception e) {
+            throw new ReservaException("Error al agregar equipo", e);
         }
-        equipos.put(equipo.getCodigoEquipo(), equipo);
     }
 
     public String listarEquipos() {
@@ -171,7 +221,7 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
         }
         StringBuilder sb = new StringBuilder();
         int i = 0;
-        for (Equipo equipo : equipos.values()) {
+        for (Equipo equipo : equipos) {
             if (equipo != null && (!soloDisponibles || equipo.getDisponibilidad())) {
                 sb.append(String.format("[%d] Nombre: %s | Categoría: %s | Disponible: %s%n",
                         i++,
@@ -185,15 +235,21 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
     }
 
     public String actualizarEquipo(String codigo, Equipo nuevoEquipo) {
-        if (equipos.containsKey(codigo) && nuevoEquipo != null) {
-            equipos.put(codigo, nuevoEquipo);
-            return "Equipo actualizado.";
+        for (int i = 0; i < equipos.size(); i++) {
+            if (equipos.get(i) != null && equipos.get(i).getCodigoEquipo().equals(codigo)) {
+                equipos.set(i, nuevoEquipo);
+                relacionReservaEquipo.put(this, equipos);
+                return "Equipo actualizado.";
+            }
         }
         return "Código de equipo inválido.";
     }
 
     public String eliminarEquipo(String codigo) {
-        if (equipos.remove(codigo) != null) {
+        boolean eliminado = equipos.removeIf(equipo -> equipo != null && equipo.getCodigoEquipo().equals(codigo));
+        if (eliminado) {
+            numEquipos = equipos.size();
+            relacionReservaEquipo.put(this, equipos);
             return "Equipo eliminado.";
         }
         return "Código de equipo inválido.";
@@ -201,7 +257,29 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
 
     public String eliminarEquipo(Equipo equipo) {
         if (equipo == null) return "Equipo nulo.";
-        return eliminarEquipo(equipo.getCodigoEquipo());
+        boolean eliminado = equipos.remove(equipo);
+        if (eliminado) {
+            numEquipos = equipos.size();
+            relacionReservaEquipo.put(this, equipos);
+            return "Equipo eliminado.";
+        }
+        return "Equipo no encontrado.";
+    }
+
+    /**
+     * Valida si un equipo ya existe (duplicado).
+     * @param equipo El equipo a validar.
+     * @return true si el equipo ya existe, false en caso contrario.
+     */
+    public boolean validarDuplicadoEquipo(Equipo equipo) {
+        if (equipo == null) return false;
+
+        for (Equipo e : equipos) {
+            if (e != null && e.getCodigoEquipo().equals(equipo.getCodigoEquipo())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean requiereAprobacion() {
@@ -218,12 +296,15 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
                         "│ Código: %-15s │ ID: %-8d │ Estado: %-20s │%n" +
                         "│ Fecha Inicio: %-30s │%n" +
                         "│ Fecha Fin: %-32s │%n" +
-                        "│ Equipos Asignados: %-3d │ Tipo: %-20s │%n" +
+                        "│ Equipos: %-3d │ Usuario: %-30s │%n" +
+                        "│ Auditorio: %-30s │%n" +
                         "└─────────────────────────────────────────────────────────────────────┘",
                 codigoReserva, idReserva, estado.getDescripcion(),
                 fechaInicio.toString(),
                 fechaFin.toString(),
-                numEquipos, tipoReserva());
+                numEquipos,
+                usuario != null ? usuario.getNombre() + " " + usuario.getApellido() : "Sin asignar",
+                auditorio != null ? auditorio.getNombre() : "Sin asignar");
     }
 
     // ========================
@@ -285,24 +366,20 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
         return toString();
     }
 
-    // ========================
-    // Métodos de la interfaz Comparable
-    // ========================
-
     /**
-     * Criterio natural de comparación: por idReserva y luego por fechaInicio
+     * Criterio natural de comparación: por fecha de inicio (ascendente)
      */
     @Override
     public int compareTo(Reserva o) {
+        if (this.fechaInicio.before(o.fechaInicio)) {
+            return -1;
+        } else if (this.fechaInicio.after(o.fechaInicio)) {
+            return 1;
+        }
+        // Si las fechas son iguales, comparar por ID
         if (this.idReserva < o.idReserva) {
             return -1;
         } else if (this.idReserva > o.idReserva) {
-            return 1;
-        }
-        // Si los id son iguales, comparar por fechaInicio
-        if (this.fechaInicio.compareTo(o.fechaInicio) < 0) {
-            return -1;
-        } else if (this.fechaInicio.compareTo(o.fechaInicio) > 0) {
             return 1;
         }
         return 0;
@@ -316,44 +393,32 @@ public class Reserva implements IAdministrarCRUD, Comparable<Reserva> { // Ya no
      * Ordena los equipos de la reserva por nombre
      */
     public void ordenarEquiposPorNombre() {
-        Equipo[] equiposActivos = getEquipos();
-        Arrays.sort(equiposActivos, new OrdenarEquipoNombre());
-        System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
+        equipos.sort(new OrdenarEquipoNombre());
     }
 
     /**
      * Ordena los equipos de la reserva por categoría
      */
     public void ordenarEquiposPorCategoria() {
-        Equipo[] equiposActivos = getEquipos();
-        Arrays.sort(equiposActivos, new OrdenarEquipoCategoria());
-        System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
+        equipos.sort(new OrdenarEquipoCategoria());
     }
 
     /**
-     * Ordena los equipos de la reserva por disponibilidad (disponibles primero)
+     * Ordena los equipos de la reserva por disponibilidad
      */
     public void ordenarEquiposPorDisponibilidad() {
-        Equipo[] equiposActivos = getEquipos();
-        Arrays.sort(equiposActivos, new OrdenarEquipoDisponibilidad());
-        System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
+        equipos.sort(new OrdenarEquipoDisponibilidad());
     }
 
     /**
      * Ordena los equipos de la reserva por ID (ascendente)
      */
     public void ordenarEquiposPorId() {
-        Equipo[] equiposActivos = getEquipos();
-        Arrays.sort(equiposActivos, new OrdenarEquipoId());
-        System.arraycopy(equiposActivos, 0, equipos, 0, numEquipos);
+        equipos.sort(new OrdenarEquipoId());
     }
-    
-    // Método para inicializar equipos de ejemplo
+
     public void inicializar() {
-        if (equipos.isEmpty()) {
-            crearEquipo(new Equipo("Proyector", "Audiovisual", true));
-            crearEquipo(new Equipo("Micrófono", "Audio", true));
-            crearEquipo(new Equipo("Laptop", "Computo", false));
-        }
+        // Aquí puedes agregar datos de ejemplo si lo deseas, por ejemplo:
+        // crearEquipo(new Equipo());
     }
 }

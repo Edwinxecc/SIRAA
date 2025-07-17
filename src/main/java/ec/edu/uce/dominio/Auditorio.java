@@ -1,14 +1,14 @@
 package ec.edu.uce.dominio;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Date;
+import java.util.Map;
 
 /**
  * Representa un auditorio en el sistema SIRAA.
  * Esta clase maneja la información y las reservas de un auditorio.
- * Implementa la relación uno a muchos (1:0..n) con Reserva usando arreglos.
+ * Implementa la relación uno a muchos (1:0..n) con Reserva usando ArrayList.
  */
 public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
     // Variables static final para generación automática de códigos
@@ -20,20 +20,27 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
     private String nombre;
     private int capacidad;
     private int numReservas = 0;
-    private Map<String, Reserva> reservas;
+    private List<Reserva> reservas;
+    private Facultad facultad; // Referencia a la facultad a la que pertenece
+    private Map<Auditorio, List<Reserva>> relacionAuditorioReserva = new HashMap<>();
 
-    public Auditorio(String nombre, int capacidad){
+    public Auditorio(String nombre, int capacidad, Facultad facultad){
         this.nombre = nombre;
         this.capacidad = capacidad;
-        this.reservas = new HashMap<>();
+        this.facultad = facultad;
+        this.reservas = new ArrayList<>();
         this.numReservas = 0;
         this.idAuditorio = generarIdAuditorio();
         this.codigoAuditorio = generarCodigoAuditorio();
-        inicializar();
+        //inicializar();
+    }
+
+    public Auditorio(String nombre, int capacidad){
+        this(nombre, capacidad, null);
     }
 
     public Auditorio(){
-        this("Sin nombre", 0);
+        this("Sin nombre", 0, null);
     }
 
     // Método para generar IDs automáticos
@@ -80,8 +87,20 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
         return reservas.size();
     }
 
-    public Reserva[] getReservas() {
-        return reservas.values().toArray(new Reserva[0]);
+    public List<Reserva> getReservas() {
+        return new ArrayList<>(reservas);
+    }
+
+    public Map<Auditorio, List<Reserva>> getRelacionAuditorioReserva() {
+        return relacionAuditorioReserva;
+    }
+
+    public Facultad getFacultad() {
+        return facultad;
+    }
+
+    public void setFacultad(Facultad facultad) {
+        this.facultad = facultad;
     }
 
     // ========================
@@ -92,7 +111,11 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      * Crea una nueva reserva con valores por defecto.
      */
     public void crearReserva() {
-        crearReserva(new Reserva());
+        try {
+            crearReserva(new Reserva());
+        } catch (SIRAAException e) {
+            System.out.println("[!] Error al crear reserva: " + e.getMessage());
+        }
     }
 
     /**
@@ -101,21 +124,34 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      * @param fechaInicio Fecha de inicio
      * @param fechaFin Fecha de fin
      */
-    public void crearReserva(int idReserva, Date fechaInicio, Date fechaFin) {
-        crearReserva(new Reserva(idReserva, fechaInicio, fechaFin));
+    public void crearReserva(int idReserva, java.util.Date fechaInicio, java.util.Date fechaFin) {
+        try {
+            crearReserva(new Reserva(idReserva, fechaInicio, fechaFin));
+        } catch (SIRAAException e) {
+            System.out.println("[!] Error al crear reserva: " + e.getMessage());
+        }
     }
 
     /**
      * Crea una nueva reserva.
      * @param reserva Objeto Reserva a crear.
      */
-    public void crearReserva(Reserva reserva) {
-        if (reserva == null) return;
-        if (reservas.containsKey(reserva.getCodigoReserva())) {
-            System.err.println("La reserva ya existe y no se puede agregar duplicada.");
-            return;
+    public void crearReserva(Reserva reserva) throws SIRAAException {
+        try {
+            if (reserva == null) {
+                throw new SIRAAException("La reserva no puede ser nula");
+            }
+            if (validarDuplicadoReserva(reserva)) {
+                throw new SIRAAException("La reserva ya existe");
+            }
+            reservas.add(reserva);
+            numReservas = reservas.size();
+            relacionAuditorioReserva.put(this, reservas);
+        } catch (SIRAAException e) {
+            throw e; // Re-lanzar la excepción personalizada
+        } catch (Exception e) {
+            throw new SIRAAException("Error al crear reserva en auditorio", e);
         }
-        reservas.put(reserva.getCodigoReserva(), reserva);
     }
 
     /**
@@ -129,7 +165,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
         StringBuilder texto = new StringBuilder();
         texto.append("=== RESERVAS DEL AUDITORIO: ").append(nombre.toUpperCase()).append(" ===\n");
         int indice = 0;
-        for (Reserva reserva : reservas.values()) {
+        for (Reserva reserva : reservas) {
             if (reserva != null) {
                 texto.append("[").append(indice++).append("] ").append(reserva).append("\n");
             }
@@ -154,7 +190,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
         texto.append("=== RESERVAS ").append(estado.getDescripcion().toUpperCase()).append(" ===\n");
         int contador = 0;
 
-        for (Reserva reserva : reservas.values()) {
+        for (Reserva reserva : reservas) {
             if (reserva != null && reserva.getEstado() == estado) {
                 texto.append("[").append(contador++).append("] ").append(reserva).append("\n");
             }
@@ -173,8 +209,8 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      * @return La reserva en el índice especificado o null si el índice es inválido.
      */
     public Reserva getReserva(int indice) {
-        if (indice >= 0 && indice < numReservas) {
-            return reservas.values().toArray(new Reserva[0])[indice];
+        if (indice >= 0 && indice < reservas.size()) {
+            return reservas.get(indice);
         }
         return null;
     }
@@ -189,7 +225,12 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
             return null;
         }
 
-        return reservas.get(codigoReserva);
+        for (Reserva reserva : reservas) {
+            if (reserva != null && reserva.getCodigoReserva().equals(codigoReserva)) {
+                return reserva;
+            }
+        }
+        return null;
     }
 
     /**
@@ -198,8 +239,12 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      * @param nuevaReserva Nuevo objeto Reserva.
      */
     public void actualizarReserva(String codigo, Reserva nuevaReserva) {
-        if (reservas.containsKey(codigo) && nuevaReserva != null) {
-            reservas.put(codigo, nuevaReserva);
+        for (int i = 0; i < reservas.size(); i++) {
+            if (reservas.get(i) != null && reservas.get(i).getCodigoReserva().equals(codigo)) {
+                reservas.set(i, nuevaReserva);
+                relacionAuditorioReserva.put(this, reservas);
+                return;
+            }
         }
     }
 
@@ -209,8 +254,11 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      * @param nuevoEstado Nuevo estado de la reserva.
      */
     public void actualizarEstadoReserva(String codigo, Estado nuevoEstado) {
-        if (reservas.containsKey(codigo) && nuevoEstado != null) {
-            reservas.get(codigo).setEstado(nuevoEstado);
+        for (Reserva reserva : reservas) {
+            if (reserva != null && reserva.getCodigoReserva().equals(codigo)) {
+                reserva.setEstado(nuevoEstado);
+                return;
+            }
         }
     }
 
@@ -219,7 +267,9 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      * @param codigo Código de la reserva a eliminar.
      */
     public void eliminarReserva(String codigo) {
-        reservas.remove(codigo);
+        reservas.removeIf(reserva -> reserva != null && reserva.getCodigoReserva().equals(codigo));
+        numReservas = reservas.size();
+        relacionAuditorioReserva.put(this, reservas);
     }
 
     /**
@@ -228,7 +278,9 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      */
     public void eliminarReserva(Reserva reserva) {
         if (reserva == null) return;
-        reservas.remove(reserva.getCodigoReserva());
+        reservas.remove(reserva);
+        numReservas = reservas.size();
+        relacionAuditorioReserva.put(this, reservas);
     }
 
     /**
@@ -239,7 +291,12 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
     public boolean validarDuplicadoReserva(Reserva reserva) {
         if (reserva == null) return false;
 
-        return reservas.containsKey(reserva.getCodigoReserva());
+        for (Reserva r : reservas) {
+            if (r != null && r.getCodigoReserva().equals(reserva.getCodigoReserva())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -253,7 +310,7 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
             return false;
         }
 
-        for (Reserva reserva : reservas.values()) {
+        for (Reserva reserva : reservas) {
             if (reserva != null &&
                     (reserva.getEstado() == Estado.CONFIRMADA ||
                             reserva.getEstado() == Estado.EN_PROCESO)) {
@@ -342,13 +399,18 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
     @Override
     public String toString() {
         return String.format("┌─ AUDITORIO ────────────────────────────────────────────────────────┐%n" +
-                        "│ Código: %-15s │ ID: %-8d │ Capacidad: %-8d personas │%n" +
-                        "│ Nombre: %-50s │%n" +
-                        "│ Reservas Activas: %-3d │ Estado: %-20s │%n" +
-                        "└─────────────────────────────────────────────────────────────────────┘",
-                codigoAuditorio, idAuditorio, capacidad,
-                nombre,
-                numReservas, "Disponible");
+                        "│ %-15s │ %-8s │ %-20s │%n" +
+                        "│ %-15s │ %-8d │ %-20s │%n" +
+                        "├─────────────────┼──────────┼────────────────────┤%n" +
+                        "│ %-15s │ %-8s │ %-20s │%n" +
+                        "│ %-15s │ %-8s │ %-20s │%n" +
+                        "│ %-15s │ %-8d │ %-20s │%n" +
+                        "└─────────────────┴──────────┴────────────────────┘",
+                "CÓDIGO", "ID", "NOMBRE",
+                codigoAuditorio, idAuditorio, nombre,
+                "CAPACIDAD", "RESERVAS", "FACULTAD",
+                capacidad + " personas", numReservas, 
+                facultad != null ? facultad.getNombre() : "Sin asignar");
     }
 
     // equals
@@ -392,36 +454,21 @@ public class Auditorio implements IAdministrarCRUD, Comparable<Auditorio> {
      * Ordena las reservas del auditorio por fecha de inicio (ascendente)
      */
     public void ordenarReservasPorFecha() {
-        Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, new OrdenarReservaFechaInicio());
-        reservas.clear();
-        for (Reserva reserva : reservasActivas) {
-            reservas.put(reserva.getCodigoReserva(), reserva);
-        }
+        reservas.sort(new OrdenarReservaFechaInicio());
     }
 
     /**
      * Ordena las reservas del auditorio por estado
      */
     public void ordenarReservasPorEstado() {
-        Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, new OrdenarReservaEstado());
-        reservas.clear();
-        for (Reserva reserva : reservasActivas) {
-            reservas.put(reserva.getCodigoReserva(), reserva);
-        }
+        reservas.sort(new OrdenarReservaEstado());
     }
 
     /**
      * Ordena las reservas del auditorio por ID (ascendente)
      */
     public void ordenarReservasPorId() {
-        Reserva[] reservasActivas = getReservas();
-        Arrays.sort(reservasActivas, (r1, r2) -> Integer.compare(r1.getIdReserva(), r2.getIdReserva()));
-        reservas.clear();
-        for (Reserva reserva : reservasActivas) {
-            reservas.put(reserva.getCodigoReserva(), reserva);
-        }
+        reservas.sort((r1, r2) -> Integer.compare(r1.getIdReserva(), r2.getIdReserva()));
     }
 
     private void inicializar() {

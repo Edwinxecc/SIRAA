@@ -1,5 +1,6 @@
 package ec.edu.uce.Util;
 
+
 import ec.edu.uce.dominio.*;
 import java.util.Arrays;
 import java.util.Date;
@@ -123,10 +124,10 @@ public class OrdenacionUtil {
         System.out.println("\n=== DEMOSTRACIÓN ORDENACIÓN DE RESERVAS ===");
 
         // Crear algunas reservas de ejemplo
-        Date fecha1 = new Date(2024, 0, 15, 9, 0);
-        Date fecha2 = new Date(2024, 0, 15, 11, 0);
-        Date fecha3 = new Date(2024, 0, 16, 14, 0);
-        Date fecha4 = new Date(2024, 0, 16, 16, 0);
+        Date fecha1 = new Date(124, 0, 15, 9, 0); // 2024-01-15 09:00
+        Date fecha2 = new Date(124, 0, 15, 11, 0); // 2024-01-15 11:00
+        Date fecha3 = new Date(124, 0, 16, 14, 0); // 2024-01-16 14:00
+        Date fecha4 = new Date(124, 0, 16, 16, 0); // 2024-01-16 16:00
 
         Reserva[] reservas = {
                 new Reserva(fecha3, fecha4),

@@ -1,7 +1,5 @@
 package ec.edu.uce.dominio;
 
-import java.util.Comparator;
-
 /**
  * Representa un equipo disponible para reservas en el sistema SIRAA.
  * Esta clase maneja la información y el estado de los equipos que pueden ser asignados a las reservas.

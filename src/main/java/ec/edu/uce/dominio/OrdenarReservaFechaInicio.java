@@ -1,7 +1,6 @@
 package ec.edu.uce.dominio;
 
 import java.util.Comparator;
-import java.util.Date;
 
 public class OrdenarReservaFechaInicio implements Comparator<Reserva> {
     @Override

@@ -1,11 +1,9 @@
 package ec.edu.uce.consola;
 
-//import ec.edu.uce.dominio
-import ec.edu.uce.dominio.Usuario;
-import ec.edu.uce.dominio.Facultad;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
+
+import ec.edu.uce.dominio.*;
 
 public class MenuUsuario extends MenuBase {
     private final Facultad facultad;
@@ -82,7 +80,7 @@ public class MenuUsuario extends MenuBase {
         System.out.printf("%n%s%n", "=".repeat(40));
         System.out.printf("%-25s%n", "🔍 [2] Consultar Usuario");
         facultad.inicializar();
-        java.util.List<Usuario> usuarios = new java.util.ArrayList<>(java.util.Arrays.asList(facultad.getUsuarios()));
+        List<Usuario> usuarios = new ArrayList<>(facultad.getUsuarios());
         if (usuarios.isEmpty()) {
             System.out.printf("%-25s%n", "❌ No hay ningún usuario creado");
             return;
@@ -96,10 +94,11 @@ public class MenuUsuario extends MenuBase {
         System.out.print(">: ");
         int criterio = leerEnteroPositivo();
         switch (criterio) {
-            case 2 -> usuarios.sort(new ec.edu.uce.dominio.OrdenarUsuarioNombre());
-            case 3 -> usuarios.sort(new ec.edu.uce.dominio.OrdenarUsuarioApellido());
-            case 4 -> usuarios.sort(new ec.edu.uce.dominio.OrdenarUsuarioCorreo());
-            case 5 -> usuarios.sort(new ec.edu.uce.dominio.OrdenarUsuarioNumReservas());
+           // case 1 -> usuarios.sort(new OrdenarUsuarioId());
+            case 2 -> usuarios.sort(new OrdenarUsuarioNombre());
+            case 3 -> usuarios.sort(new OrdenarUsuarioApellido());
+            case 4 -> usuarios.sort(new OrdenarUsuarioCorreo());
+            case 5 -> usuarios.sort(new OrdenarUsuarioNumReservas());
             default -> java.util.Collections.sort(usuarios);
         }
         System.out.println("=== LISTA DE USUARIOS ORDENADA ===");
@@ -131,7 +130,7 @@ public class MenuUsuario extends MenuBase {
 
     private void editarUsuario() {
         System.out.println("\n[3] Editar Usuario");
-        List<Usuario> usuarios = new ArrayList<>(Arrays.asList(facultad.getUsuarios()));
+        List<Usuario> usuarios = new ArrayList<>(facultad.getUsuarios());
         if (usuarios.isEmpty()) {
             System.out.println("[!] No hay ningún usuario creado.");
             return;
@@ -184,7 +183,7 @@ public class MenuUsuario extends MenuBase {
 
     private void eliminarUsuario() {
         System.out.println("\n[4] Eliminar Usuario");
-        List<Usuario> usuarios = new ArrayList<>(Arrays.asList(facultad.getUsuarios()));
+        List<Usuario> usuarios = new ArrayList<>(facultad.getUsuarios());
         if (usuarios.isEmpty()) {
             System.out.println("[!] No hay ningún usuario creado.");
             return;

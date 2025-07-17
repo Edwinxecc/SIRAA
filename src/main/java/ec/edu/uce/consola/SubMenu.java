@@ -7,20 +7,17 @@ import ec.edu.uce.dominio.Usuario;
 import ec.edu.uce.dominio.Facultad;
 import ec.edu.uce.dominio.Reserva;
 
+import java.util.List;
+
 public class SubMenu {
     private final MenuUsuario menuUsuario;
     private final MenuReserva menuReserva;
     private final MenuFacultad menuFacultad;
-    private final MenuEquipo menuEquipo;
-    private final MenuCredenciales menuCredenciales;
 
     public SubMenu(Facultad facultad, Usuario usuarioActual) {
         this.menuUsuario = new MenuUsuario(facultad, usuarioActual);
         this.menuReserva = new MenuReserva(facultad, usuarioActual);
-        this.menuFacultad = new MenuFacultad(facultad);
-        // Inicializar con null, se actualizará cuando se cree una reserva
-        this.menuEquipo = new MenuEquipo(null);
-        this.menuCredenciales = new MenuCredenciales();
+        this.menuFacultad = new MenuFacultad(usuarioActual);
     }
 
     public void menuGestionarUsuario() {
@@ -36,11 +33,17 @@ public class SubMenu {
     }
 
     public void menuAdministrarEquipos() {
+        System.out.printf("%n%s%n", "=".repeat(50));
+        System.out.printf("%-20s%s%n", "", "GESTIONAR EQUIPOS");
+        System.out.printf("%s%n", "=".repeat(50));
+        System.out.println("Esta funcionalidad está disponible para todos los usuarios.");
+        System.out.println("Aquí puedes gestionar los equipos de tus reservas.");
+        
         // Verificar si el usuario tiene reservas
-        Reserva[] reservas = menuReserva.getUsuarioActual().getReservas();
-        if (reservas.length == 0) {
-            System.out.printf("%-25s%n", "❌ Debe crear una reserva antes de administrar equipos");
-            System.out.printf("%-25s%n", "💡 Vaya a 'Gestionar Reservas' y cree una nueva reserva");
+        List<Reserva> reservas = menuReserva.getUsuarioActual().getReservas();
+        if (reservas.isEmpty()) {
+            System.out.println("[!] Debe crear una reserva antes de administrar equipos");
+            System.out.println("💡 Vaya a 'Gestionar Reservas' y cree una nueva reserva");
             return;
         }
 
@@ -48,31 +51,20 @@ public class SubMenu {
         System.out.printf("%n%s%n", "=".repeat(50));
         System.out.printf("%-20s%s%n", "", "RESERVAS DISPONIBLES");
         System.out.printf("%s%n", "=".repeat(50));
-        for (int i = 0; i < reservas.length; i++) {
-            System.out.printf("%-5s%s%n", "[" + i + "]", reservas[i]);
+        for (int i = 0; i < reservas.size(); i++) {
+            System.out.printf("%-5s%s%n", "[" + i + "]", reservas.get(i));
         }
-
-        System.out.printf("%n%-50s", "Seleccione el índice de la reserva para administrar equipos: ");
-        java.util.Scanner entrada = new java.util.Scanner(System.in);
-        int indice = 0;
-        try {
-            indice = Integer.parseInt(entrada.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.printf("%-25s%n", "❌ Índice inválido");
-            return;
-        }
-
-        if (indice < 0 || indice >= reservas.length) {
-            System.out.printf("%-25s%n", "❌ Índice inválido");
-            return;
-        }
-
-        // Crear nuevo menú de equipos con la reserva seleccionada
-        MenuEquipo menuEquipoActual = new MenuEquipo(reservas[indice]);
-        menuEquipoActual.mostrarMenu();
     }
 
     public void menuRecuperarCredenciales() {
-        menuCredenciales.mostrarMenu();
+        System.out.printf("%n%s%n", "=".repeat(50));
+        System.out.printf("%-20s%s%n", "", "RECUPERAR CREDENCIALES");
+        System.out.printf("%s%n", "=".repeat(50));
+        System.out.println("Esta funcionalidad está disponible para todos los usuarios.");
+        System.out.println("Aquí puedes recuperar tus credenciales de acceso.");
+        System.out.println("\nPara recuperar credenciales:");
+        System.out.println("1. Contacta al administrador del sistema");
+        System.out.println("2. Proporciona tu correo institucional");
+        System.out.println("3. Verifica tu identidad");
     }
 }
